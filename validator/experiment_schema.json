@@ -1,0 +1,190 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Experiment descriptor Schema",
+  "required": [
+    "Name",
+    "User",
+    "Platform",
+    "TestCases",
+    "UEs",
+    "Slice",
+    "NS",
+    "Type_experiment",
+    "Scenario",
+    "Application",
+    "Attended",
+    "Reservation_time"
+  ],
+  "properties": {
+    "Id": {
+      "$id": "#/properties/Id",
+      "type": "integer",
+      "title": "Id of the experiment",
+      "default": 0,
+      "examples": [
+        123
+      ]
+    },
+    "Name": {
+      "$id": "#/properties/Name",
+      "type": "string",
+      "title": "Name of the experiment",
+      "default": "",
+      "examples": [
+        "sfafd"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "User": {
+      "$id": "#/properties/User",
+      "type": "integer",
+      "title": "ID of the user running the experiment",
+      "default": 0,
+      "examples": [
+        123
+      ]
+    },
+    "Platform": {
+      "$id": "#/properties/Platform",
+      "type": "string",
+      "title": "Platform ID where the experiment is going to be executed",
+      "default": "",
+      "examples": [
+        "malaga"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "TestCases": {
+      "$id": "#/properties/TestCases",
+      "type": "array",
+      "title": "List of Testcases to be executed along with the experiment",
+      "items": {
+        "$id": "#/properties/TestCases/items",
+        "type": "string",
+        "title": "Testcase ID",
+        "default": "",
+        "examples": [
+          "TC1",
+          "TC2"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "UEs": {
+      "$id": "#/properties/UEs",
+      "type": "array",
+      "title": "List of UEs",
+      "items": {
+        "$id": "#/properties/UEs/items",
+        "type": "string",
+        "title": "Name of the UE",
+        "default": "",
+        "examples": [
+          "UE1",
+          "UE2"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "Slice": {
+      "$id": "#/properties/Slice",
+      "type": "string",
+      "title": "Slice ID",
+      "default": "",
+      "examples": [
+        "fer9af0gfg0ads"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "NS": {
+      "$id": "#/properties/NS",
+      "type": "string",
+      "title": "NS Id",
+      "default": "",
+      "examples": [
+        "cqcqcleerv9e"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "NS_Placement": {
+      "$id": "#/properties/NS_Placement",
+      "type": "string",
+      "title": "Placement options: Edge, Core or Automatic",
+      "default": "Automatic",
+      "examples": [
+        "Edge"
+      ],
+      "pattern": "^(Edge|Core|Automatic)$"
+    },
+    "Limited": {
+      "$id": "#/properties/Limited",
+      "type": "boolean",
+      "title": "Whether the experiment needs to run exclusively or not",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "Type_experiment": {
+      "$id": "#/properties/Type_experiment",
+      "type": "boolean",
+      "title": "Type of experiment: True: 'Tailored' False: 'Custom'",
+      "default": false,
+      "examples": [
+        false
+      ]
+    },
+    "Scenario": {
+      "$id": "#/properties/Scenario",
+      "type": "array",
+      "title": "The Scenario Schema",
+      "items": {
+        "$id": "#/properties/Scenario/items",
+        "type": "string",
+        "title": "List of scenarios where the experiment is going to be executed",
+        "default": "",
+        "examples": [
+          "scenario1",
+          "scenario2"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "Application": {
+      "$id": "#/properties/Application",
+      "type": "array",
+      "title": "Application list",
+      "items": {
+        "$id": "#/properties/Application/items",
+        "type": "string",
+        "title": "Application",
+        "default": "",
+        "examples": [
+          "app1"
+        ],
+        "pattern": "^(.*)$"
+      }
+    },
+    "Attended": {
+      "$id": "#/properties/Attended",
+      "type": "boolean",
+      "title": "Whether the execution is going to be attended or not",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "Reservation_time": {
+      "$id": "#/properties/Reservation_time",
+      "type": "integer",
+      "title": "Reservation time in minutes",
+      "default": 0,
+      "examples": [
+        123
+      ]
+    }
+  }
+}

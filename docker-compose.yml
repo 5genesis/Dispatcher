@@ -8,3 +8,14 @@ services:
     ports:
       - 8082:8082
       - 443:443
+  validator:
+    build: ./validator
+    image: validator
+    container_name: validator
+    command: python exp_validator.py
+    volumes:
+      - "./validator:/validator"
+    ports:
+      - '5100:5100'
+    restart: always
+
