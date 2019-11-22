@@ -33,6 +33,8 @@ The Validator is available through the Dispatcher port (8082) and using the endp
 
 ## Next steps
 - Control required fields that depend on the value of another field
+- Add logging
+- Integrate Validator with ELCM
 
 ## Authors
 Javier Melian (javier.melian@atos.net)

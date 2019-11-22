@@ -18,4 +18,14 @@ services:
     ports:
       - '5100:5100'
     restart: always
+  swagger:
+    image: 'swaggerapi/swagger-ui'
+    container_name: swagger
+    environment:
+      - SWAGGER_JSON=/my_swagger/swagger.json
+    ports:
+      - '5002:8080'
+    volumes:
+      - './swagger:/my_swagger'
+
 
