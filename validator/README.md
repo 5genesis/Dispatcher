@@ -26,9 +26,9 @@ This module validates the correct syntax of the Experiment descriptor
     }    
 
 ## Try out the application
-The Validator is available through the Dispatcher port (8082) and using the endpoint /validator with a POST method:
+The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with a POST method:
 
-curl -X POST -d @descriptor.json http://<dispatcher host>:8082/validator
+> curl -X POST -d @descriptor.json http://{dispatcher host}:8082/validator
 
 
 ## Next steps
