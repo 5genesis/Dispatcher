@@ -79,6 +79,11 @@ The start script will deploy and run the Dispatcher container, the ED Validator 
 
 `$ ./start.sh`
 
+Dispatcher will be accessible through port `8082`.
+
+Swagger environment will be accessible through port `5002`.
+
+
 ### Stop
 To stop the Dispatcher service just run the following: 
 
