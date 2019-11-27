@@ -7,7 +7,7 @@ This implementation is based on a NGINX reverse proxy containerised in a Docker 
 ![](./images/dispatcher_arch.png)
 
 ## Available features
-The available features will depend on the features exposed by each dispatched module. Stable features are:
+The available features will depend on the features exposed by each dispatched module. The stable features are:
 
 ##### MANO
 - Onboard VNFD
