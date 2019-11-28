@@ -91,7 +91,7 @@ To stop the Dispatcher service just run the following:
 
 ## Try out the application
 A swagger testing framework is deployed in port 5002 with the following API specifications:
-![](./images/swagger.png)
+![](./images/swagger.PNG)
 
 ## Next steps
 - Improve the configuration file options
