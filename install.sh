@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Usage:
-# ./dispatcher.sh <input_config_file> <output_nginx_config_file>
+# ./dispatcher.sh <input_config_file>
 #
 # Example of entry config file:
 # 
@@ -68,7 +68,7 @@ done
 
 # Before the config file is processed, the nginx config file is created and filled up
 #  with the static part of the configuration
-write_header $2
+write_header "nginx.conf"
 
 write_enabler=false
 
@@ -88,7 +88,7 @@ then
     # the first time we arrive here, we don't do anything
     if $write_enabler; then
 	# write the paragraph that includes all the config of the module
-        add_enabler $module $line $2
+        add_enabler $module $line "nginx.conf"
     fi
     # Preparation of the key line that includes all the information included in the config file
     write_enabler=true
@@ -100,9 +100,11 @@ else
 fi
 done < $1
 
-add_enabler $module $line $2
+add_enabler $module $line "nginx.conf"
 echo "Dispatcher configured using information from '$1' file"
 
 # after the whole config file is processed, we write the last part of the config file
-write_footer $2
+write_footer "nginx.conf"
 
+# Build the images
+docker-compose -f docker-compose.yaml build

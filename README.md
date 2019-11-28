@@ -44,32 +44,32 @@ The Dispatcher needs to be configured properly before it is deployed. For that a
 The file contains information of all the modules the Dispatcher forwards information to and how to do it. It uses the following format:
 
     [module_name]
-    protocol=[http|https]
-    ip=x.x.x.x -> IP of the host component
-    port=xxxx -> Port where the app API is available
-    path=/ -> Base path of the application ("/" by default)
+    PROTOCOL=[http|https]
+    HOST=x.x.x.x -> IP or DNS name of the host component
+    PORT=xxxx -> Port where the app API is available
+    PATH=/ -> Base path of the application ("/" by default)
 
-Once edited properly, the configuration should be applied and the containers deployed:
-`$ ./install.sh`
+Once edited properly, the configuration should be applied and the containers built passing the config file we have just created as a parameter:
+`$ ./install.sh dispatcher.conf`
 
 #### Example
     [elcm]
-    protocol=http
-    ip=192.168.33.102
-    port=4000
-    path=/
+    PROTOCOL=http
+    HOST=192.168.33.102
+    PORT=4000
+    PATH=/
     [validator]
-    protocol=http
-    ip=192.168.33.105
+    PROTOCOL=http
+    HOST=192.168.33.105
     port=5100
     path=/api
     [mano]
-    protocol=http
-    ip=192.168.33.105
-    port=5001
-    path=/
+    PROTOCOL=http
+    HOST=192.168.33.105
+    PROTOCOL=5001
+    PATH=/
     
-With the config file above, using the Validator as an example, the dispatcher will translate the original request to a new one:
+With the config file above, using the Validator as an **example**, the dispatcher will translate the original request to a new one:
 > Original URL: http://192.168.33.105:5100/api/validate
 
 > Translated URL: http://<dispatcher_ip>:<dispatcher:port>/validator/validate
