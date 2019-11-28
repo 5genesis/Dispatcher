@@ -81,6 +81,9 @@ if [ -z "${name}" ]
 then
     continue;
 fi
+# Remove blanks from the strings
+name=${name//[[:blank:]]/}
+value=${value//[[:blank:]]/}
 
 # if the variable "value" is empty (it means we are in the line that defines the module name
 if [ -z "${value}" ]
