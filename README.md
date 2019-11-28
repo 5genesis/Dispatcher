@@ -49,6 +49,13 @@ The file contains information of all the modules the Dispatcher forwards informa
     PORT=xxxx -> Port where the app API is available
     PATH=/ -> Base path of the application ("/" by default)
 
+    [validator]
+    PROTOCOL=http
+    HOST=validator
+    PORT=5100
+    PATH=/
+
+The config file template already includes the *validator* module as it is included within the *Dispatcher*.
 Once edited properly, the configuration should be applied and the containers built passing the config file we have just created as a parameter:
 
 `$ ./install.sh dispatcher.conf`
