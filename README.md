@@ -50,6 +50,7 @@ The file contains information of all the modules the Dispatcher forwards informa
     PATH=/ -> Base path of the application ("/" by default)
 
 Once edited properly, the configuration should be applied and the containers built passing the config file we have just created as a parameter:
+
 `$ ./install.sh dispatcher.conf`
 
 #### Example
