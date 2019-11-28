@@ -50,6 +50,7 @@ The file contains information of all the modules the Dispatcher forwards informa
     PATH=/ -> Base path of the application ("/" by default)
 
 Once edited properly, the configuration should be applied and the containers built passing the config file we have just created as a parameter:
+
 `$ ./install.sh dispatcher.conf`
 
 #### Example
@@ -91,7 +92,7 @@ To stop the Dispatcher service just run the following:
 
 ## Try out the application
 A swagger testing framework is deployed in port 5002 with the following API specifications:
-![](./images/swagger.png)
+![](./images/swagger.PNG)
 
 ## Next steps
 - Improve the configuration file options
