@@ -282,7 +282,7 @@
         }
       }
     },
-    "/validator": {
+    "/validator/validate": {
       "post": {
         "tags": [
           "Validator"
@@ -298,11 +298,57 @@
         ],
         "parameters": [
           {
-            "name": "body",
             "in": "body",
+            "name": "body",
             "description": "Experiment descriptor in JSON format",
-            "required": true,
-            "type": "json"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "//experiment_schema.json"
+              }
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful validation"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Entry badly formed"
+          }
+        }
+      }
+    },
+    "/validator/onboard": {
+      "post": {
+        "tags": [
+          "Validator"
+        ],
+        "summary": "Validate Experiment descriptor and onboard it in the ELCM",
+        "description": "",
+        "operationId": "onboardED",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Experiment descriptor in JSON format",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "//experiment_schema.json"
+              }
+            },
+            "required": true
           }
         ],
         "responses": {
@@ -324,4 +370,3 @@
     "url": "http://swagger.io"
   }
 }
-

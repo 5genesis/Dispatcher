@@ -72,7 +72,7 @@ Once edited properly, the configuration should be applied and the containers bui
 With the config file above, using the Validator as an **example**, the dispatcher will translate the original request to a new one:
 > Original URL: http://192.168.33.105:5100/api/validate
 
-> Translated URL: http://<dispatcher_ip>:<dispatcher:port>/validator/validate
+> Translated URL: http://{dispatcher_ip}:{dispatcher:port}/validator/validate
 
 ### Start
 The start script will deploy and run the Dispatcher container, the ED Validator and a Swagger environment to test the available features:
@@ -90,6 +90,8 @@ To stop the Dispatcher service just run the following:
 `$ ./stop.sh`
 
 ## Try out the application
+A swagger testing framework is deployed in port 5002 with the following API specifications:
+![](./images/swagger.png)
 
 ## Next steps
 - Improve the configuration file options
