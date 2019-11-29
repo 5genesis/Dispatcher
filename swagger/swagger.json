@@ -310,6 +310,25 @@
             "required": true
           }
         ],
+        "examples": [
+            {
+                "Id": 123,
+                "Name":"sfafd",
+                "User": 123,
+                "Platform": "malaga",
+                "TestCases": ["TC1", "TC2"], 
+                "UEs": ["UE1", "UE2"], 
+                "Slice": "slice id", 
+                "NS": "ns_id",
+                "NS_Placement": "Edge",
+                "Limited": true,
+                "Type_experiment": false,
+                "Scenario": ["scenario1", "scemarop2"], 
+                "Application": ["app1"],
+                "Attended": true, 
+                "Reservation_time": 123 
+            }
+        ],
         "responses": {
           "200": {
             "description": "Successful validation"

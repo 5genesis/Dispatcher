@@ -1,8 +1,8 @@
 version: '3'
 services:
-  nginx: 
+  dispatcher: 
     image: nginx:latest
-    container_name: production_nginx
+    container_name: dispatcher
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
@@ -12,6 +12,8 @@ services:
     build: ./validator
     image: validator
     container_name: validator
+    env_file:
+      - ./validator/config.env
     command: python exp_validator.py
     volumes:
       - "./validator:/validator"
