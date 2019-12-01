@@ -128,17 +128,16 @@ def onboard_vnfd():
             return "VNFD file not present in the query", 404
         # Write package file to static directory and validate it
         file.save(file.filename)
-        r, code = validate_zip(file.filename, vnfd_schema)
+        res, code = validate_zip(file.filename, vnfd_schema)
         if code is 200:
             # Valid descriptor: proceed with the onboarding
-            data = open(file.filename, 'rb').read()
-            headers = []
-            headers["Accept"] = "application/json"
-            headers["Content-type"] = "application/gzip"
-            r = requests.post(MANO_VNFD_POST, vnfd=data, headers=headers)
+            data_obj = open(file.filename, 'rb')
+            r = requests.post(MANO_VNFD_POST, files={"vnfd": (file.filename, data_obj)})
+            res = r.text
+            code = r.status_code
         # Delete package file when done with validation
         os.remove(file.filename)
-        return r, code
+        return res, code
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
@@ -170,17 +169,16 @@ def onboard_nsd():
             return "NSD file not present in the query", 404
         # Write package file to static directory and validate it
         file.save(file.filename)
-        r, code = validate_zip(file.filename, nsd_schema)
+        res, code = validate_zip(file.filename, nsd_schema)
         if code is 200:
             # Valid descriptor: proceed with the onboarding
-            data = open(file.filename, 'rb').read()
-            headers = []
-            headers["Accept"] = "application/json"
-            headers["Content-type"] = "application/gzip"
-            r = requests.post(MANO_NSD_POST, vnfd=data, headers=headers)
+            data_obj = open(file.filename, 'rb')
+            r = requests.post(MANO_NSD_POST, files={"nsd": (file.filename, data_obj)})
+            res = r.text
+            code = r.status_code
         # Delete package file when done with validation
         os.remove(file.filename)
-        return r, code
+        return res, code
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
