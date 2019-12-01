@@ -1,6 +1,6 @@
 # 5GENESIS Experiment descriptor Validator
 
-This module validates the correct syntax of the Experiment descriptor 
+This module validates the correct syntax of the Experiment descriptor and the descriptors of the Network Service (VNFD + NSD)
 
 ## Experiment descriptor definition 
 ![](./images/ED.png)
@@ -8,33 +8,62 @@ This module validates the correct syntax of the Experiment descriptor
 ## Experiment descriptor example
 
     {
-	"Id": 123,
-	"Name":"sfafd",
-	"User": 123,
-	"Platform": "malaga",
-	"TestCases": ["TC1", "TC2"], 
-	"UEs": ["UE1", "UE2"], 
-	"Slice": "slice id", 
-	"NS": "ns_id",
-	"NS_Placement": "Edge",
-	"Limited": true,
-	"Type_experiment": false,
-	"Scenario": ["scenario1", "scemarop2"], 
-	"Application": ["app1"],
-	"Attended": true, 
-	"Reservation_time": 123 
+    	"Id": 123,
+    	"Name":"sfafd",
+    	"User": 123,
+    	"Platform": "malaga",
+    	"TestCases": ["TC1", "TC2"], 
+    	"UEs": ["UE1", "UE2"], 
+    	"Slice": "slice id", 
+    	"NS": "ns_id",
+    	"NS_Placement": "Edge",
+    	"Limited": true,
+    	"Type_experiment": false,
+    	"Scenario": ["scenario1", "scemarop2"], 
+    	"Application": ["app1"],
+    	"Attended": true, 
+    	"Reservation_time": 123 
     }    
 
-## Try out the application
-The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with a POST method:
+## Available functions
 
-> curl -X POST -d @descriptor.json http://{dispatcher host}:8082/validator
+The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with POST methods:
 
+- Validate Experiment descriptor:
+`/validate/ed`
+
+Example:
+> curl -X POST -d @descriptor.json http://{dispatcher host}:8082/validator/validate/ed
+- Validate and onboard Experiment descriptor:
+`/onboard/ed`
+
+Example:
+> curl -X POST -d @descriptor.json http://{dispatcher host}:8082/validator/onboard/ed
+- Validate VNF descriptor:
+`/validate/vnfd`
+
+Example:
+> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" http://{dispatcher host}:8082/validator/validate/vnfd
+- Validate and onboard VNF descriptor:
+`/onboard/vnfd`
+
+Example:
+> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" http://{dispatcher host}:8082/validator/onboard/vnfd
+- Validate NS descriptor:
+`/validate/nsd`
+
+Example:
+> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" http://{dispatcher host}:8082/validator/validate/nsd
+- Validate and onboard NS descriptor:
+`/onboard/nsd`
+
+Example:
+> curl -X POST -F "ns=@./ns_descriptor.tar.gz" http://{dispatcher host}:8082/validator/onboard/nsd
 
 ## Next steps
 - Control required fields that depend on the value of another field
 - Add logging
-- Integrate Validator with ELCM
+- Control exceptions more efficiently
 
 ## Authors
 Javier Melian (javier.melian@atos.net)
