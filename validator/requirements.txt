@@ -4,3 +4,5 @@ gevent==1.4.0
 Flask-Cors==3.0.8
 jsonschema==2.6.0
 simplejson==3.17.0
+PyYAML==3.11
+
