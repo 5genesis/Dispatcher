@@ -2,6 +2,7 @@ import jsonschema
 import simplejson as json
 import os
 from flask import Flask, jsonify, request
+import requests
 
 from gevent.pywsgi import WSGIServer
 import logging
@@ -55,7 +56,7 @@ def onboard_ed():
     try:
         content = request.get_data()
         data = json.loads(content)
-        jsonschema.validate(data, schema)
+        jsonschema.validate(data, ed_schema)
         headers = {'Content-type': 'application/json'}
         r = requests.post(ELCM_ED_POST, data=data, headers=headers)
     except jsonschema.exceptions.ValidationError as ve:
@@ -77,10 +78,13 @@ def validate_zip(file, schema):
         folder = tar.getnames()[0]
         tar.extractall()
         tar.close()
+        # pick the file that contains the main descriptor
         descriptor_file = glob.glob(folder+"/*.y*ml")[0]
         with open(descriptor_file, 'r') as f:
             descriptor_data = f.read()
+        # load the data inside the file in the 'descriptor_json' variable
         descriptor_json = yaml.safe_load(descriptor_data)
+        # compare the json with the proper schema
         r = jsonschema.validate(descriptor_json, schema)
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
@@ -145,7 +149,7 @@ if __name__ == '__main__':
     vnfd_schema = json.loads(vnfd_schema_data)
     with open('nsd_schema.json', 'r') as f:
         nsd_schema_data = f.read()
-    nds_schema = json.loads(nsd_schema_data)
+    nsd_schema = json.loads(nsd_schema_data)
 
     http_server = WSGIServer(('', 5100), app)
     http_server.serve_forever()
