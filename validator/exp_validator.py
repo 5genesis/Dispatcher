@@ -85,7 +85,7 @@ def validate_zip(file, schema):
         # load the data inside the file in the 'descriptor_json' variable
         descriptor_json = yaml.safe_load(descriptor_data)
         # compare the json with the proper schema
-        r = jsonschema.validate(descriptor_json, schema)
+        jsonschema.validate(descriptor_json, schema)
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         return "ok", 200
@@ -120,6 +120,30 @@ def validate_vnfd():
         message = template.format(type(e).__name__, e.args)
         return message, 500
 
+@app.route('/onboard/vnfd', methods=['POST'])
+def onboard_vnfd():
+    try:
+        file = request.files.get("vnfd")
+        if not file:
+            return "VNFD file not present in the query", 404
+        # Write package file to static directory and validate it
+        file.save(file.filename)
+        r, code = validate_zip(file.filename, vnfd_schema)
+        if code is 200:
+            # Valid descriptor: proceed with the onboarding
+            data = open(file.filename, 'rb').read()
+            headers = []
+            headers["Accept"] = "application/json"
+            headers["Content-type"] = "application/gzip"
+            r = requests.post(MANO_VNFD_POST, vnfd=data, headers=headers)
+        # Delete package file when done with validation
+        os.remove(file.filename)
+        return r, code
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        return message, 500
+
 
 @app.route('/validate/nsd', methods=['POST'])
 def validate_nsd():
@@ -130,6 +154,30 @@ def validate_nsd():
         # Write package file to static directory and validate it
         file.save(file.filename)
         r, code = validate_zip(file.filename, nsd_schema)
+        # Delete package file when done with validation
+        os.remove(file.filename)
+        return r, code
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        return message, 500
+
+@app.route('/onboard/nsd', methods=['POST'])
+def onboard_nsd():
+    try:
+        file = request.files.get("nsd")
+        if not file:
+            return "NSD file not present in the query", 404
+        # Write package file to static directory and validate it
+        file.save(file.filename)
+        r, code = validate_zip(file.filename, nsd_schema)
+        if code is 200:
+            # Valid descriptor: proceed with the onboarding
+            data = open(file.filename, 'rb').read()
+            headers = []
+            headers["Accept"] = "application/json"
+            headers["Content-type"] = "application/gzip"
+            r = requests.post(MANO_NSD_POST, vnfd=data, headers=headers)
         # Delete package file when done with validation
         os.remove(file.filename)
         return r, code
