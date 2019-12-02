@@ -282,7 +282,7 @@
         }
       }
     },
-    "/validator/validate": {
+    "/validator/validate/ed": {
       "post": {
         "tags": [
           "Validator"
@@ -342,7 +342,7 @@
         }
       }
     },
-    "/validator/onboard": {
+    "/validator/onboard/ed": {
       "post": {
         "tags": [
           "Validator"
@@ -379,6 +379,180 @@
           },
           "500": {
             "description": "Entry badly formed"
+          }
+        }
+      }
+    },
+    "/validator/validate/vnfd": {
+      "post": {
+        "tags": [
+          "Validator"
+        ],
+        "summary": "Validate VNFD",
+        "description": "",
+        "operationId": "validateVNFD",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "vnfd",
+            "in": "formData",
+            "description": "VNFD Package",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "VNFD created"
+          },
+          "400": {
+            "description": "Descriptor with failures"
+          },
+          "405": {
+            "description": "Invalid input"
+          },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/validator/onboard/vnfd": {
+      "post": {
+        "tags": [
+          "Validator"
+        ],
+        "summary": "Validate VNFD and add it to the catalogue",
+        "description": "",
+        "operationId": "onboardVNFD",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "vnfd",
+            "in": "formData",
+            "description": "VNFD Package",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "VNFD created"
+          },
+          "400": {
+            "description": "Descriptor with failures"
+          },
+          "405": {
+            "description": "Invalid input"
+          },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
+          "409": {
+            "description": "Conflict - VNFD already present"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/validator/validate/nsd": {
+      "post": {
+        "tags": [
+          "Validator"
+        ],
+        "summary": "Validate NSD",
+        "description": "",
+        "operationId": "validateNSD",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "nsd",
+            "in": "formData",
+            "description": "NSD Package",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "NSD created"
+          },
+          "400": {
+            "description": "Descriptor with failures"
+          },
+          "405": {
+            "description": "Invalid input"
+          },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/validator/onboard/nsd": {
+      "post": {
+        "tags": [
+          "Validator"
+        ],
+        "summary": "Validate NSD and add it to the catalogue",
+        "description": "",
+        "operationId": "onboardNSD",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "nsd",
+            "in": "formData",
+            "description": "NSD Package",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "NSD created"
+          },
+          "400": {
+            "description": "Descriptor with failures"
+          },
+          "405": {
+            "description": "Invalid input"
+          },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
+          "409": {
+            "description": "Conflict - VNFD already present"
+          },
+          "500": {
+            "description": "Internal server error"
           }
         }
       }
