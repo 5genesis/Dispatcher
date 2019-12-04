@@ -25,8 +25,8 @@ The available features will depend on the features exposed by each dispatched mo
 - Get execution logs
 
 ##### Validator
-- Validation service: Validate Experiment Descriptor as a standalone service
-- Validate and onboard directly the Experiment Descriptor
+- Validation service: Validate Experiment descriptor, VNFD or NSD as a standalone service
+- Validate and onboard directly the Experiment descriptor in the ELCM, and the VNF descriptor or the NS descriptor in the NFVO
 
 
 ## Getting Started
@@ -38,10 +38,11 @@ These instructions will get you a copy of the project up and running on your loc
 For running the 5Genesis Dispatcher, you will need:
 - docker version >= 18.09.6
 - docker-compose version >= 1.17.1
+- Configuration files correctly filled up (including the config file inside the *validator* folder)
 
 ### Config file and installation
 The Dispatcher needs to be configured properly before it is deployed. For that a simplified configuration file is offered: `dispatcher.conf`, which will have to be edited and adapted.
-The file contains information of all the modules the Dispatcher forwards information to and how to do it. It uses the following format:
+The file contains information of all the modules the Dispatcher forwards information to and how to do it. For each module, a new enabler will be added in the Dispatcher. It uses the following format:
 
     [module_name]
     PROTOCOL=[http|https]
@@ -77,13 +78,13 @@ Once edited properly, the configuration should be applied and the containers bui
     PROTOCOL=5001
     PATH=/
     
-With the config file above, using the Validator as an **example**, the dispatcher will translate the original request to a new one:
+With the config file above, using the Validator API as an **example**, the dispatcher will translate the original request to a new one:
 > Original URL: http://192.168.33.105:5100/api/validate
 
 > Translated URL: http://{dispatcher_ip}:{dispatcher:port}/validator/validate
 
 ### Start
-The start script will deploy and run the Dispatcher container, the ED Validator and a Swagger environment to test the available features:
+The start script will deploy and run the Dispatcher container, the Validator and a Swagger environment to test the available features:
 
 `$ ./start.sh`
 
@@ -101,11 +102,14 @@ To stop the Dispatcher service just run the following:
 A swagger testing framework is deployed in port 5002 with the following API specifications:
 ![](./images/swagger.PNG)
 
+## Versioning
+- 1.0.0 - First stable version including all features
+
 ## Next steps
-- Improve the configuration file options
 - Add user authentication and registration
 - Add logging
 - Add cross-platform features
+- Include the *MANO Wrapper* as a default module inside the *Dispatcher* like the *Validator*
 
 ## Authors
 Javier Melian (javier.melian@atos.net)

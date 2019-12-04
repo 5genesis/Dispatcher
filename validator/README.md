@@ -1,6 +1,6 @@
 # 5GENESIS Experiment descriptor Validator
 
-This module validates the correct syntax of the Experiment descriptor and the descriptors of the Network Service (VNFD + NSD)
+This module validates the correct syntax of the Experiment descriptor and the descriptors of the Network Service (VNFD + NSD). It allows two options: a stand alone validation service that returns whether the descriptor is correct or not and the onboarding option, which, besides the validation, performs the onboard of the descriptor after a successful validation.
 
 ## Experiment descriptor definition 
 ![](./images/ED.png)
@@ -59,6 +59,13 @@ Example:
 
 Example:
 > curl -X POST -F "ns=@./ns_descriptor.tar.gz" http://{dispatcher host}:8082/validator/onboard/nsd
+
+## Responses
+The *Validator* issues a response in string format along with a status code:
+- 200, 201: ok
+- 400: Error during the validation
+- 409: Conflict with descriptor already present
+- 500: Network error
 
 ## Next steps
 - Control required fields that depend on the value of another field

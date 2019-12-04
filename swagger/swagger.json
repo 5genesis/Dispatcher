@@ -3,7 +3,7 @@
   "info": {
     "description": "Swagger 5GENESIS Dispatcher",
     "version": "1.0.0",
-    "title": "Swagger 5GENESIS Dispatcher",
+    "title": "5GENESIS Dispatcher Swagger",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
       "email": "javier.melian@atos.net"
@@ -22,7 +22,7 @@
     },
     {
       "name": "Validator",
-      "description": "Experiment descriptor validation"
+      "description": "Experiment descriptor validation and network service validation (VNFD + NSD)"
     }
   ],
   "schemes": [
@@ -302,32 +302,10 @@
             "name": "body",
             "description": "Experiment descriptor in JSON format",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "//experiment_schema.json"
-              }
+              "$ref": "#/definitions/Experiment_descriptor"
             },
             "required": true
           }
-        ],
-        "examples": [
-            {
-                "Id": 123,
-                "Name":"sfafd",
-                "User": 123,
-                "Platform": "malaga",
-                "TestCases": ["TC1", "TC2"], 
-                "UEs": ["UE1", "UE2"], 
-                "Slice": "slice id", 
-                "NS": "ns_id",
-                "NS_Placement": "Edge",
-                "Limited": true,
-                "Type_experiment": false,
-                "Scenario": ["scenario1", "scemarop2"], 
-                "Application": ["app1"],
-                "Attended": true, 
-                "Reservation_time": 123 
-            }
         ],
         "responses": {
           "200": {
@@ -554,6 +532,99 @@
           "500": {
             "description": "Internal server error"
           }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Experiment_descriptor": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "integer",
+          "format": "int64",
+          "example": 123
+        },
+        "Name": {
+          "type": "string",
+          "example": "sfafd"
+        },
+        "User": {
+          "type": "integer",
+          "format": "int64",
+          "example": 1234
+        },
+        "Platform": {
+          "type": "string",
+          "example": "malaga"
+        },
+        "TestCases": {
+          "type": "array",
+          "example": [
+            "TC1",
+            "TC2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "UEs": {
+          "type": "array",
+          "example": [
+            "UE1",
+            "UE2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Slice": {
+          "type": "string",
+          "example": "slice_id"
+        },
+        "NS": {
+          "type": "string",
+          "example": "ns_id"
+        },
+        "NS_Placement": {
+          "type": "string",
+          "example": "Edge"
+        },
+        "Limited": {
+          "type": "boolean",
+          "example": true
+        },
+        "Type_experiment": {
+          "type": "boolean",
+          "example": false
+        },
+        "Scenario": {
+          "type": "array",
+          "example": [
+            "scenario1",
+            "scemarop2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Application": {
+          "type": "array",
+          "example": [
+            "app1"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Attended": {
+          "type": "boolean",
+          "example": true
+        },
+        "Reservation_time": {
+          "type": "integer",
+          "format": "int64",
+          "example": 60
         }
       }
     }
