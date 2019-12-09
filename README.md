@@ -63,9 +63,9 @@ The file contains information of all the modules the Dispatcher forwards informa
     PATH=/
 
 The config file template already includes the *validator* module as it is included within the *Dispatcher*.
-Once edited properly, the configuration should be applied and the containers built passing the config file we have just created as a parameter:
+Once edited properly, the configuration should be applied and the containers built, based on the config file we have just created (*dispatcher.conf*):
 
-`$ ./install.sh dispatcher.conf`
+`$ ./install.sh`
 
 #### Example
 
@@ -87,6 +87,7 @@ Once edited properly, the configuration should be applied and the containers bui
 
 With the config file above, using the Validator API as an **example**, the dispatcher will translate the original request to a new one:
 > Original URL: <http://192.168.33.105:5100/api/validate>
+
 > Translated URL: <http://{dispatcher_ip}:{dispatcher:port}/validator/validate>
 
 ### Start
@@ -110,14 +111,18 @@ To stop the Dispatcher service just run the following:
 A swagger testing framework is deployed in port 5002 with the following API specifications:
 ![Dispatcher Swagger](./images/swagger.PNG)
 
+## Logging
+
+*Dispatcher* logs are available in the `log` folder of the application.
+
 ## Versioning
 
+- 1.1.0 - Added logging in the *Dispatcher* and the *Validator*
 - 1.0.0 - First stable version including all features
 
 ## Next steps
 
 - Add user authentication and registration
-- Add logging
 - Add cross-platform features
 - Include the *MANO Wrapper* as a default module inside the *Dispatcher* like the *Validator*
 

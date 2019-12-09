@@ -76,10 +76,23 @@ The *Validator* issues a response in string format along with a status code:
 - 409: Conflict with descriptor already present
 - 500: Network error
 
+## Logging
+
+Application logs are available in the application directory as `validator.log`
+
+#### Example
+
+    2019-12-09 12:17:38,704 -VALIDATOR API- INFO Starting app
+    2019-12-09 12:23:51,381 -VALIDATOR API- INFO Validating Experiment descriptor
+    2019-12-09 12:23:51,400 -VALIDATOR API- DEBUG Experiment descriptor:
+    2019-12-09 12:23:51,506 -VALIDATOR API- DEBUG Experiment descriptor sucessfully validated
+    2019-12-09 12:24:07,708 -VALIDATOR API- INFO Validating Experiment descriptor
+    2019-12-09 12:24:07,721 -VALIDATOR API- DEBUG Experiment descriptor:
+    2019-12-09 12:24:07,803 -VALIDATOR API- DEBUG Problem while validating Experiment descriptor: '1234' is not of type 'integer'
+
 ## Next steps
 
 - Control required fields that depend on the value of another field
-- Add logging
 - Control exceptions more efficiently
 
 ## Authors
