@@ -29,11 +29,21 @@ output_file="nginx.conf"
 
 function write_header {
 echo "
-events {}
+events {
+    worker_connections  1024;  ## Default: 1024
+}
+
 http {
+    log_format   main '\$remote_addr - \$remote_user [\$time_local]  \$status '
+        '\"\$request\" \$body_bytes_sent \"\$http_referer\" '
+        '\"\$http_user_agent\" \"\$http_x_forwarded_for\"';
+    access_log   logs/access.log  main;
+    server_names_hash_bucket_size 128; # this seems to be required for some vhosts
+
     server {
         listen 8082 default_server;
         listen [::]:8082 default_server;
+        access_log   logs/dispatcher.log  main;
         server_name localhost;" > $1
 }
 
