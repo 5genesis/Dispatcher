@@ -2,4 +2,4 @@
 
 # Start the docker containers in the background
 
-docker-compose -f docker-compose.yml up -d
+COMPOSE_HTTP_TIMEOUT=200 docker-compose -f docker-compose.yml up -d
