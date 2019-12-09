@@ -21,6 +21,16 @@ services:
     ports:
       - '5100:5100'
     restart: always
+  mano:
+    build: ./mano
+    image: mano
+    container_name: mano
+    command: python app.py
+    volumes:
+      - "./MANO:/MANO"
+    ports:
+      - '5001:5001'
+    restart: always
   swagger:
     image: 'swaggerapi/swagger-ui'
     container_name: swagger
