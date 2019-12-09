@@ -4,12 +4,15 @@ The 5GENESIS Dispatcher is the entry point to the system, offering the functiona
 This implementation is based on a NGINX reverse proxy containerised in a Docker environment.
 
 ## Architecture
-![](./images/dispatcher_arch.png)
+
+![Dispatcher architecture](./images/dispatcher_arch.png)
 
 ## Available features
+
 The available features will depend on the features exposed by each dispatched module. The stable features are:
 
 ##### MANO
+
 - Onboard VNFD
 - List VNFDs
 - Retrieve single VNFD
@@ -20,14 +23,15 @@ The available features will depend on the features exposed by each dispatched mo
 - Delete NSD
 
 ##### ELCM
+
 - Launch experiment (create)
 - Cancel execution
 - Get execution logs
 
 ##### Validator
+
 - Validation service: Validate Experiment descriptor, VNFD or NSD as a standalone service
 - Validate and onboard directly the Experiment descriptor in the ELCM, and the VNF descriptor or the NS descriptor in the NFVO
-
 
 ## Getting Started
 
@@ -36,11 +40,13 @@ These instructions will get you a copy of the project up and running on your loc
 ### Pre-requisites
 
 For running the 5Genesis Dispatcher, you will need:
+
 - docker version >= 18.09.6
 - docker-compose version >= 1.17.1
 - Configuration files correctly filled up (including the config file inside the *validator* folder)
 
 ### Config file and installation
+
 The Dispatcher needs to be configured properly before it is deployed. For that a simplified configuration file is offered: `dispatcher.conf`, which will have to be edited and adapted.
 The file contains information of all the modules the Dispatcher forwards information to and how to do it. For each module, a new enabler will be added in the Dispatcher. It uses the following format:
 
@@ -62,6 +68,7 @@ Once edited properly, the configuration should be applied and the containers bui
 `$ ./install.sh dispatcher.conf`
 
 #### Example
+
     [elcm]
     PROTOCOL=http
     HOST=192.168.33.102
@@ -77,13 +84,13 @@ Once edited properly, the configuration should be applied and the containers bui
     HOST=192.168.33.105
     PROTOCOL=5001
     PATH=/
-    
-With the config file above, using the Validator API as an **example**, the dispatcher will translate the original request to a new one:
-> Original URL: http://192.168.33.105:5100/api/validate
 
-> Translated URL: http://{dispatcher_ip}:{dispatcher:port}/validator/validate
+With the config file above, using the Validator API as an **example**, the dispatcher will translate the original request to a new one:
+> Original URL: <http://192.168.33.105:5100/api/validate>
+> Translated URL: <http://{dispatcher_ip}:{dispatcher:port}/validator/validate>
 
 ### Start
+
 The start script will deploy and run the Dispatcher container, the Validator and a Swagger environment to test the available features:
 
 `$ ./start.sh`
@@ -92,26 +99,30 @@ Dispatcher will be accessible through port `8082`.
 
 Swagger environment will be accessible through port `5002`.
 
-
 ### Stop
-To stop the Dispatcher service just run the following: 
+
+To stop the Dispatcher service just run the following:
 
 `$ ./stop.sh`
 
 ## Try out the application
+
 A swagger testing framework is deployed in port 5002 with the following API specifications:
-![](./images/swagger.PNG)
+![Dispatcher Swagger](./images/swagger.PNG)
 
 ## Versioning
+
 - 1.0.0 - First stable version including all features
 
 ## Next steps
+
 - Add user authentication and registration
 - Add logging
 - Add cross-platform features
 - Include the *MANO Wrapper* as a default module inside the *Dispatcher* like the *Validator*
 
 ## Authors
+
 Javier Melian (javier.melian@atos.net)
 
 ## License
@@ -120,11 +131,10 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   > http://www.apache.org/licenses/LICENSE-2.0
+   > <http://www.apache.org/licenses/LICENSE-2.0>
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
