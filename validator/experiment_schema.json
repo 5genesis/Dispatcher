@@ -15,8 +15,7 @@
     "Type_experiment",
     "Scenario",
     "Application",
-    "Attended",
-    "Reservation_time"
+    "Attended"
   ],
   "properties": {
     "Id": {
@@ -186,5 +185,12 @@
         123
       ]
     }
-  }
+  },
+  "if": {
+    "properties": {
+      "Attended": { "const": true }
+    },
+    "required": ["Attended"]
+  },
+  "then": { "required": ["Reservation_time"] }
 }

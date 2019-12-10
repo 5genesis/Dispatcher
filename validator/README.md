@@ -1,11 +1,13 @@
 # 5GENESIS Validator
 
 This module validates the correct syntax of the Experiment descriptor and the descriptors of the Network Service (VNFD + NSD). It allows two options: a stand alone validation service that returns whether the descriptor is correct or not and the onboarding option, which, besides the validation, performs the onboard of the descriptor after a successful validation.
-**Note**: the Experiment descriptor validation is based on the latest version of the Experiment descriptor information model defined below. Therefore, older versions are not supported. 
+**Note**: the Experiment descriptor validation is based on the latest version of the Experiment descriptor information model defined below. Therefore, older versions are not supported.
 
 ## Experiment descriptor definition
 
 ![Experiment descriptor](./images/ED.png)
+
+All fields are required except the *Reservation_time* one, that is only required if the experiment is attended.
 
 ## Experiment descriptor example
 
