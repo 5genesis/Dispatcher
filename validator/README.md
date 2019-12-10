@@ -1,6 +1,7 @@
 # 5GENESIS Validator
 
 This module validates the correct syntax of the Experiment descriptor and the descriptors of the Network Service (VNFD + NSD). It allows two options: a stand alone validation service that returns whether the descriptor is correct or not and the onboarding option, which, besides the validation, performs the onboard of the descriptor after a successful validation.
+
 **Note**: the Experiment descriptor validation is based on the latest version of the Experiment descriptor information model defined below. Therefore, older versions are not supported.
 
 ## Experiment descriptor definition
@@ -35,6 +36,7 @@ The 5GENESIS Validator also validates VNFD and NSD packages.
 For now only OSM descriptors are supported:
 
 [VNFD information model](http://osm-download.etsi.org/ftp/osm-doc/vnfd.html "VNFD IM")
+
 [NSD information model](http://osm-download.etsi.org/ftp/osm-doc/nsd.html "NSD IM")
 
 ## Available functions
@@ -103,7 +105,6 @@ Application logs are available in the application directory as `validator.log`
 
 ## Next steps
 
-- Control required fields that depend on the value of another field
 - Control exceptions more efficiently
 
 ## Authors
