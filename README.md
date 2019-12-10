@@ -125,6 +125,7 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Versioning
 
+- 1.2.3 - Move to *fastjsonschema* for draft 7 schema validation
 - 1.2.0 - *MANO wrapper* is included now inside the *Dispatcher* as a new container
 - 1.1.0 - Added logging in the *Dispatcher* and the *Validator*
 - 1.0.0 - First stable version including all features
