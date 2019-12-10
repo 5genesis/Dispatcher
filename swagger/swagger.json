@@ -282,6 +282,56 @@
         }
       }
     },
+    "/mano/image": {
+      "post": {
+        "tags": [
+          "Image"
+        ],
+        "summary": "Upload an image file in the VIM",
+        "description": "",
+        "operationId": "addImage",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "image",
+            "in": "formData",
+            "description": "Image file",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "disk_format",
+            "in": "query",
+            "description": "Disk format: raw, qcow2...",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "container_format",
+            "in": "query",
+            "description": "Container format: bare",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Image uploaded. Image status: active"
+          },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/validator/validate/ed": {
       "post": {
         "tags": [

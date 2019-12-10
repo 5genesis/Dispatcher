@@ -45,6 +45,7 @@ http {
         listen 8082 default_server;
         listen [::]:8082 default_server;
         access_log   /var/log/nginx/dispatcher.log  main;
+        client_max_body_size 8000M;
         server_name localhost;" > $1
 }
 
