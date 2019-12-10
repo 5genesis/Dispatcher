@@ -321,7 +321,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Image uploaded"
+            "description": "Image uploaded. Image status: active"
           },
           "406": {
             "description": "Not acceptable - File not valid"

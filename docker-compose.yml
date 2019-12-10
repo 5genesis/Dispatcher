@@ -27,7 +27,7 @@ services:
     container_name: mano
     command: python app.py
     volumes:
-      - "./MANO:/MANO"
+      - "./mano:/mano"
     ports:
       - '5001:5001'
     restart: always

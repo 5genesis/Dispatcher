@@ -25,8 +25,8 @@ logger = logging.getLogger("-MANO API-")
 fh = logging.FileHandler('mano.log')
 
 stream_handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-stream_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
+stream_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
 fh.setFormatter(formatter)
 stream_handler.setFormatter(stream_formatter)
 logger.setLevel(logging.DEBUG)
@@ -284,7 +284,7 @@ api.add_resource(Prometheus, '/prometheus')
 
 if __name__ == '__main__':
     import configparser
-    config_file = 'mano_malaga.conf'
+    config_file = 'mano.conf'
 
     # load the NFVO parameters from the config file
     try:
