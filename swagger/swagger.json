@@ -285,7 +285,7 @@
     "/mano/image": {
       "post": {
         "tags": [
-          "Image"
+          "MANO"
         ],
         "summary": "Upload an image file in the VIM",
         "description": "",
@@ -326,8 +326,11 @@
           "406": {
             "description": "Not acceptable - File not valid"
           },
+          "413": {
+            "description": "File too large"
+          },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error - Service is not accessible"
           }
         }
       }

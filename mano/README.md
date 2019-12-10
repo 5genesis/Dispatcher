@@ -9,12 +9,6 @@ The original documentation for the OSM API can be found [here](https://osm.etsi.
 
 [OSM NSD information model](http://osm-download.etsi.org/ftp/osm-doc/nsd.html)
 
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
-
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
@@ -22,11 +16,13 @@ These instructions will get you a copy of the project up and running on your loc
 ### Pre-requisites
 
 For running the 5Genesis MANO wrapper you will need:
+
 - docker version >= 18.09.6
 - docker-compose version >= 1.17.1
 - NFVO + VIM
 
 ### Config file
+
 Modify the file `mano.conf` to adapt it to your testbed needs:
 
     [NFVO]
@@ -44,6 +40,7 @@ Modify the file `mano.conf` to adapt it to your testbed needs:
     PROJECT=<VIM project>
 
 #### Example
+
     [NFVO]
     TYPE=OSM
     IP=192.168.33.100
@@ -59,61 +56,67 @@ Modify the file `mano.conf` to adapt it to your testbed needs:
     PROJECT=admin
 
 ### Installation
+
 `$ ./install.sh`
 
 ### Start
+
 To start MANO wrapper, run:
 `$ ./start.sh`
 
 This will start your application on port 5001 along with a Swagger environment to test the API running on port 5002
 
 ### Stop
+
 To stop MANO wrapper, run:
 `$ ./stop.sh`
 
 ## Available features
-![](./images/MANO_swagger.PNG)
+
+![MANO Swagger](./images/MANO_swagger.PNG)
 
 ## Try out the application
+
 You can find [here](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) examples of VNFD and NSD packages to populate and test the application
 
 #### Examples on how to use it
+
 You can test the API using your favorite REST client following these simple workflow:
 
 - Insert a VNFD package:
-    
+
     `curl -X POST -F "vnfd=@./<vnfd_package_file>" http://<host>:5001/vnfd`
-    
+
     Result:
-    
+
     >{"id": "VNFD_id_assigned_by_the_NFVO"}
 - Insert a NSD package:
-    
+
     `curl -X POST -F "nsd=@./<nsd_package_file>" http://<host>:5001/nsd`
-    
+
     Result:
-    
+
     >{"id": "NSD_id_assigned_by_the_NFVO"}
 - List all available VNFDs:
-    
+
     `curl -X GET "http://<host>:5001/vnfd" -H "accept: application/json"`
-    
+
     Result:
-    
+
     >List of available VNFDs in JSON format. (according to the NFVO information model)
 - Retrieve an individual VNFD descriptor:
-    
+
     `curl -X GET "http://<host>:5001/vnfd/<VNFD id>" -H "accept: application/json"`
-    
+
     Result:
-    
+
     >VNF descriptor in JSON format. (according to the NFVO information model)
 - List all available NSDs:
-    
+
     `curl -X GET "http://<host>:5001/nsd" -H "accept: application/json"`
-    
+
     Result:
-    
+
     >List of available NSDs in JSON format. (according to the NFVO information model)
 - Retrieve an individual NSD descriptor:
 
@@ -130,32 +133,35 @@ You can test the API using your favorite REST client following these simple work
     `curl -X DELETE "http://<host>:5001/vnfd/<VNFD _id>" -H "accept: application/json"`
 
 - Upload an image file in the VIM:
-    
+
     `curl -X POST -F "image=@./<image_file>" http://<host>:5001/image?disk_format=<raw|qcow2>&container_format=bare`
-    
+
     Result:
-    
+
     >Image status: active
 
 ## Logs
+
 Application logs are available in the application directory as `mano.log`
 
 #### Example
+
     2019-11-13 17:26:42,678 -MANO API- INFO Validating VNFD hackfest_cloudinit_vnf.tar.gz
     2019-11-13 17:27:12,145 -MANO API- INFO Validating NSD file
     2019-11-13 17:27:12,155 -MANO API- INFO Unpacking file for validation
     2019-11-13 17:27:12,224 -MANO API- INFO Deleting temporary files
     2019-11-13 17:29:21,939 -MANO API- INFO Retrieving available VNFDs
 
-
 ## Versioning
 
 - 1.0.0: First full stable version
 
 ## Next steps
+
 - Add support for updating VNFDs and NSDs
 
 ## Authors
+
 Javier Melian (javier.melian@atos.net)
 
 ## License
@@ -164,11 +170,10 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   > http://www.apache.org/licenses/LICENSE-2.0
+   > <http://www.apache.org/licenses/LICENSE-2.0>
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
