@@ -22,7 +22,6 @@
       "$id": "#/properties/Id",
       "type": "integer",
       "title": "Id of the experiment",
-      "default": 0,
       "examples": [
         123
       ]
@@ -31,7 +30,6 @@
       "$id": "#/properties/Name",
       "type": "string",
       "title": "Name of the experiment",
-      "default": "",
       "examples": [
         "sfafd"
       ],
@@ -41,7 +39,6 @@
       "$id": "#/properties/User",
       "type": "integer",
       "title": "ID of the user running the experiment",
-      "default": 0,
       "examples": [
         123
       ]
@@ -50,7 +47,6 @@
       "$id": "#/properties/Platform",
       "type": "string",
       "title": "Platform ID where the experiment is going to be executed",
-      "default": "",
       "examples": [
         "malaga"
       ],
@@ -64,7 +60,6 @@
         "$id": "#/properties/TestCases/items",
         "type": "string",
         "title": "Testcase ID",
-        "default": "",
         "examples": [
           "TC1",
           "TC2"
@@ -80,7 +75,6 @@
         "$id": "#/properties/UEs/items",
         "type": "string",
         "title": "Name of the UE",
-        "default": "",
         "examples": [
           "UE1",
           "UE2"
@@ -92,7 +86,6 @@
       "$id": "#/properties/Slice",
       "type": "string",
       "title": "Slice ID",
-      "default": "",
       "examples": [
         "fer9af0gfg0ads"
       ],
@@ -102,7 +95,6 @@
       "$id": "#/properties/NS",
       "type": "string",
       "title": "NS Id",
-      "default": "",
       "examples": [
         "cqcqcleerv9e"
       ],
@@ -144,7 +136,6 @@
         "$id": "#/properties/Scenario/items",
         "type": "string",
         "title": "List of scenarios where the experiment is going to be executed",
-        "default": "",
         "examples": [
           "scenario1",
           "scenario2"
@@ -160,7 +151,6 @@
         "$id": "#/properties/Application/items",
         "type": "string",
         "title": "Application",
-        "default": "",
         "examples": [
           "app1"
         ],
@@ -180,7 +170,6 @@
       "$id": "#/properties/Reservation_time",
       "type": "integer",
       "title": "Reservation time in minutes",
-      "default": 0,
       "examples": [
         123
       ]

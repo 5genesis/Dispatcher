@@ -29,6 +29,14 @@ All fields are required except the *Reservation_time* one, that is only required
         "Reservation_time": 123 
     }    
 
+## Network service descriptors
+
+The 5GENESIS Validator also validates VNFD and NSD packages.
+For now only OSM descriptors are supported:
+
+[VNFD information model](http://osm-download.etsi.org/ftp/osm-doc/vnfd.html "VNFD IM")
+[NSD information model](http://osm-download.etsi.org/ftp/osm-doc/nsd.html "NSD IM")
+
 ## Available functions
 
 The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with POST methods:

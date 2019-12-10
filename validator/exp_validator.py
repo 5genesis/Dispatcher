@@ -1,4 +1,5 @@
 import jsonschema
+import fastjsonschema
 import simplejson as json
 import os
 from flask import Flask, jsonify, request
@@ -59,8 +60,13 @@ def validate_ed():
         content = request.get_data()
         data = json.loads(content)
         logger.debug("Experiment descriptor: {}".format(data))
-        jsonschema.validate(data, ed_schema)
+        #jsonschema.validate(data, ed_schema)
+        validate = fastjsonschema.compile(ed_schema)
+        j = validate(data)
     except jsonschema.exceptions.ValidationError as ve:
+        logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
+        return ve.message, 400
+    except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
         return ve.message, 400
     except Exception as e:
@@ -77,16 +83,21 @@ def onboard_ed():
         content = request.get_data()
         data = json.loads(content)
         logger.debug("Experiment descriptor: {}".format(data))
-        jsonschema.validate(data, ed_schema)
+        #jsonschema.validate(data, ed_schema)
+        validate = fastjsonschema.compile(ed_schema)
+        j = validate(data)
         headers = {'Content-type': 'application/json'}
         r = requests.post(ELCM_ED_POST, data=data, headers=headers)
     except jsonschema.exceptions.ValidationError as ve:
         logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
         return ve.message, 400
+    except fastjsonschema.JsonSchemaDefinitionException as ve:
+        logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
+        return ve.message, 400
     except Exception as e:
         logger.error("Problem while onboarding Experiment descriptor: {}".format(str(e)))
         return str(e), 500
-    return r.json(), r.status_code
+    return r, r.status_code
 
 
 def validate_zip(file, schema):
