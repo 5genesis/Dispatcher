@@ -1,3 +1,6 @@
+dispatcher.conf
+nginx.conf
+mano_*.conf
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
