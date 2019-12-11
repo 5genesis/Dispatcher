@@ -121,26 +121,19 @@ class VNFD_get(Resource):
     def delete(self, vnf_name):
         logger.info("Deleting VNFD: {}".format(vnf_name))
         return nbiUtil.delete_vnfd(vnf_name)
+    def put(self, vnf_name):
+        try:
+            file = request.files.get("vnfd")
+            if not file:
+                logger.error("VNFD file not present in the query")
+                return "VNFD file not present in the query", 404
+            r, status_code = nbiUtil.modify_vnfd_package(file, vnf_name)
+            return json.loads(r), status_code
+        except Exception as e:
+            return {"error": str(e), "status": type(e).__name__}
 
 
 class VNFD(Resource):
-    def validate(self, file):
-        import tarfile
-        import shutil
-
-        logger.info("Validating VNFD {}".format(file))
-        if file.endswith("tar.gz"):
-            # unzip the package
-            tar = tarfile.open(file, "r:gz")
-            folder = tar.getnames()[0]
-            tar.extractall()
-            tar.close()
-            # Delete the folder we just created
-            shutil.rmtree(folder, ignore_errors=True)
-            return True
-        logger.info("Invalid VNFD")
-        return False
-
     def post(self):
         import os
 
@@ -149,16 +142,14 @@ class VNFD(Resource):
             if not file:
                 logger.error("VNFD file not present in the query")
                 return "VNFD file not present in the query", 404
-            print(file)
-            # Write package file to static directory and validate it
-            file.save(file.filename)
-            if self.validate(file.filename):
-                r, status_code = nbiUtil.upload_vnfd_package(file)
-                os.remove(file.filename)
-                return json.loads(r), status_code
+            #print(file)
+            # Write package file to static directory
+            #file.save(file.filename)
+            r, status_code = nbiUtil.upload_vnfd_package(file)
+            return json.loads(r), status_code
             # Delete package file when done with validation
-            os.remove(file.filename)
-            return "File not valid", 406
+            #os.remove(file.filename)
+            #return "File not valid", 406
         except Exception as e:
             return {"error": str(e), "status": type(e).__name__}
         
