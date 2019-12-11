@@ -1,6 +1,7 @@
 dispatcher.conf
 nginx.conf
 mano/mano.conf
+mano/mano_*.conf
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

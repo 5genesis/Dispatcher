@@ -15,5 +15,5 @@ RUN pip install -r requirements.txt
 COPY . /validator
 
 EXPOSE 5100
-CMD [ "python", "exp_validator.py" ]
+CMD [ "python", "validator.py" ]
 

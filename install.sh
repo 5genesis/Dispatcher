@@ -72,10 +72,10 @@ echo "
 
 # Check the user has configured the validator env file
 while true; do
-    read -p "Have you prepared the Validator environment file in the 'validator' folder? " yn
+    read -p "Have you prepared the MANO config file in the 'mano' folder? " yn
     case $yn in
         [Yy]* ) echo "Let's continue"; break;;
-        [Nn]* ) echo "Please, fill in Validator 'config.env' in the proper way"; exit;;
+        [Nn]* ) echo "Please, fill in MANO 'mano.conf' in the proper way"; exit;;
         * ) echo "Please answer yes or no.";;
     esac
 done
