@@ -15,7 +15,7 @@ services:
     container_name: validator
     env_file:
       - ./validator/config.env
-    command: python exp_validator.py
+    command: python validator.py
     volumes:
       - "./validator:/validator"
     ports:
@@ -25,7 +25,7 @@ services:
     build: ./mano
     image: mano
     container_name: mano
-    command: python app.py
+    command: python mano.py
     volumes:
       - "./mano:/mano"
     ports:
