@@ -362,12 +362,11 @@ class NbiUtil():
         status code
         """
 
-        #print("INFO - Modifying VNFD: ", vnfd_id)
+        print("INFO - Modifying VNFD: ", vnfd_id)
         if not os.path.exists(file.filename):
             return "File '{}' does not exist".format(file.filename), 404
         data = open(file.filename, 'rb').read()
-
-        vnfd_url = "{0}/vnfpkgm/v1/vnf_packages_content/{}".format(self.osm_nbi_url, vnfd_id)
+        vnfd_url = "{}/vnfpkgm/v1/vnf_packages_content/{}".format(self.osm_nbi_url, vnfd_id)
 
         headers = dict(self.headers)
         headers["Accept"] = "application/json"
