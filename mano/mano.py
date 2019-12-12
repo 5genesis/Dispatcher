@@ -119,22 +119,32 @@ class VNFD_get(Resource):
         return nbiUtil.get_vnfd_by_name(vnf_name)
 
     def delete(self, vnf_name):
+        # vnf_name should be the _id for the VNFD in this case
         logger.info("Deleting VNFD: {}".format(vnf_name))
         return nbiUtil.delete_vnfd(vnf_name)
 
     def put(self, vnf_name):
+        import os
+
+        # vnf_name should be the _id for the VNFD in this case
+        logger.info("Modifying VNFD: {}".format(vnf_name))
         try:
-            logger.info("Modifying VNFD: {}".format(vnf_name))
             file = request.files.get("vnfd")
             if not file:
                 logger.error("VNFD file not present in the query")
                 return "VNFD file not present in the query", 404
             logger.debug(file)
-            # Write package file to static directory
-            file.save(file.filename)
-            r, status_code = nbiUtil.modify_vnfd_package(file, vnf_name)
-            logger.debug(r)
-            os.remove(file.filename)
+            # delete the old VNFD package
+            r, status_code = nbiUtil.delete_vnfd(vnf_name)
+            print("codigo: ", status_code)
+            if status_code is 204:
+                # the VNFD exists and was deleted successfully
+                # Write package file to static directory
+                file.save(file.filename)
+                # upload the new package
+                r, status_code = nbiUtil.upload_vnfd_package(file)
+                os.remove(file.filename)
+                logger.info("VNFD successfully modified")
             return json.loads(r), status_code
         except Exception as e:
             return {"error": str(e), "status": type(e).__name__}
