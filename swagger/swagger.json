@@ -152,6 +152,50 @@
             "description": "VNFD not found"
           }
         }
+      },
+      "put": {
+        "tags": [
+          "MANO"
+        ],
+        "summary": "Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated",
+        "description": "",
+        "operationId": "updateVNFD",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "vnfd",
+            "in": "formData",
+            "description": "VNFD Package",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "vnfdId",
+            "in": "path",
+            "description": "VNFD _id to update",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "VNFD successfully updated"
+          },
+          "400": {
+            "description": "Invalid VNFD _ID supplied"
+          },
+          "404": {
+            "description": "VNFD not found"
+          },
+          "409": {
+            "description": "There was a conflict when updating this VNFD"
+          }
+        }
       }
     },
     "/mano/nsd": {
@@ -183,9 +227,6 @@
           },
           "405": {
             "description": "Invalid input"
-          },
-          "406": {
-            "description": "Not acceptable - File not valid"
           },
           "409": {
             "description": "Conflict - VNFD already present"
@@ -280,6 +321,50 @@
             "description": "NSD not found"
           }
         }
+      },
+      "put": {
+        "tags": [
+          "MANO"
+        ],
+        "summary": "Updates an NSD providing the new NSD package and the _ID of the old one that is being updated",
+        "description": "",
+        "operationId": "updateNSD",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "nsd",
+            "in": "formData",
+            "description": "NSD Package",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "nsdId",
+            "in": "path",
+            "description": "NSD _id to update",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "NSD successfully updated"
+          },
+          "400": {
+            "description": "Invalid NS _ID supplied"
+          },
+          "404": {
+            "description": "NSD not found"
+          },
+          "409": {
+            "description": "There was a conflict when updating this NSD"
+          }
+        }
       }
     },
     "/mano/image": {
@@ -322,9 +407,6 @@
         "responses": {
           "201": {
             "description": "Image uploaded. Image status: active"
-          },
-          "406": {
-            "description": "Not acceptable - File not valid"
           },
           "413": {
             "description": "File too large"

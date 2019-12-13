@@ -336,10 +336,10 @@ class NbiUtil():
         headers["Content-type"] = "application/gzip"
         try:
             r = requests.post(vnfd_url, params=None, verify=False, stream=True, data=data, headers=headers)
-            return r.text, r.status_code
+            return r.json(), r.status_code
         except Exception as e:
             print("ERROR - post VNFD: ", e)
-            return r.text, r.status_code
+            return r.json(), r.status_code
 
     @check_authorization
     def modify_vnfd_package(self, file, vnfd_id):
@@ -449,10 +449,10 @@ class NbiUtil():
         headers["Content-type"] = "application/gzip"
         try:
             r = requests.post(nsd_url, params=None, verify=False, stream=True, data=data, headers=headers)
-            return r.text, r.status_code
+            return r.json(), r.status_code
         except Exception as e:
             print("ERROR - post NSD: ", e)
-            return r.text, r.status_code
+            return r.json(), r.status_code
 
 
     @check_authorization

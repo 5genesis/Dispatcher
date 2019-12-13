@@ -64,13 +64,13 @@ def validate_ed():
         validate = fastjsonschema.compile(ed_schema)
         j = validate(data)
     except jsonschema.exceptions.ValidationError as ve:
-        logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
+        logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         return ve.message, 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
-        logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
+        logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         return ve.message, 400
     except Exception as e:
-        logger.error("Problem while validating Experiment descriptor: {}".format(str(e)))
+        logger.warning("Problem while validating Experiment descriptor: {}".format(str(e)))
         return str(e), 500
     logger.debug("Experiment descriptor sucessfully validated")
     return "ok", 200
@@ -89,13 +89,13 @@ def onboard_ed():
         headers = {'Content-type': 'application/json'}
         r = requests.post(ELCM_ED_POST, data=data, headers=headers)
     except jsonschema.exceptions.ValidationError as ve:
-        logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
+        logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         return ve.message, 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
-        logger.debug("Problem while validating Experiment descriptor: {}".format(ve.message))
+        logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         return ve.message, 400
     except Exception as e:
-        logger.error("Problem while onboarding Experiment descriptor: {}".format(str(e)))
+        logger.warning("Problem while onboarding Experiment descriptor: {}".format(str(e)))
         return str(e), 500
     return r, r.status_code
 
@@ -132,14 +132,14 @@ def validate_zip(file, schema):
         shutil.rmtree(folder, ignore_errors=True)
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(ve).__name__, ve.message)
-        logger.error("Problem while validating descriptor: {}".format(ve.message))
+        logger.warning("Problem while validating descriptor: {}".format(ve.message))
         return message, 400
     except Exception as e:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.error("Problem while validating descriptor: {}".format(str(e)))
+        logger.warning("Problem while validating descriptor: {}".format(str(e)))
         return message, 500
 
 
@@ -162,7 +162,7 @@ def validate_vnfd():
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.error("Problem while validating VNFD: {}".format(str(e)))
+        logger.warning("Problem while validating VNFD: {}".format(str(e)))
         return message, 500
 
 @app.route('/onboard/vnfd', methods=['POST'])
@@ -191,7 +191,7 @@ def onboard_vnfd():
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.error("Problem while onboarding VNFD: ", str(e))
+        logger.warning("Problem while onboarding VNFD: ", str(e))
         return message, 500
 
 
@@ -214,7 +214,7 @@ def validate_nsd():
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.error("Problem while validating NSD: {}".format(str(e)))
+        logger.warning("Problem while validating NSD: {}".format(str(e)))
         return message, 500
 
 @app.route('/onboard/nsd', methods=['POST'])
@@ -243,7 +243,7 @@ def onboard_nsd():
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.error("Problem while onboarding VNFD: ", str(e))
+        logger.warning("Problem while onboarding VNFD: ", str(e))
         return message, 500
 
 
