@@ -26,7 +26,6 @@ The available features will depend on the features exposed by each dispatched mo
 - Update NSD
 - Upload VIM images
 
-
 ##### ELCM
 
 - Launch experiment (create)
@@ -129,7 +128,7 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Versioning
 
-- 1.2.4 - Added VNFD and NSD update to the MANO API features and image uploading.
+- 1.3.3 - Added VNFD and NSD update to the MANO API features and image uploading.
 - 1.2.3 - Move to *fastjsonschema* for draft 7 schema validation.
 - 1.2.0 - *MANO wrapper* is included now inside the *Dispatcher* as a new container.
 - 1.1.0 - Added logging in the *Dispatcher* and the *Validator*.
