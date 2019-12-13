@@ -136,7 +136,6 @@ class VNFD_get(Resource):
             logger.debug(file)
             # delete the old VNFD package
             r, status_code = nbiUtil.delete_vnfd(vnf_name)
-            print("codigo: ", status_code)
             if status_code is 204:
                 # the VNFD exists and was deleted successfully
                 # Write package file to static directory
@@ -145,7 +144,7 @@ class VNFD_get(Resource):
                 r, status_code = nbiUtil.upload_vnfd_package(file)
                 os.remove(file.filename)
                 logger.info("VNFD successfully modified")
-            return json.loads(r), status_code
+            return r, status_code
         except Exception as e:
             return {"error": str(e), "status": type(e).__name__}
 
@@ -164,9 +163,8 @@ class VNFD(Resource):
             file.save(file.filename)
             r, status_code = nbiUtil.upload_vnfd_package(file)
             os.remove(file.filename)
-            return json.loads(r), status_code
+            return r, status_code
             # Delete package file when done with validation
-            #return "File not valid", 406
         except Exception as e:
             return {"error": str(e), "status": type(e).__name__}
         
@@ -174,33 +172,60 @@ class VNFD(Resource):
 
     def get(self):
         logger.info("Retrieving available VNFDs")
-        res, code = nbiUtil.get_onboarded_vnfds()
-        if res:
-            logger.debug("VNFD list: {}".format(res))
+        r, code = nbiUtil.get_onboarded_vnfds()
+        if r:
+            logger.debug("VNFD list: {}".format(r))
         else:
             logger.error("Failed to retrieve VNFD list")
-        return res, code
+        return r, code
 
 
 class NSD_get(Resource):
     def get(self, ns_name):
         logger.info("Retrieving NSD: {}".format(ns_name))
-        res, code = nbiUtil.get_nsd_by_name(ns_name)
-        if res:
-            logger.debug("NSD: {}".format(res))
+        r, code = nbiUtil.get_nsd_by_name(ns_name)
+        if r:
+            logger.debug("NSD: {}".format(r))
         else:
             logger.error("Failed to retrieve NSD")
-        return res, code
+        return r, code
         
 
     def delete(self, ns_name):
         logger.info("Deleting NSD: {}".format(ns_name))
-        res, code = nbiUtil.delete_nsd(ns_name)
+        r, code = nbiUtil.delete_nsd(ns_name)
         if code is 204:
             logger.debug("NSD successfully deleted")
         else:
-            logger.debug("NSD cannot be deleted: {} - {}".format(res, code))
-        return res, code
+            logger.debug("NSD cannot be deleted: {} - {}".format(r, code))
+        return r, code
+
+    def put(self, ns_name):
+        import os
+
+        # vnf_name should be the _id for the VNFD in this case
+        logger.info("Modifying NSD: {}".format(ns_name))
+        try:
+            file = request.files.get("nsd")
+            if not file:
+                logger.error("NSD file not present in the query")
+                return "NSD file not present in the query", 404
+            logger.debug(file)
+            # delete the old NSD package
+            r, status_code = nbiUtil.delete_nsd(ns_name)
+            if status_code is 204:
+                # the NSD exists and was deleted successfully
+                # Write package file to static directory
+                file.save(file.filename)
+                # upload the new package
+                r, status_code = nbiUtil.upload_nsd_package(file)
+                os.remove(file.filename)
+                logger.info("NSD successfully modified")
+            return r, status_code
+        except Exception as e:
+            return {"error": str(e), "status": type(e).__name__}
+
+
 
 class NSD_post(Resource):
     def post(self):
@@ -218,7 +243,7 @@ class NSD_post(Resource):
             #print(status_code)
             # Delete package file when done with validation
             os.remove(file.filename)
-            return json.loads(r), status_code
+            return r, status_code
         except Exception as e:
             return {"error": str(e), "status": type(e).__name__}
 
