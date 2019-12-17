@@ -1,0 +1,14 @@
+Dear Admin,
+
+The user {{ user }} with email {{ email }} is trying to validate his account in the platform.
+You can choose if you want to provide access or not.
+
+The link for provide access:
+{{ url_for('reset_password', token=token_provide, _external=True) }}
+
+The link for not provide access and revoke his account:
+{{ url_for('validate_user', token=token_not_provide, _external=True) }}
+
+Sincerely,
+
+The Auth Team

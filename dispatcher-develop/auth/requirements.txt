@@ -1,0 +1,7 @@
+jwcrypto
+gevent
+Flask
+Flask-SQLAlchemy
+requests
+flask_mail
+jwcrypto
