@@ -31,6 +31,16 @@ services:
     ports:
       - '5001:5001'
     restart: always
+  auth:
+    build: ./auth
+    image: auth
+    container_name: auth
+    command: python app.py
+    volumes:
+      - "./auth:/auth"
+    ports:
+      - '2000:2000'
+    restart: always
   swagger:
     image: 'swaggerapi/swagger-ui'
     container_name: swagger

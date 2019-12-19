@@ -5,3 +5,4 @@ Flask-SQLAlchemy
 requests
 flask_mail
 jwcrypto
+Flask-Cors==3.0.8

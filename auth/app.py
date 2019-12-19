@@ -8,12 +8,14 @@ from jwcrypto import jwt, jwk
 import json
 import ast
 from flask_mail import Mail, Message
+from flask_cors import CORS
 
 import string
 import random
 import re
 
 app = Flask(__name__)
+CORS(app)
 
 mail_settings = {
     "MAIL_SERVER": 'smtp.gmail.com',
