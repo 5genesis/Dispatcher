@@ -1,8 +1,8 @@
 jwcrypto
 gevent
 Flask
-Flask-SQLAlchemy
+Flask-SQLAlchemy==2.1
 requests
 flask_mail
-jwcrypto
-Flask-Cors==3.0.8
+flask-cors
+flask-restful

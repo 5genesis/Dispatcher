@@ -162,6 +162,9 @@ done < $config_file
 
 add_enabler $module $line $output_file
 
+# Add the local IP to the swagger file
+my_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+sed "s/DISPATCHER/$my_ip/g" swagger/swagger.json
 
 echo "Dispatcher configured using information from '$config_file' file"
 

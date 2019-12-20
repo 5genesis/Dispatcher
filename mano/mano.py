@@ -306,7 +306,7 @@ if __name__ == '__main__':
         nfvo_ip = str(config['NFVO']['IP'])
         nfvo_user = str(config['NFVO']['USER'])
         nfvo_pass = str(config['NFVO']['PASSWORD'])
-        nfvo_vim_account = str(config['NFVO']['VIM_ACCOUNT'])
+        #nfvo_vim_account = str(config['NFVO']['VIM_ACCOUNT'])
         #VIM config
         vim_type = str(config['VIM']['TYPE'])
         vim_auth_url = str(config['VIM']['AUTH_URL'])
@@ -316,9 +316,9 @@ if __name__ == '__main__':
 
         logger.info("Starting app")
         # init the NFVO
-        logger.info("Adding NFVO- Type: {}, IP:{}, User:{}, VIM account:{}".format(nfvo_type, nfvo_ip, nfvo_user, nfvo_vim_account))
+        logger.info("Adding NFVO- Type: {}, IP:{}, User:{}".format(nfvo_type, nfvo_ip, nfvo_user))
         if nfvo_type == "OSM":
-            nbiUtil = osmUtils(osm_ip=nfvo_ip, username=nfvo_user, password=nfvo_pass, vim_account_id=nfvo_vim_account)
+            nbiUtil = osmUtils(osm_ip=nfvo_ip, username=nfvo_user, password=nfvo_pass, vim_account_id=None)
         else:
             logger.error("NFVO type {} not supported".format(nfvo_type))
             raise KeyError("NFVO type {} not supported".format(nfvo_type))

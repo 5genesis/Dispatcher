@@ -17,5 +17,5 @@ RUN pip install -r requirements.txt
 COPY . /auth
 
 EXPOSE 2000
-CMD [ "python", "app.py" ]
+CMD [ "python", "Auth.py" ]
 
