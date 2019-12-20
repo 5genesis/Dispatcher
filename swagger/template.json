@@ -13,7 +13,7 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "localhost:8082",
+  "host": "DISPATCHER:8082",
   "basePath": "/",
   "tags": [
     {
