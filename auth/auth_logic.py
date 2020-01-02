@@ -186,14 +186,11 @@ def drop_db():
         return jsonify(result=('Drop DataBase failed: ' + str(e))), 400
 
 
-@auth_logic.route('/delete_user', methods=['DELETE'])
+@auth_logic.route('/delete_user/<user>', methods=['DELETE'])
 @admin_auth
-def delete_one_user():
+def delete_one_user(user):
     logger.info(str(request))
     try:
-        # User to be eliminated
-        user = request.form['username']
-
         # Drop DB & create a new instance of DB
         Registry.query.filter_by(username=user).delete()
         User.query.filter_by(username=user).delete()

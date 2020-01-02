@@ -6,13 +6,15 @@ from MailConfig import mail_settings
 from flask_sqlalchemy import SQLAlchemy
 from settings import Settings
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///auth.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 settings = Settings()
 key = settings.KEY
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///auth.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 class User(db.Model):
     """ Create user table"""
