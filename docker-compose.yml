@@ -35,7 +35,7 @@ services:
     build: ./auth
     image: auth
     container_name: auth
-    command: python app.py
+    command: python auth.py
     volumes:
       - "./auth:/auth"
     ports:
