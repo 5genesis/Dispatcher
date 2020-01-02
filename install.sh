@@ -22,6 +22,7 @@
 # HOST=validator
 # PORT=5100
 # PATH=/
+#
 
 config_file="dispatcher.conf"
 output_file="nginx.conf"
@@ -51,14 +52,33 @@ http {
 
 function write_footer {
 echo "
+
+        location /auth {
+            proxy_pass http://auth:2000;
+            #rewrite ^/(.*)/$ /\$1 permanent;
+            proxy_redirect     off;
+            proxy_set_header   Host \$host;
+            proxy_set_header   X-Real-IP \$remote_addr;
+            proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Host \$server_name;
+        }
+        location = /mandatory_auth {
+            internal;
+            proxy_pass              http://auth:2000/validate_request;
+            proxy_pass_request_body off;
+            proxy_set_header        Content-Length \"\";
+            proxy_set_header        X-Original-URI \$request_uri;
+        }
     }
 }" >> $1
 }
 
 function add_enabler {
-echo "
-        
+    echo "
+
         location /$1 {
+            auth_request     /mandatory_auth;
+            auth_request_set \$auth_status \$upstream_status;
             proxy_pass $2;
             #rewrite ^/(.*)/$ /\$1 permanent;
             proxy_redirect     off;
@@ -66,16 +86,31 @@ echo "
             proxy_set_header   X-Real-IP \$remote_addr;
             proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
             proxy_set_header   X-Forwarded-Host \$server_name;
+            if (\$request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                #
+                # Custom headers and headers various browsers *should* be OK with but aren't 
+                #
+                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                #
+                # Tell client that this pre-flight info is valid for 20 days
+                #
+                add_header 'Access-Control-Max-Age' 1728000;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }        
         }" >> $3
-
 }
+
 
 # Check the user has configured the validator env file
 while true; do
-    read -p "Have you prepared the MANO config file in the 'mano' folder? " yn
+    read -p "Have you prepared the Validator environment file in the 'validator' folder? " yn
     case $yn in
         [Yy]* ) echo "Let's continue"; break;;
-        [Nn]* ) echo "Please, fill in MANO 'mano.conf' in the proper way"; exit;;
+        [Nn]* ) echo "Please, fill in Validator 'config.env' in the proper way"; exit;;
         * ) echo "Please answer yes or no.";;
     esac
 done
@@ -116,6 +151,7 @@ then
     if $write_enabler; then
 	# write the paragraph that includes all the config of the module
         add_enabler $module $line $output_file
+
     fi
     # Preparation of the key line that includes all the information included in the config file
     write_enabler=true
@@ -128,6 +164,11 @@ fi
 done < $config_file
 
 add_enabler $module $line $output_file
+
+# Add the local IP to the swagger file
+my_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
+sed "s/DISPATCHER/$my_ip/g" swagger/template.json > swagger/swagger.json
+
 echo "Dispatcher configured using information from '$config_file' file"
 
 # after the whole config file is processed, we write the last part of the config file
