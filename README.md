@@ -3,6 +3,7 @@
 The 5GENESIS Dispatcher is the entry point to the system, offering the functionalities to an Experimenter through a single interface. These functionalites are know as the Open APIs, being able to interact with the key features of the underlying modules (as shown in the architecture diagram below) without actually exposing them
 This implementation is based on a NGINX reverse proxy containerised in a Docker environment.
 By default, The *Dispatcher* includes as added on modules, the [Validator](validator/README.md "Validator"), the [MANO Wrapper](mano/README.md "MANO Wrapper") and a Swagger environment to test the available features.
+On top of all that and to secure all the requests, the Dispatcher provides user registration and authentication using JWT. Consult the [Auth documentation](auth/readme.md "Auth") for the available actions and how to use them.
 
 ## Architecture
 
@@ -128,6 +129,7 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Versioning
 
+- 2.0.0 - User registration and authentication
 - 1.3.3 - Added VNFD and NSD update to the MANO API features and image uploading.
 - 1.2.3 - Move to *fastjsonschema* for draft 7 schema validation.
 - 1.2.0 - *MANO wrapper* is included now inside the *Dispatcher* as a new container.
@@ -136,8 +138,8 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Next steps
 
-- Add user authentication and registration.
 - Add cross-platform features.
+- Make the authentication optional when installing the *Dispatcher*
 
 ## Authors
 
