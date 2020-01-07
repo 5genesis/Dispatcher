@@ -1,7 +1,9 @@
 # 5GENESIS Dispatcher
 
 The 5GENESIS Dispatcher is the entry point to the system, offering the functionalities to an Experimenter through a single interface. These functionalites are know as the Open APIs, being able to interact with the key features of the underlying modules (as shown in the architecture diagram below) without actually exposing them
+
 This implementation is based on a NGINX reverse proxy containerised in a Docker environment.
+
 By default, The *Dispatcher* includes as added on modules, the [Validator](validator/README.md "Validator"), the [MANO Wrapper](mano/README.md "MANO Wrapper") and a Swagger environment to test the available features.
 On top of all that and to secure all the requests, the Dispatcher provides user registration and authentication using JWT. Consult the [Auth documentation](auth/readme.md "Auth") for the available actions and how to use them.
 
@@ -11,9 +13,9 @@ On top of all that and to secure all the requests, the Dispatcher provides user 
 
 ## Available features
 
-The available features will depend on the features exposed by each dispatched module. The stable features are:
+The available features will depend on the features exposed by each dispatched module. The currently available features are:
 
-##### MANO
+##### MANO enabler
 
 - Onboard VNFD
 - List VNFDs
@@ -27,16 +29,37 @@ The available features will depend on the features exposed by each dispatched mo
 - Update NSD
 - Upload VIM images
 
-##### ELCM
+##### ELCM enabler
 
 - Launch experiment (create)
 - Cancel execution
 - Get execution logs
 
-##### Validator
+##### Validator enabler
 
 - Validation service: Validate Experiment descriptor, VNFD or NSD as a standalone service
 - Validate and onboard directly the Experiment descriptor in the ELCM, and the VNF descriptor or the NS descriptor in the NFVO
+
+## How the authentication works
+
+![Authentication](./images/auth.png)
+
+Authentication is delegated to the *Auth* module. Users are registered into it and provide the ability to an user to claim an access token. This token is a JSON Web Token. It contains user's identity (subject id, name, email) and some meta data relatives to the authorization process (issuer, time to live, etc.). The access token can be claimed using Basic Authentication (username + password). The access token is online, that is, a token used by client apps having a direct user interaction (GUI such as: web site, desktop apps, mobile apps, etc). It's a short-lived token, so it shall be renew before its expiration date using a refresh token. Once claimed, the access token is renewed as well as the refresh token. And the process is repeated during the whole user session life time.
+Instead of requesting an access token, it is also possible to authenticate every request using Basic Auth with a user already registered and validated by the Platform Administrator.
+
+### The process is following:
+
+#### User registration
+![User registration](./images/user_registration.png)
+
+The user that wants to have access to the platform services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
+
+#### Request to a service using Token Authentication
+![Request with token](./images/request_with_token.png)
+
+#### Request to a service using Token Authentication
+![Request with basic authentication](./images/request_with_ba.png)
+
 
 ## Getting Started
 
@@ -46,10 +69,12 @@ These instructions will get you a copy of the project up and running on your loc
 
 For running the 5Genesis Dispatcher, you will need:
 
-- docker version >= 18.09.6
-- docker-compose version >= 1.17.1
-- Configuration files correctly filled up (including the config file inside the *validator* folder)
-- NFVO + VIM
++ docker version >= 18.09.6
++ docker-compose version >= 1.17.1
++ Configuration files correctly filled up:
+    + [Validator](validator/README.md "Validator") module config: Environment variables file (`config.env`) inside the *validator* folder
+    + [MANO Wrapper](mano/README.md#config-file "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder
++ NFVO + VIM
 
 ### Config file and installation
 
@@ -81,26 +106,27 @@ Once edited properly, the configuration should be applied and the containers bui
 
 #### Example
 
+    [validator]
+    PROTOCOL=http
+    HOST=validator
+    port=5100
+    path=/
+    [mano]
+    PROTOCOL=http
+    HOST=mano
+    PROTOCOL=5001
+    PATH=/
     [elcm]
     PROTOCOL=http
     HOST=192.168.33.102
-    PORT=4000
-    PATH=/
-    [validator]
-    PROTOCOL=http
-    HOST=192.168.33.105
-    port=5100
-    path=/api
-    [mano]
-    PROTOCOL=http
-    HOST=192.168.33.105
-    PROTOCOL=5001
-    PATH=/
+    PORT=5000
+    PATH=/api
 
-With the config file above, using the Validator API as an **example**, the dispatcher will translate the original request to a new one:
-> Original URL: <http://192.168.33.105:5100/api/validate>
+With the config file above, using the ELCM API as an **example**, the dispatcher will translate the original request to a new one. For example, the original URL would be the following one:
+> Original URL: <http://192.168.33.102:5000/api/v0/run>
 
-> Translated URL: <http://{dispatcher_ip}:{dispatcher:port}/validator/validate>
+The previous URL is translated to a new one, removing the speficied base path (`/api`, in this example), adding a new base path common to all the requests directed to the ELCM (`/elcm` in this example) and leaving the particular endpoint (`/v0/run`) as it was:
+> Translated URL: <http://{dispatcher_ip}:{dispatcher:port}/elcm/v0/run>
 
 ### Start
 
@@ -122,6 +148,15 @@ To stop the Dispatcher service just run the following:
 
 A swagger testing framework is deployed on port 5002 with the following API specifications:
 ![Dispatcher Swagger](./images/swagger.PNG)
+
+## Authentication management
+
+![Change pasword](./images/change_password.png)
+![Pasword recovery](./images/password_recovery.png)
+![Show registered users](./images/show_users.png)
+![Drop users DB](./images/drop_db.png)
+![Delete user](./images/delete_user.png)
+
 
 ## Logging
 

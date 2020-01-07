@@ -156,9 +156,9 @@ Application logs are available in the application directory as `mano.log`
 
 - 1.0.0: First full stable version
 
-## Next steps
+## Bugs
 
-- Add support for updating VNFDs and NSDs
+- The NFVO sometimes does not include the "_id" field in the response when retrieving a descriptor, which is necessary for removing it. If this bug confirms, a *MANO Wrapper* database will be needed for storing such information associated to the descriptor "id".
 
 ## Authors
 
