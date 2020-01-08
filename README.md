@@ -56,11 +56,13 @@ The user that wants to have access to the platform services will have to request
 
 #### Request to a service using Token Authentication
 ![Request with token](./images/request_with_token.png)
+Prior to any request to a service, the user needs to obtain an authentication token using valid credentials and Basic Auth. Once received the token, this is valid for the next 3 minutes and can be used to query any service behind the *Dispatcher*.
 
-#### Request to a service using Token Authentication
+#### Request to a service using Basic Authentication
 ![Request with basic authentication](./images/request_with_ba.png)
+Basic authentication is also available: A registered user, using valid credentials should use them in every query to a service behind the *Dispatcher*. 
 
-**NOTE:** To know more about the Auth module, go [Auth documentation](auth/README.md "here") 
+**NOTE:** To know more about the Auth module, go [here](auth/README.md "Auth docs") 
 
 ## Getting Started
 
@@ -73,7 +75,7 @@ For running the 5Genesis Dispatcher, you will need:
 + docker version >= 18.09.6
 + docker-compose version >= 1.17.1
 + Configuration files correctly filled up:
-    + [Validator](validator/README.md "Validator") module config: Environment variables file (`config.env`) inside the *validator* folder
+    + [Validator](validator/README.md#validator-configuration "Validator") module config: Environment variables file (`config.env`) inside the *validator* folder
     + [MANO Wrapper](mano/README.md#config-file "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder
 + NFVO + VIM
 
@@ -156,6 +158,7 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Versioning
 
+- 2.0.1 - Auth module documentation updated
 - 2.0.0 - User registration and authentication
 - 1.3.3 - Added VNFD and NSD update to the MANO API features and image uploading.
 - 1.2.3 - Move to *fastjsonschema* for draft 7 schema validation.
