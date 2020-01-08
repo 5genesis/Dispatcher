@@ -3,6 +3,11 @@
 Standalone REST API part of 5Genesis' OSS for interactions with in the MANO.
 This application uses the NFVO and VIM original API, bypassing security and abstracting the type of NVFO or VIM used to the user, that should not be aware of sensitive information but must use the functionalities of the underlying application.
 
+**Supported NFVOs**
+OSM
+**Supported VIMs**
+Openstack
+
 The original documentation for the OSM API can be found [here](https://osm.etsi.org/wikipub/index.php/NBI_API_Description).
 
 [OSM VNFD information model](http://osm-download.etsi.org/ftp/osm-doc/vnfd.html)
@@ -56,7 +61,7 @@ Modify the file `mano.conf` to adapt it to your testbed needs:
     PROJECT=admin
 
 ### Installation
-
+**NOTE:** It is not necessary to install and start the application if the installation has been done through the *Dispatcher*.
 `$ ./install.sh`
 
 ### Start
@@ -156,7 +161,11 @@ Application logs are available in the application directory as `mano.log`
 
 - 1.0.0: First full stable version
 
-## Bugs
+## Next steps
+
++ Add OpenNebula as supported VIM
+
+## Identified bugs
 
 - The NFVO sometimes does not include the "_id" field in the response when retrieving a descriptor, which is necessary for removing it. If this bug confirms, a *MANO Wrapper* database will be needed for storing such information associated to the descriptor "id".
 
