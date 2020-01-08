@@ -60,6 +60,7 @@ The user that wants to have access to the platform services will have to request
 #### Request to a service using Token Authentication
 ![Request with basic authentication](./images/request_with_ba.png)
 
+**NOTE:** To know more about the Auth module, go [Auth documentation](auth/README.md "here") 
 
 ## Getting Started
 
@@ -148,15 +149,6 @@ To stop the Dispatcher service just run the following:
 
 A swagger testing framework is deployed on port 5002 with the following API specifications:
 ![Dispatcher Swagger](./images/swagger.PNG)
-
-## Authentication management
-
-![Change pasword](./images/change_password.png)
-![Pasword recovery](./images/password_recovery.png)
-![Show registered users](./images/show_users.png)
-![Drop users DB](./images/drop_db.png)
-![Delete user](./images/delete_user.png)
-
 
 ## Logging
 
