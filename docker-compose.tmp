@@ -1,0 +1,42 @@
+version: '3'
+services:
+  dispatcher: 
+    image: nginx:latest
+    container_name: dispatcher
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./log:/var/log/nginx
+    ports:
+      - 8082:8082
+      - 443:443
+  validator:
+    build: ./validator
+    image: validator
+    container_name: validator
+    env_file:
+      - ./validator/config.env
+    command: python validator.py
+    volumes:
+      - "./validator:/validator"
+    ports:
+      - '5100:5100'
+    restart: always
+  mano:
+    build: ./mano
+    image: mano
+    container_name: mano
+    command: python mano.py
+    volumes:
+      - "./mano:/mano"
+    ports:
+      - '5001:5001'
+    restart: always
+  swagger:
+    image: 'swaggerapi/swagger-ui'
+    container_name: swagger
+    environment:
+      - SWAGGER_JSON=/my_swagger/swagger.json
+    ports:
+      - '5002:8080'
+    volumes:
+      - './swagger:/my_swagger'

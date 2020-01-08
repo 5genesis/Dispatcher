@@ -4,8 +4,11 @@ Standalone REST API part of 5Genesis' OSS for interactions with in the MANO.
 This application uses the NFVO and VIM original API, bypassing security and abstracting the type of NVFO or VIM used to the user, that should not be aware of sensitive information but must use the functionalities of the underlying application.
 
 **Supported NFVOs**
+
 OSM
+
 **Supported VIMs**
+
 Openstack
 
 The original documentation for the OSM API can be found [here](https://osm.etsi.org/wikipub/index.php/NBI_API_Description).
@@ -62,11 +65,13 @@ Modify the file `mano.conf` to adapt it to your testbed needs:
 
 ### Installation
 **NOTE:** It is not necessary to install and start the application if the installation has been done through the *Dispatcher*.
+
 `$ ./install.sh`
 
 ### Start
 
 To start MANO wrapper, run:
+
 `$ ./start.sh`
 
 This will start your application on port 5001 along with a Swagger environment to test the API running on port 5002
@@ -74,6 +79,7 @@ This will start your application on port 5001 along with a Swagger environment t
 ### Stop
 
 To stop MANO wrapper, run:
+
 `$ ./stop.sh`
 
 ## Available features
@@ -92,28 +98,29 @@ You can test the API using your favorite REST client following these simple work
 
     `curl -X POST -F "vnfd=@./<vnfd_package_file>" http://<host>:5001/vnfd`
 
-    Result:
+    Response:
 
     >{"id": "VNFD_id_assigned_by_the_NFVO"}
+
 - Insert a NSD package:
 
     `curl -X POST -F "nsd=@./<nsd_package_file>" http://<host>:5001/nsd`
 
-    Result:
+    Response:
 
     >{"id": "NSD_id_assigned_by_the_NFVO"}
 - List all available VNFDs:
 
     `curl -X GET "http://<host>:5001/vnfd" -H "accept: application/json"`
 
-    Result:
+    Response:
 
     >List of available VNFDs in JSON format. (according to the NFVO information model)
 - Retrieve an individual VNFD descriptor:
 
     `curl -X GET "http://<host>:5001/vnfd/<VNFD id>" -H "accept: application/json"`
 
-    Result:
+    Response:
 
     >VNF descriptor in JSON format. (according to the NFVO information model)
 - List all available NSDs:
@@ -167,7 +174,7 @@ Application logs are available in the application directory as `mano.log`
 
 ## Identified bugs
 
-- The NFVO sometimes does not include the "_id" field in the response when retrieving a descriptor, which is necessary for removing it. If this bug confirms, a *MANO Wrapper* database will be needed for storing such information associated to the descriptor "id".
+- The NFVO sometimes does not include the "_id" field in the response when retrieving a descriptor, which is necessary for deleting it. If this bug confirms, a *MANO Wrapper* database will be needed for storing such information associated to the descriptor "id".
 
 ## Authors
 

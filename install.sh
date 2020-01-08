@@ -169,6 +169,9 @@ while true; do
     esac
 done
 
+#copy the docker-compose template to the final docker-compose file   
+cp docker-compose.tmp docker-compose.yml
+
 # Before the config file is processed, the nginx config file is created and filled up
 #  with the static part of the configuration
 write_header $output_file
@@ -196,6 +199,16 @@ then
 	# write the paragraph that includes all the config of the module
         if $authentication; then
             add_enabler_auth $module $line $output_file
+            echo"  auth:
+    build: ./auth
+    image: auth
+    container_name: auth
+    command: python auth.py
+    volumes:
+      - \"./auth:/auth\"
+    ports:
+      - '2000:2000'
+    restart: always" >> docker-compose.yml
         else
             add_enabler $module $line $output_file
         fi
@@ -212,13 +225,15 @@ done < $config_file
 
 if $authentication; then
     add_enabler_auth $module $line $output_file
+    swagger_file="swagger/template_auth.json"
 else
     add_enabler $module $line $output_file
+    swagger_file="swagger/template_no_auth.json"
 fi
 
 # Add the local IP to the swagger file
 my_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-sed "s/DISPATCHER/$my_ip/g" swagger/template.json > swagger/swagger.json
+sed "s/DISPATCHER/$my_ip/g" $swagger_file > swagger/swagger.json
 
 echo "Dispatcher configured using information from '$config_file' file"
 

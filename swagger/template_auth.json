@@ -1,0 +1,714 @@
+swagger: '2.0'
+info:
+  description: Swagger 5GENESIS Dispatcher
+  version: 1.0.0
+  title: 5GENESIS Dispatcher Swagger
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: javier.melian@atos.net
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: 'localhost:8082'
+basePath: /
+tags:
+  - name: MANO
+    description: MANO catalogue operations
+  - name: Validator
+    description: Experiment descriptor validation and network service validation (VNFD + NSD)
+  - name: Auth
+    description: Operations for users in order to access to the different microservices
+  - name: 'Auth: Admin Functions'
+    description: Operations for Admin for managing the  user Auth
+schemes:
+  - http
+paths:
+  /mano/vnfd:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Add a new VNFD to the catalogue
+      description: ''
+      operationId: addVNFD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: vnfd
+          in: formData
+          description: VNFD Package
+          required: true
+          type: file
+      responses:
+        '201':
+          description: VNFD created
+          schema:
+            $ref: '#/definitions/ObjectID'
+        '405':
+          description: Invalid input
+        '406':
+          description: Not acceptable - File not valid
+        '409':
+          description: Conflict - VNFD already present
+        '500':
+          description: Internal server error
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: List all available VNFDs
+      description: List all available VNFDs as a json collection
+      operationId: listVNFDs
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid status value
+  '/mano/vnfd/{vnfdId}':
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Find VNFD by id
+      description: Returns a single VNFD
+      operationId: getVNFDById
+      produces:
+        - application/json
+      parameters:
+        - name: vnfdId
+          in: path
+          description: ID of VNFD to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: VNFD not found
+    delete:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Deletes a VNFD
+      description: Deletes a VNFD given its _id
+      operationId: deleteVNFD
+      produces:
+        - application/json
+      parameters:
+        - name: vnfdId
+          in: path
+          description: VNFD _id to delete
+          required: true
+          type: string
+      responses:
+        '204':
+          description: VNFD successfully deleted
+        '400':
+          description: Invalid _ID supplied
+        '404':
+          description: VNFD not found
+  /mano/nsd:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Add a new NSD to the catalogue
+      description: ''
+      operationId: addNSD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: nsd
+          in: formData
+          description: NSD Package
+          required: true
+          type: file
+      responses:
+        '201':
+          description: NSD created
+          schema:
+            $ref: '#/definitions/ObjectID'
+        '405':
+          description: Invalid input
+        '406':
+          description: Not acceptable - File not valid
+        '409':
+          description: Conflict - VNFD already present
+        '422':
+          description: Unprocessable entity
+        '500':
+          description: Internal server error
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: List all available NSDs
+      description: List all available NSDs as a json collection
+      operationId: listNSDs
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid status value
+  '/mano/nsd/{nsdId}':
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Find NSD by name
+      description: Returns a single NSD identified by its name
+      operationId: getNSDByName
+      produces:
+        - application/json
+      parameters:
+        - name: nsdId
+          in: path
+          description: Name of the NSD to return
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid NSD name supplied
+        '404':
+          description: NSD not found
+    delete:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Deletes an NSD by _ID
+      description: ''
+      operationId: deleteNSD
+      produces:
+        - application/json
+      parameters:
+        - name: nsdId
+          in: path
+          description: NSD id to delete
+          required: true
+          type: string
+      responses:
+        '204':
+          description: NSD successfully deleted
+        '400':
+          description: Invalid NS _ID supplied
+        '404':
+          description: NSD not found
+  /mano/image:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Upload an image file in the VIM
+      description: ''
+      operationId: addImage
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: image
+          in: formData
+          description: Image file
+          required: true
+          type: file
+        - name: disk_format
+          in: query
+          description: 'Disk format: raw, qcow2...'
+          required: true
+          type: string
+        - name: container_format
+          in: query
+          description: 'Container format: bare'
+          required: true
+          type: string
+      responses:
+        '201':
+          description: 'Image uploaded. Image status: active'
+        '406':
+          description: Not acceptable - File not valid
+        '413':
+          description: File too large
+        '500':
+          description: Internal server error - Service is not accessible
+  /validator/validate/ed:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - Validator
+      summary: Validate Experiment descriptor
+      description: ''
+      operationId: validateED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Experiment descriptor in JSON format
+          schema:
+            $ref: '#/definitions/Experiment_descriptor'
+          required: true
+      responses:
+        '200':
+          description: Successful validation
+          schema:
+            $ref: '#/definitions/String'
+        '400':
+          description: Invalid input
+        '500':
+          description: Entry badly formed
+  /validator/onboard/ed:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - Validator
+      summary: Validate Experiment descriptor and onboard it in the ELCM
+      description: ''
+      operationId: onboardED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Experiment descriptor in JSON format
+          schema:
+            $ref: '#/definitions/Experiment_descriptor'
+          required: true
+      responses:
+        '200':
+          description: Successful validation
+        '400':
+          description: Invalid input
+        '500':
+          description: Entry badly formed
+  /validator/validate/vnfd:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - Validator
+      summary: Validate VNFD
+      description: ''
+      operationId: validateVNFD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: vnfd
+          in: formData
+          description: VNFD Package
+          required: true
+          type: file
+      responses:
+        '201':
+          description: VNFD created
+        '400':
+          description: Descriptor with failures
+        '405':
+          description: Invalid input
+        '406':
+          description: Not acceptable - File not valid
+        '500':
+          description: Internal server error
+  /validator/onboard/vnfd:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - Validator
+      summary: Validate VNFD and add it to the catalogue
+      description: ''
+      operationId: onboardVNFD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: vnfd
+          in: formData
+          description: VNFD Package
+          required: true
+          type: file
+      responses:
+        '201':
+          description: VNFD created
+        '400':
+          description: Descriptor with failures
+        '405':
+          description: Invalid input
+        '406':
+          description: Not acceptable - File not valid
+        '409':
+          description: Conflict - VNFD already present
+        '500':
+          description: Internal server error
+  /validator/validate/nsd:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - Validator
+      summary: Validate NSD
+      description: ''
+      operationId: validateNSD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: nsd
+          in: formData
+          description: NSD Package
+          required: true
+          type: file
+      responses:
+        '201':
+          description: NSD created
+        '400':
+          description: Descriptor with failures
+        '405':
+          description: Invalid input
+        '406':
+          description: Not acceptable - File not valid
+        '500':
+          description: Internal server error
+  /validator/onboard/nsd:
+    post:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - Validator
+      summary: Validate NSD and add it to the catalogue
+      description: ''
+      operationId: onboardNSD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: nsd
+          in: formData
+          description: NSD Package
+          required: true
+          type: file
+      responses:
+        '201':
+          description: NSD created
+        '400':
+          description: Descriptor with failures
+        '405':
+          description: Invalid input
+        '406':
+          description: Not acceptable - File not valid
+        '409':
+          description: Conflict - VNFD already present
+        '500':
+          description: Internal server error
+  /auth/get_token:
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      description: 'TODO: Add Description'
+      summary: Get token
+      tags:
+        - Auth
+      operationId: Gettoken
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /auth/change_password:
+    put:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      description: 'TODO: Add Description'
+      summary: Change Password
+      tags:
+        - Auth
+      operationId: ChangePassword
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: password
+          in: formData
+          required: true
+          type: string
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /auth/register:
+    post:
+      description: 'TODO: Add Description'
+      summary: Register User
+      tags:
+        - Auth
+      operationId: RegisterUser
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: password
+          in: formData
+          required: true
+          type: string
+          description: ''
+        - name: username
+          in: formData
+          required: true
+          type: string
+          description: ''
+        - name: email
+          in: formData
+          required: true
+          type: string
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      security: []
+  /auth/login:
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      description: 'TODO: Add Description'
+      summary: LogIn
+      tags:
+        - Auth
+      operationId: LogIn
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /auth/recover_password:
+    put:
+      description: 'TODO: Add Description'
+      summary: Recover Password
+      tags:
+        - Auth
+      operationId: RecoverPassword
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: email
+          in: formData
+          required: true
+          type: string
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      security: []
+  /auth/show_users:
+    get:
+      security:
+        - basicAuth: []
+      description: 'TODO: Add Description'
+      summary: Show Users
+      tags:
+        - 'Auth: Admin Functions'
+      operationId: ShowUsers
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: verbose
+          in: query
+          required: true
+          type: boolean
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  /auth/drop_db:
+    delete:
+      security:
+        - basicAuth: []
+      description: 'TODO: Add Description'
+      summary: Drop DB
+      tags:
+        - 'Auth: Admin Functions'
+      operationId: DropDB
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+  '/auth/delete_user/{username}':
+    delete:
+      security:
+        - basicAuth: []
+      description: 'TODO: Add Description'
+      summary: Delete User
+      tags:
+        - 'Auth: Admin Functions'
+      operationId: DeleteUser
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+definitions:
+  ObjectID:
+    type: object
+    properties:
+      id:
+        type: string
+        example: 123e4567-e89b-12d3-a456-426655440000
+  String:
+    type: string
+    example: "ok"
+  Experiment_descriptor:
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+        example: 123
+      Name:
+        type: string
+        example: sfafd
+      User:
+        type: integer
+        format: int64
+        example: 1234
+      Platform:
+        type: string
+        example: malaga
+      TestCases:
+        type: array
+        example:
+          - TC1
+          - TC2
+        items:
+          type: string
+      UEs:
+        type: array
+        example:
+          - UE1
+          - UE2
+        items:
+          type: string
+      Slice:
+        type: string
+        example: slice_id
+      NS:
+        type: string
+        example: ns_id
+      NS_Placement:
+        type: string
+        example: Edge
+      Limited:
+        type: boolean
+        example: true
+      Type_experiment:
+        type: boolean
+        example: false
+      Scenario:
+        type: array
+        example:
+          - scenario1
+          - scemarop2
+        items:
+          type: string
+      Application:
+        type: array
+        example:
+          - app1
+        items:
+          type: string
+      Attended:
+        type: boolean
+        example: true
+      Reservation_time:
+        type: integer
+        format: int64
+        example: 60
+securityDefinitions:
+  basicAuth:
+    type: basic
+  BearerToken:
+    type: apiKey
+    name: Authorization
+    in: header
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
