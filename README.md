@@ -56,10 +56,12 @@ The user that wants to have access to the platform services will have to request
 
 #### Request to a service using Token Authentication
 ![Request with token](./images/request_with_token.png)
+
 Prior to any request to a service, the user needs to obtain an authentication token using valid credentials and Basic Auth. Once received the token, this is valid for the next 3 minutes and can be used to query any service behind the *Dispatcher*.
 
 #### Request to a service using Basic Authentication
 ![Request with basic authentication](./images/request_with_ba.png)
+
 Basic authentication is also available: A registered user, using valid credentials should use them in every query to a service behind the *Dispatcher*. 
 
 **NOTE:** To know more about the Auth module, go [here](auth/README.md "Auth docs") 
