@@ -3,7 +3,7 @@
 Standalone REST API part of 5Genesis' OSS for interactions with in the MANO.
 This application uses the NFVO and VIM original API, bypassing security and abstracting the type of NVFO or VIM used to the user, that should not be aware of sensitive information but must use the functionalities of the underlying application.
 
-The original documentation for the OSM API can be found [here](https://osm.etsi.org/wikipub/index.php/OSM_Scope_and_Functionality).
+The original documentation for the OSM API can be found [here](https://osm.etsi.org/wikipub/index.php/NBI_API_Description).
 
 [OSM VNFD information model](http://osm-download.etsi.org/ftp/osm-doc/vnfd.html)
 

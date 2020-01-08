@@ -50,7 +50,7 @@ http {
         server_name localhost;" > $1
 }
 
-function write_footer {
+function write_footer_auth {
 echo "
 
         location /auth {
@@ -73,7 +73,13 @@ echo "
 }" >> $1
 }
 
-function add_enabler {
+function write_footer {
+echo "
+    }
+}" >> $1
+}
+
+function add_enabler_auth {
     echo "
 
         location /$1 {
@@ -104,6 +110,34 @@ function add_enabler {
         }" >> $3
 }
 
+function add_enabler {
+    echo "
+
+        location /$1 {
+            proxy_pass $2;
+            #rewrite ^/(.*)/$ /\$1 permanent;
+            proxy_redirect     off;
+            proxy_set_header   Host \$host;
+            proxy_set_header   X-Real-IP \$remote_addr;
+            proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Host \$server_name;
+            if (\$request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                #
+                # Custom headers and headers various browsers *should* be OK with but aren't 
+                #
+                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                #
+                # Tell client that this pre-flight info is valid for 20 days
+                #
+                add_header 'Access-Control-Max-Age' 1728000;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }        
+        }" >> $3
+}
 
 # Check the user has configured the validator env file
 while true; do
@@ -121,6 +155,16 @@ while true; do
     case $yn in
         [Yy]* ) echo "Let's proceed"; break;;
         [Nn]* ) echo "Please, fill in '$config_file' in the proper way"; exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+# Allow authentication or not when installin the Dispatcher
+while true; do
+    read -p "Do you wish to allow Authentication? " yn
+    case $yn in
+        [Yy]* ) echo "Authentication enabled"; authentication=true; break;;
+        [Nn]* ) echo "Authentication disabled"; authentication=false; break;;
         * ) echo "Please answer yes or no.";;
     esac
 done
@@ -150,8 +194,11 @@ then
     # the first time we arrive here, we don't do anything
     if $write_enabler; then
 	# write the paragraph that includes all the config of the module
-        add_enabler $module $line $output_file
-
+        if $authentication; then
+            add_enabler_auth $module $line $output_file
+        else
+            add_enabler $module $line $output_file
+        fi
     fi
     # Preparation of the key line that includes all the information included in the config file
     write_enabler=true
@@ -163,7 +210,11 @@ else
 fi
 done < $config_file
 
-add_enabler $module $line $output_file
+if $authentication; then
+    add_enabler_auth $module $line $output_file
+else
+    add_enabler $module $line $output_file
+fi
 
 # Add the local IP to the swagger file
 my_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
@@ -172,7 +223,11 @@ sed "s/DISPATCHER/$my_ip/g" swagger/template.json > swagger/swagger.json
 echo "Dispatcher configured using information from '$config_file' file"
 
 # after the whole config file is processed, we write the last part of the config file
-write_footer $output_file
+if $authentication; then
+    write_footer_auth $output_file
+else
+    write_footer $output_file
+fi
 
 # Build the images
 echo "Building the images..."

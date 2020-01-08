@@ -7,6 +7,8 @@ This implementation is based on a NGINX reverse proxy containerised in a Docker 
 By default, The *Dispatcher* includes as added on modules, the [Validator](validator/README.md "Validator"), the [MANO Wrapper](mano/README.md "MANO Wrapper") and a Swagger environment to test the available features.
 On top of all that and to secure all the requests, the Dispatcher provides user registration and authentication using JWT. Consult the [Auth documentation](auth/readme.md "Auth") for the available actions and how to use them.
 
+**NOTE:**As shown below in the architecture diagram, the *Dispatcher* does not deal with the MANO directly but through a wrapper that simplies the communication. Also for simplification, in this document we will refer to the *MANO Wrapper* as ***mano***, which is conceptually correct from the *Dispatcher* point of view.
+
 ## Architecture
 
 ![Dispatcher architecture](./images/dispatcher_arch.png)
@@ -121,11 +123,11 @@ Once edited properly, the configuration should be applied and the containers bui
     HOST=mano
     PROTOCOL=5001
     PATH=/
-    [elcm]
-    PROTOCOL=http
-    HOST=192.168.33.102
-    PORT=5000
-    PATH=/api
+    **[elcm]**
+    **PROTOCOL=http**
+    **HOST=192.168.33.102**
+    **PORT=5000**
+    **PATH=/api**
 
 With the config file above, using the ELCM API as an **example**, the dispatcher will translate the original request to a new one. For example, the original URL would be the following one:
 > Original URL: <http://192.168.33.102:5000/api/v0/run>
@@ -160,6 +162,7 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Versioning
 
+- 2.1.0 - Make Authentication optional during the installation process
 - 2.0.1 - Auth module documentation updated
 - 2.0.0 - User registration and authentication
 - 1.3.3 - Added VNFD and NSD update to the MANO API features and image uploading.
@@ -171,7 +174,6 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 ## Next steps
 
 - Add cross-platform features.
-- Make the authentication optional when installing the *Dispatcher*
 
 ## Authors
 
