@@ -46,31 +46,36 @@ The available features will depend on the features exposed by each dispatched mo
 
 ![Authentication](./images/auth.png)
 
+It is important to know----
+
 Authentication is delegated to the *Auth* module. Users are registered into it and provide the ability to an user to claim an access token. This token is a JSON Web Token. It contains user's identity (subject id, name, email) and some meta data relatives to the authorization process (issuer, time to live, etc.). The access token can be claimed using Basic Authentication (username + password). The access token is online, that is, a token used by client apps having a direct user interaction (GUI such as: web site, desktop apps, mobile apps, etc). It's a short-lived token, so it shall be renew before its expiration date using a refresh token. Once claimed, the access token is renewed as well as the refresh token. And the process is repeated during the whole user session life time.
 Instead of requesting an access token, it is also possible to authenticate every request using Basic Auth with a user already registered and validated by the Platform Administrator.
 
-### The process is following:
+### The process is the following:
 
 #### User registration
-![User registration](./images/user_registration.png)
-
 The user that wants to have access to the platform services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
 
-#### Request to a service using Token Authentication
-![Request with token](./images/request_with_token.png)
+![User registration](./images/user_registration.png)
 
+#### Sending a request to a service
+The *Dispatcher* allows two different authentication methods: Token authentication (JWT) and Basic authentication.
+
+##### Request to a service using Token Authentication
 Prior to any request to a service, the user needs to obtain an authentication token using valid credentials and Basic Auth. Once received the token, this is valid for the next 3 minutes and can be used to query any service behind the *Dispatcher*.
 
-#### Request to a service using Basic Authentication
-![Request with basic authentication](./images/request_with_ba.png)
+![Request with token](./images/request_with_token.png)
 
+##### Request to a service using Basic Authentication
 Basic authentication is also available: A registered user, using valid credentials should use them in every query to a service behind the *Dispatcher*. 
+
+![Request with basic authentication](./images/request_with_ba.png)
 
 **NOTE:** To know more about the Auth module, go [here](auth/README.md "Auth docs") 
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes after you clone the repository.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes after you clone the [repository](https://gitlab.fokus.fraunhofer.de/5genesis/dispatcher.git).
 
 ### Pre-requisites
 
@@ -86,7 +91,7 @@ For running the 5Genesis Dispatcher, you will need:
 ### Config file and installation
 
 The Dispatcher needs to be configured properly before it is deployed. For that a simplified configuration file is offered: `dispatcher.conf`, which will have to be edited and adapted.
-The file contains information of all the modules the Dispatcher forwards information to and how to do it. For each module, a new enabler will be added in the Dispatcher. It uses the following format:
+The file should contain information of all the modules the Dispatcher forwards information to (validator, mano, elcm, result_catalog, etc.) and how to do it. For each module, a new enabler will be added in the Dispatcher. It uses the following format:
 
     [module_name]
     PROTOCOL=[http|https]
@@ -106,8 +111,9 @@ The file contains information of all the modules the Dispatcher forwards informa
     PORT=5001
     PATH=/
 
-The config file template already includes the *validator* and the *mano* modules as they are included within the *Dispatcher*.
-Once edited properly, the configuration should be applied and the containers built, based on the config file we have just created (*dispatcher.conf*):
+The config file template already includes the *validator* and the *mano* modules as they are included within the *Dispatcher*. They are already configured and **should not be touched**.
+
+Once edited properly, the configuration will be applied and the containers built, based on the config file we have just created (*dispatcher.conf*):
 
 `$ ./install.sh`
 
@@ -130,7 +136,7 @@ Once edited properly, the configuration should be applied and the containers bui
     PORT=5000
     PATH=/api
 
-With the config file above, using the ELCM API as an **example**, the dispatcher will translate the original request to a new one. For example, the original URL would be the following one:
+With the sample config file above, using the ELCM API as an **example**, the dispatcher will translate the original request to a new one. For example, the original URL would be the following one:
 > Original URL: <http://192.168.33.102:5000/api/v0/run>
 
 The previous URL is translated to a new one, removing the speficied base path (`/api`, in this example), adding a new base path common to all the requests directed to the ELCM (`/elcm` in this example) and leaving the particular endpoint (`/v0/run`) as it was:
@@ -159,7 +165,19 @@ A swagger testing framework is deployed on port 5002 with the following API spec
 
 ## Logging
 
-*Dispatcher* logs are available in the `log` folder of the application.
+*Dispatcher* logs containing all access attemtps to the application are available in the `log` folder of the application.
+In case of needing any help, contact the [authors](#authors) for support.
+
+### Example
+
+    192.168.33.11 - - [02/Jan/2020:15:31:05 +0000]  401 "POST /validator/validate/ed HTTP/1.1" 179 "-" "curl/7.59.0" "-"
+    192.168.33.11 - - [02/Jan/2020:15:31:44 +0000]  200 "OPTIONS /auth/get_token HTTP/1.1" 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36" "-"
+    192.168.33.11 - - [02/Jan/2020:15:33:51 +0000]  204 "OPTIONS /mano/vnfd HTTP/1.1" 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36" "-"
+    192.168.33.11 - Javier [02/Jan/2020:16:00:24 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
+    192.168.33.11 - - [02/Jan/2020:16:02:10 +0000]  200 "GET /mano/vnfd HTTP/1.1" 9407 "-" "PostmanRuntime/7.21.0" "-"
+    192.168.33.11 - - [02/Jan/2020:16:08:22 +0000]  401 "GET /mano/nsd HTTP/1.1" 179 "-" "PostmanRuntime/7.21.0" "-"
+    192.168.33.11 - Javier [02/Jan/2020:16:08:30 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
+    192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Versioning
 
