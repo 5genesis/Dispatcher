@@ -48,7 +48,8 @@ auth/                                   Main Folder
 
 ### Database Model
 DB is defined in DB_Model.py and has the following structure:
-[[Imagen]]
+![DB](./images/DB.png)
+
 Once the DB is created, the Admin user is created, with username "Admin", password "Admin" and email "5genesismanagement@gmail.com", setted in the mail config.
 
 ### Email Config

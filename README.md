@@ -62,7 +62,7 @@ The user that wants to have access to the platform services will have to request
 The *Dispatcher* allows two different authentication methods: Token authentication (JWT) and Basic authentication.
 
 ##### Request to a service using Token Authentication
-Prior to any request to a service, the user needs to obtain an authentication token using valid credentials and Basic Auth. Once received the token, this is valid for the next 3 minutes and can be used to query any service behind the *Dispatcher*.
+Prior to any request to a service, the user needs to obtain an authentication token using valid credentials and Basic Auth. Once received the token, this is valid for the next 5 minutes and can be used to query any service behind the *Dispatcher*.
 
 ![Request with token](./images/request_with_token.png)
 
