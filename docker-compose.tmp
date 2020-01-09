@@ -40,3 +40,4 @@ services:
       - '5002:8080'
     volumes:
       - './swagger:/my_swagger'
+

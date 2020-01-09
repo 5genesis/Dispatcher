@@ -54,7 +54,7 @@ function write_footer_auth {
 echo "
 
         location /auth {
-            proxy_pass http://auth:2000;
+            proxy_pass http://auth:2000/;
             #rewrite ^/(.*)/$ /\$1 permanent;
             proxy_redirect     off;
             proxy_set_header   Host \$host;
@@ -98,7 +98,8 @@ function add_enabler_auth {
                 #
                 # Custom headers and headers various browsers *should* be OK with but aren't 
                 #
-                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                #add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
                 #
                 # Tell client that this pre-flight info is valid for 20 days
                 #
@@ -199,17 +200,6 @@ then
 	# write the paragraph that includes all the config of the module
         if $authentication; then
             add_enabler_auth $module $line $output_file
-            echo"
-  auth:
-    build: ./auth
-    image: auth
-    container_name: auth
-    command: python Auth.py
-    volumes:
-      - \"./auth:/auth\"
-    ports:
-      - '2000:2000'
-    restart: always" >> docker-compose.yml
         else
             add_enabler $module $line $output_file
         fi
@@ -227,6 +217,18 @@ done < $config_file
 if $authentication; then
     add_enabler_auth $module $line $output_file
     swagger_file="swagger/template_auth.json"
+    echo "
+  auth:
+    build: ./auth
+    image: auth
+    container_name: auth
+    command: python Auth.py
+    volumes:
+      - \"./auth:/auth\"
+    ports:
+      - '2000:2000'
+    restart: always
+" >> docker-compose.yml
 else
     add_enabler $module $line $output_file
     swagger_file="swagger/template_no_auth.json"
