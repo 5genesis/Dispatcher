@@ -199,11 +199,12 @@ then
 	# write the paragraph that includes all the config of the module
         if $authentication; then
             add_enabler_auth $module $line $output_file
-            echo"  auth:
+            echo"
+  auth:
     build: ./auth
     image: auth
     container_name: auth
-    command: python auth.py
+    command: python Auth.py
     volumes:
       - \"./auth:/auth\"
     ports:

@@ -1,34 +1,31 @@
 from flask import Blueprint, request, jsonify, render_template
 import hashlib
-import string
-import random
-import re
 from datetime import datetime
 import ast
-from flask_mail import Mail, Message
+from flask_mail import Message
 from jwcrypto import jwt, jwk
-from MailConfig import mail_settings
 import logging
 import json
 from Auth import app
-from auth_utils import session, admin_auth, validate_token, preValidation
+from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword
 from DB_Model import init_db, User, Registry, db
 from MailConfig import mail
+
 auth_logic = Blueprint('auth_page', __name__, template_folder='templates')
 
 
-
-key = None
 json1_file = open('key.json')
 json1_str = json1_file.read()
 json1_data = json.loads(json1_str)
 key = jwk.JWK(**json1_data)
 logger = logging.getLogger('REST API')
 
+
 @auth_logic.route('/get_token', methods=['GET'])
 def get_token():
     """Login Form"""
     logger.info(str(request))
+
     def logic(token):
 
         try:
@@ -47,6 +44,7 @@ def get_token():
 def login():
     """Login Form"""
     logger.info(str(request))
+
     def logic(token):
         try:
             session['token'] = token
@@ -92,6 +90,7 @@ def validate_request():
 
     return jsonify(result='Success')
 
+
 @auth_logic.route('/change_password', methods=['PUT'])
 def change_password():
     """change_Password Form"""
@@ -111,28 +110,6 @@ def change_password():
             return jsonify(result='No user registered/active with that user/password'), 400
     except Exception as e:
         return jsonify(result=('Change password failed: ' + str(e))), 400
-
-
-def admin_confirmation(username, email):
-    now = datetime.now()
-    Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                     claims={'username': username, 'email': email, 'action': 'delete', 'time': datetime.timestamp(now)})
-    Etoken.make_encrypted_token(key)
-    token_not_provide = str(Etoken.serialize())
-
-    Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                     claims={'username': username, 'email': email, 'action': 'activated',
-                             'time': datetime.timestamp(now)})
-    Etoken.make_encrypted_token(key)
-    token_provide = str(Etoken.serialize())
-
-    msg = Message(subject='User validation',
-                  sender=app.config.get('MAIL_USERNAME'),
-                  recipients=[app.config.get('MAIL_USERNAME')],  # replace with your email for testing
-                  html=render_template('validate_user.html',
-                                       user=username, email=email, token_provide=token_provide,
-                                       token_not_provide=token_not_provide))
-    mail.send(msg)
 
 
 @auth_logic.route('/register', methods=['POST'])
@@ -169,7 +146,6 @@ def register():
         return jsonify(result=('Registration failed: ' + str(e))), 400
 
 
-
 @auth_logic.route('/drop_db', methods=['DELETE'])
 @admin_auth
 def drop_db():
@@ -204,11 +180,11 @@ def delete_one_user(user):
 @admin_auth
 def show_users():
     logger.info(str(request))
-    try:
+    user = request.args.get('username')
+    verbose = request.args.get('verbose')
 
-        user = request.args.get('username')
-        verbose = request.args.get('verbose')
-        if verbose == 'false' or verbose == False:
+    try:
+        if verbose == 'false' or verbose is False:
             verbose = None
         active = request.args.get('active')
         deleted = request.args.get('deleted')
@@ -236,14 +212,14 @@ def get_users(username=None, verbose=False, active=False, deleted=False):
             'deleted': item.deleted
         }
     if verbose:
-        for key in users_dict.keys():
+        for aux_key in users_dict.keys():
             traces_list = []
-            for item in Registry.query.filter_by(username=key).all():
+            for item in Registry.query.filter_by(username=aux_key).all():
                 if item.data:
                     traces_list.append({'action': item.action, 'data_provided': str(item.data), 'date': str(item.date)})
                 else:
                     traces_list.append({'action': item.action, 'date': str(item.date)})
-            users_dict[key]['traces'] = traces_list
+            users_dict[aux_key]['traces'] = traces_list
 
     return users_dict
 
@@ -254,23 +230,6 @@ def logout():
     logger.info(str(request))
     session['token'] = False
     return jsonify(result="Logged out"), 200
-
-
-def randomPassword(stringLength=10):
-    """Generate a random string of fixed length """
-
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(stringLength))
-
-
-def check_mail(email):
-    # pass the regualar expression
-    # and the string in search() method
-    if (re.search('^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$', email)):
-        return True
-
-    else:
-        return False
 
 
 @auth_logic.route('/recover_password', methods=['PUT'])
@@ -304,12 +263,12 @@ def recover_password():
         return jsonify(result=('Change password failed: ' + str(e))), 400
 
 
-@auth_logic.route('/validate_user/<token>', methods=['GET', 'POST'])
-def validate_user(token):
+@auth_logic.route('/validate_user/<data>', methods=['GET'])
+def validate_user(data):
     logger.info(str(request))
     try:
-        metadata = ast.literal_eval(jwt.JWT(key=key, jwt=token).claims)
 
+        metadata = ast.literal_eval(jwt.JWT(key=key, jwt=data).claims)
         user = metadata['username']
         action = metadata['action']
 
@@ -330,6 +289,52 @@ def validate_user(token):
 
     except Exception as e:
         return jsonify(result=('Validation process interrupted: ' + str(e))), 400
+
+
+@auth_logic.route('/validate_user/<data>', methods=['PUT'])
+@admin_auth
+def validate_user_manually(data):
+    logger.info(str(request))
+    try:
+        admin_auth(validate_user)
+        user = data
+        action = "create"
+        email = User.query.filter_by(username=user).first().email
+
+        data = User.query.filter_by(username=user).first()
+        data.active = True
+        data.deleted = False
+        new_action = Registry(username=data.username, action='Activated')
+        db.session.add(new_action)
+
+        db.session.commit()
+        notify_user(email, action)
+        return jsonify(result='Changes applied')
+
+    except Exception as e:
+        return jsonify(result=('Validation process interrupted: ' + str(e))), 400
+
+
+def admin_confirmation(username, email):
+    now = datetime.now()
+    Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                     claims={'username': username, 'email': email, 'action': 'delete', 'time': datetime.timestamp(now)})
+    Etoken.make_encrypted_token(key)
+    token_not_provide = str(Etoken.serialize())
+
+    Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                     claims={'username': username, 'email': email, 'action': 'activated',
+                             'time': datetime.timestamp(now)})
+    Etoken.make_encrypted_token(key)
+    token_provide = str(Etoken.serialize())
+
+    msg = Message(subject='User validation',
+                  sender=app.config.get('MAIL_USERNAME'),
+                  recipients=[app.config.get('MAIL_USERNAME')],  # replace with your email for testing
+                  html=render_template('validate_user.html',
+                                       user=username, email=email, token_provide=token_provide,
+                                       token_not_provide=token_not_provide))
+    mail.send(msg)
 
 
 def notify_user(email, action):

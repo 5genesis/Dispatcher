@@ -1,3 +1,6 @@
+import string
+import random
+import re
 from flask import request
 import hashlib
 from jwcrypto import jwt
@@ -7,6 +10,7 @@ from DB_Model import User, Registry, Rol, db
 from flask import session, jsonify
 from datetime import datetime
 from settings import Settings
+
 
 key = Settings().KEY
 
@@ -19,7 +23,7 @@ def preValidation(request, functional_part):
     if data is not None and data.active:
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                         claims={'username': username, 'password': password, 'timeout': datetime.timestamp(now) + 120})
+                         claims={'username': username, 'password': password, 'timeout': datetime.timestamp(now) + Settings.Timeout})
 
         Etoken.make_encrypted_token(key)
         token = Etoken.serialize()
@@ -97,3 +101,22 @@ def validate_token(token, request):
             raise Exception()
     except:
         return 'No valid Token given'
+
+def randomPassword(stringLength=10):
+    """Generate a random string of fixed length """
+
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
+
+
+def check_mail(email):
+    # pass the regualar expression
+    # and the string in search() method
+    if (re.search('^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$', email)):
+        return True
+
+    else:
+        return False
+
+
+

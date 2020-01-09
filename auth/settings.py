@@ -10,7 +10,7 @@ def set_key():
 
 
 class Settings:
-
+    Timeout = 5 * 60  # Time in seconds
     KEY = None
 
     def __init__(self):
