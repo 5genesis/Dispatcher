@@ -282,7 +282,14 @@ class VIM_image_post(Resource):
 
 class VIM_list(Resource):
     def get(self):
-        return [{vim_name, vim_type, vim_location}]
+        list = []
+        vim = {}
+        vim['name'] = vim_name
+        vim['type'] = vim_type
+        vim['location'] = vim_location
+        list.append(vim)
+        logger.info("Retrieving VIMs list: {}".format(list))
+        return list
 
 
 #api.add_resource(InstantiateNSD, '/instantiate_nsd/<string:nsd_id>')
