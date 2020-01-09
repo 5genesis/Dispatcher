@@ -280,6 +280,9 @@ class VIM_image_post(Resource):
         #osUtils.list_images(vim_conn) 
         return "Image status: {}".format(r.status), 201
 
+class VIM_list(Resource):
+    def get(self):
+        return [{vim_name, vim_type, vim_location}]
 
 
 #api.add_resource(InstantiateNSD, '/instantiate_nsd/<string:nsd_id>')
@@ -289,6 +292,7 @@ api.add_resource(VNFD, '/vnfd')
 api.add_resource(NSD_post, '/nsd')
 api.add_resource(NSD_get, '/nsd/<string:ns_name>')
 api.add_resource(VIM_image_post, '/image')
+api.add_resource(VIM_list, '/vims')
 
 api.add_resource(Prometheus, '/prometheus')
 
@@ -308,7 +312,9 @@ if __name__ == '__main__':
         nfvo_pass = str(config['NFVO']['PASSWORD'])
         #nfvo_vim_account = str(config['NFVO']['VIM_ACCOUNT'])
         #VIM config
+        vim_name = str(config['VIM']['NAME'])
         vim_type = str(config['VIM']['TYPE'])
+        vim_location = str(config['VIM']['LOCATION'])
         vim_auth_url = str(config['VIM']['AUTH_URL'])
         vim_user = str(config['VIM']['USER'])
         vim_pass = str(config['VIM']['PASSWORD'])
