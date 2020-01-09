@@ -312,7 +312,9 @@ if __name__ == '__main__':
     try:
         config = configparser.ConfigParser()
         config.read(config_file)
+        """
         #NFVO config
+        conf = {}
         nfvo_type = str(config['NFVO']['TYPE'])
         nfvo_ip = str(config['NFVO']['IP'])
         nfvo_user = str(config['NFVO']['USER'])
@@ -326,22 +328,57 @@ if __name__ == '__main__':
         vim_user = str(config['VIM']['USER'])
         vim_pass = str(config['VIM']['PASSWORD'])
         vim_project = str(config['VIM']['PROJECT'])
+        """
+        '''
+        config format after reading the config file
+        {
+            "nfvo": {
+                "type": "OSM",
+                "ip": "xxx"
+            },
+            "vim": [
+                {
+                    "name": "malaga1",
+                    "type": "openstack"
+                },
+                {
+                    "name": "malaga2",
+                    "type": "openstack"
+                }
+            ]
+        }
+        '''
+        conf = {"nfvo": {}, "vim": []}
+        for section in config.sections():
+            if section == 'NFVO':
+                for (key, val) in config.items(section):
+                    conf["nfvo"][key] = val
+            else:
+                if section == 'VIM':
+                    vim = {}
+                    for (key, val) in config.items(section):
+                        vim[key] = val
+                    conf["vim"].append(vim)
+                else:
+                    raise KeyError('Unexpected section in the config file')
 
         logger.info("Starting app")
         # init the NFVO
-        logger.info("Adding NFVO- Type: {}, IP:{}, User:{}".format(nfvo_type, nfvo_ip, nfvo_user))
-        if nfvo_type == "OSM":
-            nbiUtil = osmUtils(osm_ip=nfvo_ip, username=nfvo_user, password=nfvo_pass, vim_account_id=None)
+        logger.info("Adding NFVO- Type: {}, IP:{}, User:{}".format(conf["nfvo"]["type"], conf["nfvo"]["ip"], conf["nfvo"]["user"]))
+        if conf["nfvo"]["type"] == "OSM":
+            nbiUtil = osmUtils(osm_ip=conf["nfvo"]["ip"], username=conf["nfvo"]["user"], password=conf["nfvo"]["password"], vim_account_id=None)
         else:
-            logger.error("NFVO type {} not supported".format(nfvo_type))
-            raise KeyError("NFVO type {} not supported".format(nfvo_type))
+            logger.error("NFVO type {} not supported".format(conf["nfvo"]["type"]))
+            raise KeyError("NFVO type {} not supported".format(conf["nfvo"]["type"]))
         # init the VIM
+        """
         logger.info("Adding VIM- Type: {}, Auth URL:{}, User:{}, Project:{}".format(vim_type, vim_auth_url, vim_user, vim_project))
         if vim_type == "openstack":
             vim_conn = osUtils.connection(auth_url=vim_auth_url, region="RegionOne", project_name=vim_project, username=vim_user, password=vim_pass)
         else:
             logger.error("VIM type {} not supported".format(vim_type))
             raise KeyError("VIM type {} not supported".format(vim_type))
+        """
         #app.run(host='0.0.0.0', debug=True)
         http_server = WSGIServer(('', 5001), app)
         http_server.serve_forever()
