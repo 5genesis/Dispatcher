@@ -94,7 +94,7 @@ function add_enabler_auth {
             proxy_set_header   X-Forwarded-Host \$server_name;
             if (\$request_method = 'OPTIONS') {
                 add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
                 #
                 # Custom headers and headers various browsers *should* be OK with but aren't 
                 #
@@ -124,7 +124,7 @@ function add_enabler {
             proxy_set_header   X-Forwarded-Host \$server_name;
             if (\$request_method = 'OPTIONS') {
                 add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
                 #
                 # Custom headers and headers various browsers *should* be OK with but aren't 
                 #
