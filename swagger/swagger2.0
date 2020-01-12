@@ -23,6 +23,14 @@
     {
       "name": "Validator",
       "description": "Experiment descriptor validation and network service validation (VNFD + NSD)"
+    },
+    {
+      "name": "Auth",
+      "description": "Operations for users in order to access to the different microservices"
+    },
+    {
+      "name": "Auth: Admin Functions",
+      "description": "Operations for Admin for managing the  user Auth"
     }
   ],
   "schemes": [
@@ -31,6 +39,14 @@
   "paths": {
     "/mano/vnfd": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -71,6 +87,14 @@
         }
       },
       "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -92,6 +116,14 @@
     },
     "/mano/vnfd/{vnfdId}": {
       "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -123,6 +155,14 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -152,54 +192,18 @@
             "description": "VNFD not found"
           }
         }
-      },
-      "put": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated",
-        "description": "",
-        "operationId": "updateVNFD",
-        "consumes": [
-          "multipart/form-data"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "vnfd",
-            "in": "formData",
-            "description": "VNFD Package",
-            "required": true,
-            "type": "file"
-          },
-          {
-            "name": "vnfdId",
-            "in": "path",
-            "description": "VNFD _id to update",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "VNFD successfully updated"
-          },
-          "400": {
-            "description": "Invalid VNFD _ID supplied"
-          },
-          "404": {
-            "description": "VNFD not found"
-          },
-          "409": {
-            "description": "There was a conflict when updating this VNFD"
-          }
-        }
       }
     },
     "/mano/nsd": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -228,6 +232,9 @@
           "405": {
             "description": "Invalid input"
           },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
           "409": {
             "description": "Conflict - VNFD already present"
           },
@@ -240,6 +247,14 @@
         }
       },
       "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -261,6 +276,14 @@
     },
     "/mano/nsd/{nsdId}": {
       "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -292,6 +315,14 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -321,54 +352,18 @@
             "description": "NSD not found"
           }
         }
-      },
-      "put": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Updates an NSD providing the new NSD package and the _ID of the old one that is being updated",
-        "description": "",
-        "operationId": "updateNSD",
-        "consumes": [
-          "multipart/form-data"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "nsd",
-            "in": "formData",
-            "description": "NSD Package",
-            "required": true,
-            "type": "file"
-          },
-          {
-            "name": "nsdId",
-            "in": "path",
-            "description": "NSD _id to update",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "NSD successfully updated"
-          },
-          "400": {
-            "description": "Invalid NS _ID supplied"
-          },
-          "404": {
-            "description": "NSD not found"
-          },
-          "409": {
-            "description": "There was a conflict when updating this NSD"
-          }
-        }
       }
     },
     "/mano/image": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "MANO"
         ],
@@ -408,6 +403,9 @@
           "201": {
             "description": "Image uploaded. Image status: active"
           },
+          "406": {
+            "description": "Not acceptable - File not valid"
+          },
           "413": {
             "description": "File too large"
           },
@@ -419,6 +417,14 @@
     },
     "/validator/validate/ed": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Validator"
         ],
@@ -457,6 +463,14 @@
     },
     "/validator/onboard/ed": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Validator"
         ],
@@ -498,6 +512,14 @@
     },
     "/validator/validate/vnfd": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Validator"
         ],
@@ -540,6 +562,14 @@
     },
     "/validator/onboard/vnfd": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Validator"
         ],
@@ -585,6 +615,14 @@
     },
     "/validator/validate/nsd": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Validator"
         ],
@@ -627,6 +665,14 @@
     },
     "/validator/onboard/nsd": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Validator"
         ],
@@ -669,9 +715,296 @@
           }
         }
       }
+    },
+    "/auth/get_token": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Get token",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Gettoken",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/change_password": {
+      "put": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Change Password",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "ChangePassword",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "TODO: Add Description",
+        "summary": "Register User",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RegisterUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "username",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/login": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "LogIn",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "LogIn",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/recover_password": {
+      "put": {
+        "description": "TODO: Add Description",
+        "summary": "Recover Password",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RecoverPassword",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/show_users": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Show Users",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ShowUsers",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/drop_db": {
+      "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Drop DB",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DropDB",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/delete_user/{username}": {
+      "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Delete User",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DeleteUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "ObjectID":{
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426655440000"
+        }
+      }
+    },
     "Experiment_descriptor": {
       "type": "object",
       "properties": {
@@ -762,6 +1095,16 @@
           "example": 60
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "basicAuth": {
+      "type": "basic"
+    },
+    "BearerToken": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   },
   "externalDocs": {

@@ -39,6 +39,18 @@ For now only OSM descriptors are supported:
 
 [NSD information model](http://osm-download.etsi.org/ftp/osm-doc/nsd.html "NSD IM")
 
+## Validator configuration
+
+As part of the *Validator* features, it performs not only validation but also onboards VNFDs and NDSs and launches Experiments defined by its Experiment Descriptor. To carry ouf these actions, the *validator* needs to know the destination URLs of those external services: this information is gathered in the file `config.env`.
+
+### config.env example:
+
+    ELCM_ED_POST="http:///localhost:8082/elcm/v0/run"
+    MANO_NSD_POST=http://mano:5001/nsd
+    MANO_VNFD_POST=http://mano:5001/vnfd
+
+**NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed.
+
 ## Available functions
 
 The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with POST methods:

@@ -1,0 +1,350 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Swagger 5GENESIS Auth",
+    "version": "1.0.0",
+    "title": "5GENESIS Auth Swagger",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "luis.gomez.external@atos.net"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "localhost:2000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Operations for users in order to access to the different microservices"
+    },
+    {
+      "name": "Auth: Admin Functions",
+      "description": "Operations for Admin for managing the  user Auth"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/get_token": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Get token",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Gettoken",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/change_password": {
+      "put": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Change Password",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "ChangePassword",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "description": "TODO: Add Description",
+        "summary": "Register User",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RegisterUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "username",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/login": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "LogIn",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "LogIn",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/recover_password": {
+      "put": {
+        "description": "TODO: Add Description",
+        "summary": "Recover Password",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RecoverPassword",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/show_users": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Show Users",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ShowUsers",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/validate_user/{username}": {
+      "put": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Validate User",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ValidateUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/drop_db": {
+      "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Drop DB",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DropDB",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/delete_user/{username}": {
+      "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Delete User",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DeleteUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basicAuth": {
+      "type": "basic"
+    },
+    "BearerToken": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

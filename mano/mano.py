@@ -254,10 +254,17 @@ class NSD_post(Resource):
         logger.debug(res)
         return res, code
 
-
 class VIM_image_post(Resource):
-    def post(self):
+    def post(self, vim_name):
         import os
+        vim = conf["VIM"][vim_name]
+        # init the VIM
+        logger.info("Adding VIM- Type: {}, Auth URL:{}, User:{}, Project:{}".format(vim["TYPE"], vim["AUTH_URL"], vim["USER"], vim["PROJECT"]))
+        if vim["TYPE"] == "openstack":
+            vim_conn = osUtils.connection(auth_url=vim["AUTH_URL"], region="RegionOne", project_name=vim["PROJECT"], username=vim["USER"], password=vim["PASSWORD"])
+        else:
+            logger.error("VIM type {} not supported".format(vim["TYPE"]))
+            raise KeyError("VIM type {} not supported".format(vim["TYPE"]))
         
         try:
             logger.info("Uploading image")
@@ -281,6 +288,19 @@ class VIM_image_post(Resource):
         return "Image status: {}".format(r.status), 201
 
 
+class VIM_list(Resource):
+    def get(self):
+        logger.info("Retrieving VIMs list")
+        list = []
+        for vim in conf["VIM"]:
+            new_vim = {}
+            new_vim["name"] = conf["VIM"][vim]["NAME"]
+            new_vim["type"] = conf["VIM"][vim]["TYPE"]
+            new_vim["location"] = conf["VIM"][vim]["LOCATION"]
+            list.append(new_vim) 
+        logger.debug("VIMs list: {}".format(list))
+        return list
+
 
 #api.add_resource(InstantiateNSD, '/instantiate_nsd/<string:nsd_id>')
 #api.add_resource(NS_interfaces, '/get_interfaces/<string:ns_id>')
@@ -288,47 +308,53 @@ api.add_resource(VNFD_get, '/vnfd/<string:vnf_name>')
 api.add_resource(VNFD, '/vnfd')
 api.add_resource(NSD_post, '/nsd')
 api.add_resource(NSD_get, '/nsd/<string:ns_name>')
-api.add_resource(VIM_image_post, '/image')
+api.add_resource(VIM_image_post, '/image/<string:vim_name>')
+api.add_resource(VIM_list, '/vims')
 
 api.add_resource(Prometheus, '/prometheus')
 
 
 if __name__ == '__main__':
-    import configparser
+    from configobj import ConfigObj
+    
     config_file = 'mano.conf'
 
     # load the NFVO parameters from the config file
     try:
-        config = configparser.ConfigParser()
-        config.read(config_file)
-        #NFVO config
-        nfvo_type = str(config['NFVO']['TYPE'])
-        nfvo_ip = str(config['NFVO']['IP'])
-        nfvo_user = str(config['NFVO']['USER'])
-        nfvo_pass = str(config['NFVO']['PASSWORD'])
-        nfvo_vim_account = str(config['NFVO']['VIM_ACCOUNT'])
-        #VIM config
-        vim_type = str(config['VIM']['TYPE'])
-        vim_auth_url = str(config['VIM']['AUTH_URL'])
-        vim_user = str(config['VIM']['USER'])
-        vim_pass = str(config['VIM']['PASSWORD'])
-        vim_project = str(config['VIM']['PROJECT'])
-
+        '''
+        config format after reading the config file
+        {
+	"NFVO":{
+		"TYPE":"xxx",
+		"IP":"xxxx"
+                ...
+	},
+	"VIM":{
+		"vim-name-1":{
+			"NAME":"vim-name-1",
+			"TYPE":"openstack",
+			"LOCATION":"core",
+                        ...
+		},
+		"vim-name-2":{
+			"NAME":"vim-name-2",
+			"TYPE":"opennebula",
+			"LOCATION":"edge",
+                        ...
+		}
+	}
+        }
+        '''
+        conf = ConfigObj(config_file)
+        
         logger.info("Starting app")
         # init the NFVO
-        logger.info("Adding NFVO- Type: {}, IP:{}, User:{}, VIM account:{}".format(nfvo_type, nfvo_ip, nfvo_user, nfvo_vim_account))
-        if nfvo_type == "OSM":
-            nbiUtil = osmUtils(osm_ip=nfvo_ip, username=nfvo_user, password=nfvo_pass, vim_account_id=nfvo_vim_account)
+        logger.info("Adding NFVO- Type: {}, IP:{}, User:{}".format(conf["NFVO"]["TYPE"], conf["NFVO"]["IP"], conf["NFVO"]["USER"]))
+        if conf["NFVO"]["TYPE"] == "OSM":
+            nbiUtil = osmUtils(osm_ip=conf["NFVO"]["IP"], username=conf["NFVO"]["USER"], password=conf["NFVO"]["PASSWORD"], vim_account_id=None)
         else:
-            logger.error("NFVO type {} not supported".format(nfvo_type))
-            raise KeyError("NFVO type {} not supported".format(nfvo_type))
-        # init the VIM
-        logger.info("Adding VIM- Type: {}, Auth URL:{}, User:{}, Project:{}".format(vim_type, vim_auth_url, vim_user, vim_project))
-        if vim_type == "openstack":
-            vim_conn = osUtils.connection(auth_url=vim_auth_url, region="RegionOne", project_name=vim_project, username=vim_user, password=vim_pass)
-        else:
-            logger.error("VIM type {} not supported".format(vim_type))
-            raise KeyError("VIM type {} not supported".format(vim_type))
+            logger.error("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
+            raise KeyError("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
         #app.run(host='0.0.0.0', debug=True)
         http_server = WSGIServer(('', 5001), app)
         http_server.serve_forever()

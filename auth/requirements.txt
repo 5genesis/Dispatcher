@@ -1,0 +1,8 @@
+jwcrypto
+gevent
+Flask
+Flask-SQLAlchemy==2.1
+requests
+flask_mail
+flask-cors
+flask-restful
