@@ -293,7 +293,12 @@ class VIM_list(Resource):
         logger.info("Retrieving VIMs list")
         list = []
         for vim in conf["VIM"]:
-            list.append(conf["VIM"][vim]) 
+            new_vim = {}
+            new_vim["name"] = conf["VIM"][vim]["NAME"]
+            new_vim["type"] = conf["VIM"][vim]["TYPE"]
+            new_vim["location"] = conf["VIM"][vim]["LOCATION"]
+            list.append(new_vim) 
+        logger.debug("VIMs list: {}".format(list))
         return list
 
 

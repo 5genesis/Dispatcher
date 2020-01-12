@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-host: 'localhost:8082'
+host: 'DISPATCHER:8082'
 basePath: /
 tags:
   - name: MANO
@@ -48,14 +48,16 @@ paths:
           description: VNFD created
           schema:
             $ref: '#/definitions/ObjectID'
-        '405':
+        '400':
           description: Invalid input
-        '406':
-          description: Not acceptable - File not valid
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         '409':
           description: Conflict - VNFD already present
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         '500':
-          description: Internal server error
+          description: Internal server error - Network problems
     get:
       security:
         - basicAuth: []
@@ -70,8 +72,14 @@ paths:
       responses:
         '200':
           description: successful operation
+          schema:
+            $ref: '#/definitions/ArrayOfVnfd'
         '400':
           description: Invalid status value
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+        '500':
+          description: Internal server error - Network problems
   '/mano/vnfd/{vnfdId}':
     get:
       security:
@@ -93,10 +101,14 @@ paths:
       responses:
         '200':
           description: successful operation
-        '400':
-          description: Invalid ID supplied
+          schema:
+            $ref: '#/definitions/VnfDescriptor'
         '404':
           description: VNFD not found
+          schema:
+            $ref: '#/definitions/String'
+        '500':
+          description: Internal server error - Network problems
     delete:
       security:
         - basicAuth: []
@@ -117,10 +129,47 @@ paths:
       responses:
         '204':
           description: VNFD successfully deleted
-        '400':
-          description: Invalid _ID supplied
         '404':
           description: VNFD not found
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+        '409':
+          description: Conflict - VNFD referenced by at least one NSD
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+    put:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated
+      description: ''
+      operationId: updateVNFD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: vnfd
+          in: formData
+          description: VNFD Package
+          required: true
+          type: file
+        - name: vnfdId
+          in: path
+          description: VNFD _id to update
+          required: true
+          type: string
+      responses:
+        '201':
+          description: VNFD successfully updated
+        '400':
+          description: Invalid VNFD _ID supplied
+        '404':
+          description: VNFD not found
+        '409':
+          description: There was a conflict when updating this VNFD
   /mano/nsd:
     post:
       security:
@@ -146,16 +195,16 @@ paths:
           description: NSD created
           schema:
             $ref: '#/definitions/ObjectID'
-        '405':
+        '400':
           description: Invalid input
-        '406':
-          description: Not acceptable - File not valid
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         '409':
-          description: Conflict - VNFD already present
-        '422':
-          description: Unprocessable entity
+          description: Conflict - NSD already present
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         '500':
-          description: Internal server error
+          description: Internal server error - Network problems
     get:
       security:
         - basicAuth: []
@@ -170,8 +219,14 @@ paths:
       responses:
         '200':
           description: successful operation
+          schema:
+            $ref: '#/definitions/ArrayOfNsd'
         '400':
           description: Invalid status value
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+        '500':
+          description: Internal server error - Network problems
   '/mano/nsd/{nsdId}':
     get:
       security:
@@ -193,10 +248,12 @@ paths:
       responses:
         '200':
           description: successful operation
-        '400':
-          description: Invalid NSD name supplied
+          schema:
+            $ref: '#/definitions/NsDescriptor'
         '404':
           description: NSD not found
+        '500':
+          description: Internal server error - Network problems
     delete:
       security:
         - basicAuth: []
@@ -221,7 +278,61 @@ paths:
           description: Invalid NS _ID supplied
         '404':
           description: NSD not found
-  /mano/image:
+    put:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Updates an NSD providing the new NSD package and the _ID of the old one that is being updated
+      description: ''
+      operationId: updateNSD
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: nsd
+          in: formData
+          description: NSD Package
+          required: true
+          type: file
+        - name: nsdId
+          in: path
+          description: NSD _id to update
+          required: true
+          type: string
+      responses:
+        '201':
+          description: NSD successfully updated
+        '400':
+          description: Invalid NS _ID supplied
+        '404':
+          description: NSD not found
+        '409':
+          description: There was a conflict when updating this NSD
+          schema:
+            $ref: '#/definitions/ProblemDetails'
+  '/mano/vims':
+    get:
+      security:
+        - basicAuth: []
+        - BearerToken: []
+      tags:
+        - MANO
+      summary: Retrieves the list of registered VIMs in the mano.conf file 
+      description: ''
+      operationId: getVIMs
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: List of VIMs
+          schema:
+            $ref: '#/definitions/VimList'
+        '400':
+          description: Bad request
+  '/mano/image/{vim_name}':
     post:
       security:
         - basicAuth: []
@@ -241,6 +352,11 @@ paths:
           description: Image file
           required: true
           type: file
+        - name: vim_name
+          in: path
+          description: Name of the VIM
+          required: true
+          type: string
         - name: disk_format
           in: query
           description: 'Disk format: raw, qcow2...'
@@ -254,6 +370,8 @@ paths:
       responses:
         '201':
           description: 'Image uploaded. Image status: active'
+          schema:
+            $ref: '#/definitions/String_image'
         '406':
           description: Not acceptable - File not valid
         '413':
@@ -285,11 +403,13 @@ paths:
         '200':
           description: Successful validation
           schema:
-            $ref: '#/definitions/String'
+            $ref: '#/definitions/String_ok'
         '400':
           description: Invalid input
         '500':
           description: Entry badly formed
+          schema:
+            $ref: '#/definitions/String'
   /validator/onboard/ed:
     post:
       security:
@@ -317,7 +437,7 @@ paths:
         '400':
           description: Invalid input
         '500':
-          description: Entry badly formed
+          description: Internal server error - No connection to the service or the ELCM
   /validator/validate/vnfd:
     post:
       security:
@@ -339,16 +459,16 @@ paths:
           required: true
           type: file
       responses:
-        '201':
-          description: VNFD created
+        '200':
+          description: Valid VNFD
+          schema:
+            $ref: '#/definitions/ObjectID'
         '400':
           description: Descriptor with failures
-        '405':
-          description: Invalid input
-        '406':
-          description: Not acceptable - File not valid
+          schema:
+            $ref: '#/definitions/String'
         '500':
-          description: Internal server error
+          description: Internal server error - Network problems
   /validator/onboard/vnfd:
     post:
       security:
@@ -372,16 +492,18 @@ paths:
       responses:
         '201':
           description: VNFD created
+          schema:
+            $ref: '#/definitions/ObjectID'
         '400':
           description: Descriptor with failures
-        '405':
-          description: Invalid input
-        '406':
-          description: Not acceptable - File not valid
+          schema:
+            $ref: '#/definitions/String'
         '409':
           description: Conflict - VNFD already present
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         '500':
-          description: Internal server error
+          description: Internal server error - Network problems
   /validator/validate/nsd:
     post:
       security:
@@ -403,16 +525,16 @@ paths:
           required: true
           type: file
       responses:
-        '201':
-          description: NSD created
+        '200':
+          description: Valid NSD
+          schema:
+            $ref: '#/definitions/String_ok'
         '400':
           description: Descriptor with failures
-        '405':
-          description: Invalid input
-        '406':
-          description: Not acceptable - File not valid
+          schema:
+            $ref: '#/definitions/String'
         '500':
-          description: Internal server error
+          description: Internal server error - Network problems
   /validator/onboard/nsd:
     post:
       security:
@@ -436,16 +558,18 @@ paths:
       responses:
         '201':
           description: NSD created
+          schema:
+            $ref: '#/definitions/ObjectID'
         '400':
           description: Descriptor with failures
-        '405':
-          description: Invalid input
-        '406':
-          description: Not acceptable - File not valid
+          schema:
+            $ref: '#/definitions/String'
         '409':
-          description: Conflict - VNFD already present
+          description: Conflict - NSD already present
+          schema:
+            $ref: '#/definitions/ProblemDetails'
         '500':
-          description: Internal server error
+          description: Internal server error - Network problems
   /auth/get_token:
     get:
       security:
@@ -462,8 +586,17 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'Access token'
           headers: {}
+          schema:
+            $ref: '#/definitions/Token'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '500':
+          description: Internal server error - Network problems
   /auth/change_password:
     put:
       security:
@@ -487,8 +620,17 @@ paths:
           description: ''
       responses:
         '200':
-          description: ''
+          description: 'Password change message'
           headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '500':
+          description: Internal server error - Network problems
   /auth/register:
     post:
       description: 'TODO: Add Description'
@@ -519,27 +661,15 @@ paths:
           description: ''
       responses:
         '200':
-          description: ''
+          description: 'Successful registration'
           headers: {}
-      security: []
-  /auth/login:
-    get:
-      security:
-        - basicAuth: []
-        - BearerToken: []
-      description: 'TODO: Add Description'
-      summary: LogIn
-      tags:
-        - Auth
-      operationId: LogIn
-      deprecated: false
-      produces:
-        - application/json
-      parameters: []
-      responses:
-        '200':
-          description: ''
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '400':
+          description: 'Auth error'
           headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
   /auth/recover_password:
     put:
       description: 'TODO: Add Description'
@@ -560,9 +690,17 @@ paths:
           description: ''
       responses:
         '200':
-          description: ''
+          description: 'New password has been sent to your email'
           headers: {}
-      security: []
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '500':
+          description: Internal server error - Network problems
   /auth/show_users:
     get:
       security:
@@ -583,8 +721,58 @@ paths:
           description: ''
       responses:
         '200':
-          description: ''
+          description: 'List of registered users - traces on verbose mode'
           headers: {}
+          schema:
+            $ref: '#/definitions/AuthUsers'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '401':
+          description: 'Invalid permission'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthError'
+        '500':
+          description: Internal server error - Network problems or Auth not included
+  /auth/validate_user/{username}:
+    put:
+      security:
+        - basicAuth: []
+      description: 'Manual validation of a user after the resgistration form'
+      summary: Validate User
+      tags:
+        - 'Auth: Admin Functions'
+      operationId: ValidateUser
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+          description: ''
+      responses:
+        '200':
+          description: 'Changes applied - user validated'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '401':
+          description: 'Invalid permission'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthError'
   /auth/drop_db:
     delete:
       security:
@@ -600,13 +788,25 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'User database dropped'
           headers: {}
-  '/auth/delete_user/{username}':
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '401':
+          description: 'Invalid permission'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthError'
+  /auth/delete_user/{username}:
     delete:
       security:
         - basicAuth: []
-      description: 'TODO: Add Description'
+      description: 'Deletes a user from the DB'
       summary: Delete User
       tags:
         - 'Auth: Admin Functions'
@@ -624,8 +824,20 @@ paths:
           description: ''
       responses:
         '200':
-          description: ''
+          description: 'User removed'
           headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '400':
+          description: 'Auth error'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthMsg'
+        '401':
+          description: 'Invalid permission'
+          headers: {}
+          schema:
+            $ref: '#/definitions/AuthError'
 definitions:
   ObjectID:
     type: object
@@ -633,9 +845,65 @@ definitions:
       id:
         type: string
         example: 123e4567-e89b-12d3-a456-426655440000
+  NsDescriptor:
+    type: string
+    format: json
+  ArrayOfNsd:
+    type: array
+    items:
+      $ref: '#/definitions/NsDescriptor'
+  VnfDescriptor:
+    type: string
+    format: json
+  ArrayOfVnfd:
+    type: array
+    items:
+      $ref: '#/definitions/VnfDescriptor'
+  ProblemDetails:
+    type: object
+    properties:
+      detail:
+        type: string
+        example: invalid file content file could not be opened successfully
+      status:
+        type: integer
+        example: 400
+      code:
+        type: string
+        example: BAD_REQUEST
+    required:
+      - status
+      - detail
+  VnfdPackage:
+    type: string
+    format: binary
+  NsdPackage:
+    type: string
+    format: binary
   String:
     type: string
-    example: "ok"
+  String_ok:
+    type: string
+    example: ok
+  String_image:
+    type: string
+    example: 'Image status: active'
+  Vim:
+    type: object
+    properties:
+      name:
+        type: string
+        example: 'malagacore'
+      type:
+        type: string
+        example: 'openstack'
+      location:
+        type: string
+        example: core
+  VimList:
+    type: array
+    items:
+      $ref: '#/definitions/Vim'
   Experiment_descriptor:
     type: object
     properties:
@@ -702,6 +970,54 @@ definitions:
         type: integer
         format: int64
         example: 60
+  Token:
+    type: object
+    properties:
+      result:
+        type: string
+        example: "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.oqf4Xejq32YuFxu6FoYyv-ZQnEe0Wxt-VW2yqt-Db2PlX44CZN_H-_2Ku40OHq0000ATo2SPWlbT5g6moNiDgO"
+  AuthMsg:
+    type: object
+    properties:
+      result:
+        type: string
+        example: "Auth service message"
+  AuthError:
+    type: object
+    properties:
+      result:
+        type: string
+        example: "Invalid Permission"
+  AuthUsers:
+    type: object
+    properties:
+      result:
+        type: object
+        properties:
+          usename:
+            type: object
+            properties:
+              active:
+                type: boolean
+              deleted:
+                type: boolean
+                example: false
+              email:
+                type: string
+                example: "5genesismanagement@gmail.com"
+              traces:
+                type: array
+                items: 
+                  type: object
+                  properties:
+                    action: 
+                      type: string
+                      example: "GetToken"
+                    date:
+                      type: string
+                      example: "2020-01-09 11:22:32.772248"
+                  
+                
 securityDefinitions:
   basicAuth:
     type: basic
