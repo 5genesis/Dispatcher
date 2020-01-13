@@ -160,6 +160,7 @@ You can test the API using your favorite REST client following these simple work
     Response:
 
     >List of available VNFDs in JSON format. (according to the NFVO information model) 
+    
     >Format of the response: [{...}]
     
 - Retrieve an individual VNFD descriptor:
@@ -169,6 +170,7 @@ You can test the API using your favorite REST client following these simple work
     Response:
 
     >VNF descriptor in JSON format. (according to the NFVO information model)
+    
     >Format of the response: [{...}]
 
 - List all available NSDs:
@@ -178,6 +180,7 @@ You can test the API using your favorite REST client following these simple work
     Result:
 
     >List of available NSDs in JSON format. (according to the NFVO information model)
+    
     >Format of the response: [{...}]
 
 - Retrieve an individual NSD descriptor:
@@ -187,6 +190,7 @@ You can test the API using your favorite REST client following these simple work
     Result:
 
     >NS descriptor in JSON format. (according to the NFVO information model)
+    
     >Format of the response: [{...}]
 
 - Delete an individual NSD:
@@ -204,6 +208,7 @@ You can test the API using your favorite REST client following these simple work
     Result:
 
     >Image status: active
+    
     >Format of the response: String
 
 ## Logs
