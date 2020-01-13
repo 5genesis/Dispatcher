@@ -49,12 +49,12 @@ As part of the *Validator* features, it performs not only validation but also on
     MANO_NSD_POST=http://mano:5001/nsd
     MANO_VNFD_POST=http://mano:5001/vnfd
 
-**NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed.
+**NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed (unless the *Validator* is installed stand-alone).
 
 
 ## NBI REST API
 
-The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with POST methods:
+The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` or, if deployed stand-alone, in port `5100`:
 
 ### Validator 
 
@@ -71,8 +71,9 @@ The Validator is available through the Dispatcher port (8082) and using the endp
 ### Examples
 Depending on how the application was installed (in stand-alone mode or along with the *Dispatcher*), the host, port and base path might change:
 
-> Validator relative path: {validator_host}:5100
-> Dispatcher relative path: {dispatcher_host}:8082/validator
+- [x] Validator relative path: {validator_host}:5100
+
+- [x]  Dispatcher relative path: {dispatcher_host}:8082/validator
 
 
 - Validate Experiment descriptor:
