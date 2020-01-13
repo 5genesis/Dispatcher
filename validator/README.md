@@ -51,9 +51,24 @@ As part of the *Validator* features, it performs not only validation but also on
 
 **NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed.
 
-## Available functions
+
+## NBI REST API
 
 The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with POST methods:
+
+### Validator 
+
+| **Method**  | **URI** | **Description** | **Data** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | ------------ |
+| POST  | /validate/ed | Validate Experiment descriptor | [ED](experiment_schema.json) | "ok" | "Error message" |
+| POST  | /onboard/ed | Validate and launch Experiment descriptor | [ED](experiment_schema.json) | ? | "Error message" |
+| POST  | /validate/vnfd | Validate VNFD | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | "ok" | "Error message" |
+| POST  | /onboard/vnfd | Validate VNFD and add it to the NSD catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
+| POST  | /validate/nsd | Validate NSD | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | "ok" | "Error message" |
+| POST  | /onboard/nsd | Validate NSD and add it to the NSD catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
+
+
+### Examples
 
 - Validate Experiment descriptor:
 `/validate/ed`
@@ -90,7 +105,7 @@ Example:
 `/onboard/nsd`
 
 Example:
-> curl -X POST -F "ns=@./ns_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/onboard/nsd>
+> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/onboard/nsd>
 
 ## Responses
 

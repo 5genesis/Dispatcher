@@ -1,15 +1,15 @@
 swagger: "2.0"
 info:
-  description: Swagger 5GENESIS Dispatcher
+  description: Swagger 5GENESIS MANO Wrapper
   version: 1.0.0
-  title: 5GENESIS Dispatcher Swagger
+  title: 5GENESIS MANO Wrapper Swagger
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: javier.melian@atos.net
   license:
     name: Apache 2.0
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "DISPATCHER:8082"
+host: "localhost:5002"
 basePath: /
 tags:
   - name: VNFD
