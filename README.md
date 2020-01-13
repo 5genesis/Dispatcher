@@ -29,6 +29,7 @@ The available features will depend on the features exposed by each dispatched mo
 - Retrieve single NSD
 - Delete NSD
 - Update NSD
+- Retrieve registered VIMs
 - Upload VIM images
 
 ##### ELCM enabler
@@ -90,7 +91,7 @@ For running the 5Genesis Dispatcher, you will need:
 
 ### Config file and installation
 
-The Dispatcher needs to be configured properly before it is deployed. For that a simplified configuration file is offered: `dispatcher.conf`, which will have to be edited and adapted.
+The Dispatcher needs to be configured properly before the containers are built. For that, a simplified configuration file is offered: `dispatcher.conf`, which will have to be edited and adapted.
 The file should contain information of all the modules the Dispatcher forwards information to (validator, mano, elcm, result_catalog, etc.) and how to do it. For each module, a new enabler will be added in the Dispatcher. It uses the following format:
 
     [module_name]
@@ -112,6 +113,8 @@ The file should contain information of all the modules the Dispatcher forwards i
     PATH=/
 
 The config file template already includes the *validator* and the *mano* modules as they are included within the *Dispatcher*. They are already configured and **should not be touched**.
+
+During the installation process you will be asked for a couple of simple questions: One of them is whether you want the *Authentication module* installed as well or not, so it is completely optional.
 
 Once edited properly, the configuration will be applied and the containers built, based on the config file we have just created (*dispatcher.conf*):
 
