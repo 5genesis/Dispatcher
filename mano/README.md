@@ -103,6 +103,36 @@ To stop MANO wrapper, run:
 
 You can find [here](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) examples of VNFD and NSD packages to populate and test the application
 
+## NBI REST API
+
+### VNFD 
+
+| **Method**  | **URI** | **Description** | **Data** | **Params** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | -------- | ------------ |
+| POST  | /vnfd | Add a new VNFD to the catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [id](schemas/osm_id.json) | [error](schemas/osm_error.json) |
+| GET  | /vnfd | List all available VNFDs | - | - | [VNFD](schemas/osm_vnfd_schema.json) | [error](schemas/osm_error.json) |
+| GET  | /vnfd/{vnfd id} | Find VNFD by id | - | VNFD id | [VNFD](schemas/osm_vnfd_schema.json) | [error](schemas/osm_error.json) |
+| DELETE  | /vnfd/{vnfd _id} | Deletes a VNFD | - | VNFD _id | - | [error](schemas/osm_error.json) |
+| PUT  | /vnfd/{vnfd _id} | Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - NSD _id | [id](schemas/id_im.json) | [error](schemas/osm_error.json) |
+
+### NSD 
+
+| **Method**  | **URI** | **Description** | **Data** | **Params** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | -------- | ------------ |
+| POST  | /nsd | Add a new NSD to the catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [id](schemas/osm_id.json) | [error](schemas/osm_error.json) |
+| GET  | /nsd | List all available NSDs | - | - | [NSD](schemas/osm_nsd_schema.json) | [error](schemas/osm_error.json) |
+| GET  | /nsd/{nsd id} | Find NSD by id | - | NSD id | [NSD](schemas/osm_nsd_schema.json) | [error](schemas/osm_error.json) |
+| DELETE  | /nsd/{nsd _id} | Deletes a NSD | - | NSD _id | - | [error](schemas/osm_error.json) |
+| PUT  | /nsd/{nsd _id} | Updates a NSD providing the new NSD package and the _ID of the old one that is being updated | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - NSD _id | [id](schemas/id_im.json) | [error](schemas/osm_error.json) |
+
+### VIM related operations 
+
+| **Method**  | **URI** | **Description** | **Data** | **Params** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | -------- | ------------ |
+| GET  | /vims | Retrieves the list of registered VIMs in the mano.conf file | - | - | [VIMs list](schemas/vim_list.json) | - |
+| POST  | /image/{vim name} | Uploads an image in the VIM | image | vim_name, disk_format, container_format | "Image status: active" | - |
+
+
 #### Examples on how to use it
 
 You can test the API using your favorite REST client following these simple workflow:
