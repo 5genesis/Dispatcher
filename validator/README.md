@@ -69,43 +69,48 @@ The Validator is available through the Dispatcher port (8082) and using the endp
 
 
 ### Examples
+Depending on how the application was installed (in stand-alone mode or along with the *Dispatcher*), the host, port and base path might change:
+
+> Validator relative path: {validator_host}:5100
+> Dispatcher relative path: {dispatcher_host}:8082/validator
+
 
 - Validate Experiment descriptor:
 `/validate/ed`
 
 Example:
-> curl -X POST -d @descriptor.json <http://{dispatcher_host}:8082/validator/validate/ed>
+> curl -X POST -d @descriptor.json <http://{relative path}/validate/ed>
 
 - Validate and onboard Experiment descriptor:
 `/onboard/ed`
 
 Example:
-> curl -X POST -d @descriptor.json <http://{dispatcher_host}:8082/validator/onboard/ed>
+> curl -X POST -d @descriptor.json <http://{relative path}/onboard/ed>
 
 - Validate VNF descriptor:
 `/validate/vnfd`
 
 Example:
-> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/validate/vnfd>
+> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{relative path}/validate/vnfd>
 
 - Validate and onboard VNF descriptor:
 `/onboard/vnfd`
 
 Example:
-> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/onboard/vnfd>
+> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{relative path}/onboard/vnfd>
 
 - Validate NS descriptor:
 `/validate/nsd`
 
 Example:
-> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/validate/nsd>
+> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{relative path}/validate/nsd>
 
 - Validate and onboard NS descriptor:
 
 `/onboard/nsd`
 
 Example:
-> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/onboard/nsd>
+> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{relative path}/onboard/nsd>
 
 ## Responses
 
