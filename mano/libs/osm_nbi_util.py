@@ -244,7 +244,8 @@ class NbiUtil():
 
         #print("INFO - Getting VNFD with id: ", id)
 
-        url = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(self.osm_nbi_url, id)
+        #url = "{0}/vnfpkgm/v1/vnf_packages/{1}/vnfd".format(self.osm_nbi_url, id)
+        url = "{0}/vnfpkgm/v1/vnf_packages_content/{1}".format(self.osm_nbi_url, id)
         headers = dict(self.headers)
         headers["Accept"] = "text/plain"
         try:

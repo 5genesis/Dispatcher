@@ -232,10 +232,6 @@ Application logs are available in the application directory as `mano.log`
 
 + Add OpenNebula as supported VIM
 
-## Identified bugs
-
-- The NFVO sometimes does not include the "_id" field in the response when retrieving a descriptor, which is necessary for deleting it. If this bug confirms, a *MANO Wrapper* database will be needed for storing such information associated to the descriptor "id".
-
 ## Authors
 
 Javier Melian (javier.melian@atos.net)
