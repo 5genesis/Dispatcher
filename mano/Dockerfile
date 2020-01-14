@@ -14,5 +14,5 @@ RUN pip install -r requirements.txt
 
 COPY . /mano
 
-EXPOSE 5001
+EXPOSE 5101
 CMD [ "python", "mano.py" ]

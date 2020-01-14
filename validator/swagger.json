@@ -46,7 +46,7 @@ paths:
           description: Entry badly formed
           schema:
             $ref: "#/definitions/String"
-  /onboard/ed:
+  /create/ed:
     post:
       tags:
         - Validator
