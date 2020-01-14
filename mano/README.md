@@ -87,7 +87,7 @@ To start MANO wrapper, run:
 
 `$ ./start.sh`
 
-This will start your application on port 5001 along with a Swagger environment to test the API running on port 5002
+This will start your application on port 5101 along with a Swagger environment to test the API running on port 5002
 
 ### Stop
 
@@ -139,7 +139,7 @@ You can test the API using your favorite REST client following these simple work
 
 - Insert a VNFD package:
 
-    `curl -X POST -F "vnfd=@./<vnfd_package_file>" http://<host>:5001/vnfd`
+    `curl -X POST -F "vnfd=@./<vnfd_package_file>" http://<host>:5101/vnfd`
 
     Response:
 
@@ -147,7 +147,7 @@ You can test the API using your favorite REST client following these simple work
 
 - Insert a NSD package:
 
-    `curl -X POST -F "nsd=@./<nsd_package_file>" http://<host>:5001/nsd`
+    `curl -X POST -F "nsd=@./<nsd_package_file>" http://<host>:5101/nsd`
 
     Response:
 
@@ -155,7 +155,7 @@ You can test the API using your favorite REST client following these simple work
 
 - List all available VNFDs:
 
-    `curl -X GET "http://<host>:5001/vnfd" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/vnfd" -H "accept: application/json"`
 
     Response:
 
@@ -165,7 +165,7 @@ You can test the API using your favorite REST client following these simple work
     
 - Retrieve an individual VNFD descriptor:
 
-    `curl -X GET "http://<host>:5001/vnfd/<VNFD id>" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/vnfd/<VNFD id>" -H "accept: application/json"`
 
     Response:
 
@@ -175,7 +175,7 @@ You can test the API using your favorite REST client following these simple work
 
 - List all available NSDs:
 
-    `curl -X GET "http://<host>:5001/nsd" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/nsd" -H "accept: application/json"`
 
     Result:
 
@@ -185,7 +185,7 @@ You can test the API using your favorite REST client following these simple work
 
 - Retrieve an individual NSD descriptor:
 
-    `curl -X GET "http://<host>:5001/NSd/<NSD id>" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/NSd/<NSD id>" -H "accept: application/json"`
 
     Result:
 
@@ -195,15 +195,15 @@ You can test the API using your favorite REST client following these simple work
 
 - Delete an individual NSD:
 
-    `curl -X DELETE "http://<host>:5001/nsd/<NSD _id>" -H "accept: application/json"`
+    `curl -X DELETE "http://<host>:5101/nsd/<NSD _id>" -H "accept: application/json"`
 
 - Delete an individual VNFD:
 
-    `curl -X DELETE "http://<host>:5001/vnfd/<VNFD _id>" -H "accept: application/json"`
+    `curl -X DELETE "http://<host>:5101/vnfd/<VNFD _id>" -H "accept: application/json"`
 
 - Upload an image file in a specific VIM:
 
-    `curl -X POST -F "image=@./<image_file>" http://<host>:5001/image/<vim_name>?disk_format=<raw|qcow2>&container_format=bare`
+    `curl -X POST -F "image=@./<image_file>" http://<host>:5101/image/<vim_name>?disk_format=<raw|qcow2>&container_format=bare`
 
     Result:
 

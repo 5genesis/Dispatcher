@@ -46,8 +46,8 @@ As part of the *Validator* features, it performs not only validation but also on
 ### config.env example:
 
     ELCM_ED_POST="http:///localhost:8082/elcm/v0/run"
-    MANO_NSD_POST=http://mano:5001/nsd
-    MANO_VNFD_POST=http://mano:5001/vnfd
+    MANO_NSD_POST=http://mano:5101/nsd
+    MANO_VNFD_POST=http://mano:5101/vnfd
 
 **NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed (unless the *Validator* is installed stand-alone).
 
