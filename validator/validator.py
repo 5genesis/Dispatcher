@@ -56,6 +56,7 @@ logger.addHandler(stream_handler)
 @app.route('/validate/ed', methods=['POST'])
 def validate_ed():
     try:
+        response = {}
         logger.info("Validating Experiment descriptor")
         content = request.get_data()
         data = json.loads(content)
@@ -65,20 +66,34 @@ def validate_ed():
         j = validate(data)
     except jsonschema.exceptions.ValidationError as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        return ve.message, 400
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        return ve.message, 400
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
+    except fastjsonschema.JsonSchemaException as ve:
+        logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
     except Exception as e:
-        logger.warning("Problem while validating Experiment descriptor: {}".format(str(e)))
-        return str(e), 500
+        logger.warning("Problem while validating Experiment descriptor: {} tipo: {}".format(str(e), type(e).__name__))
+        response["detail"] = str(e)
+        response["code"] = 400
+        return json.dumps(response), 400
     logger.debug("Experiment descriptor sucessfully validated")
-    return "ok", 200
+    response["detail"] = "Successful validation"
+    response["code"] = 200
+    return json.dumps(response), 200
 
 
 @app.route('/create/ed', methods=['POST'])
 def onboard_ed():
     try:
+        response = {}
         logger.info("Onboarding Experiment descriptor")
         content = request.get_data()
         data = json.loads(content)
@@ -90,14 +105,28 @@ def onboard_ed():
         r = requests.post(ELCM_ED_POST, data=data, headers=headers)
     except jsonschema.exceptions.ValidationError as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        return ve.message, 400
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        return ve.message, 400
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
+    except fastjsonschema.JsonSchemaException as ve:
+        logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
     except Exception as e:
         logger.warning("Problem while onboarding Experiment descriptor: {}".format(str(e)))
+        response["detail"] = ve.message
+        response["code"] = 400
+        return json.dumps(response), 400
         return str(e), 500
-    return r.text, r.status_code
+    response["detail"] = r.text
+    response["code"] = r.status_code
+    return json.dumps(response), r.status_code
 
 
 def validate_zip(file, schema):
@@ -107,6 +136,8 @@ def validate_zip(file, schema):
     import yaml
 
     try:
+        # TODO: Switch from jsonschema to fastjsonschema
+        response = {}
         logger.debug("Decompressing package file")
         # unzip the package
         tar = tarfile.open(file, "r:gz")
@@ -126,31 +157,35 @@ def validate_zip(file, schema):
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
-        return "ok", 200
+        response["detail"] = "VNFD successfully validated"
+        response["code"] = 200
+        return json.dumps(response), 200
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(ve).__name__, ve.message)
-        logger.warning("Problem while validating descriptor: {}".format(ve.message))
-        return message, 400
+        logger.warning("Problem while validating VNFD: {}".format(ve.message))
+        response["detail"] = "Problem while validating VNFD: {}".format(ve.message)
+        response["code"] = 400
+        return json.dumps(response), 400
     except Exception as e:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.warning("Problem while validating descriptor: {}".format(str(e)))
-        return message, 500
+        logger.warning("Problem while validating VNFD: {}".format(str(e)))
+        response["detail"] = message
+        response["code"] = r.status_code
+        return json.dumps(response), 400
 
 
 @app.route('/validate/vnfd', methods=['POST'])
 def validate_vnfd():
     try:
+        response = {}
         logger.info("Validating VNFD")
         file = request.files.get("vnfd")
         if not file:
-            logger.error("VNFD file not present in the query")
-            return "VNFD file not present in the query", 404
+            raise AttributeError("VNFD file not present in the query or wrong headers")
         # Write package file to static directory and validate it
         logger.debug("Saving temporary VNFD")
         file.save(file.filename)
@@ -159,11 +194,18 @@ def validate_vnfd():
         os.remove(file.filename)
         logger.debug("Temporary VNFD deleted")
         return r, code
+    except AttributeError as ve:
+        logger.error("Problem while getting the vnfd the file: {}".format(str(ve)))
+        response["detail"] = str(ve)
+        response["code"] = 412
+        return json.dumps(response), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating VNFD: {}".format(str(e)))
-        return message, 500
+        response["detail"] = message
+        response["code"] = 400
+        return json.dumps(response), 400
 
 @app.route('/onboard/vnfd', methods=['POST'])
 def onboard_vnfd():
@@ -171,8 +213,7 @@ def onboard_vnfd():
         logger.info("Onboarding VNFD")
         file = request.files.get("vnfd")
         if not file:
-            logger.error("VNFD file not present in the query")
-            return "VNFD file not present in the query", 404
+            raise AttributeError("VNFD file not present in the query or wrong headers")
         # Write package file to static directory and validate it
         logger.debug("Saving temporary VNFD")
         file.save(file.filename)
@@ -188,11 +229,18 @@ def onboard_vnfd():
         os.remove(file.filename)
         logger.debug("Temporary VNFD deleted")
         return res, code
+    except AttributeError as ve:
+        logger.error("Problem while getting the vnfd the file: {}".format(str(ve)))
+        response["detail"] = str(ve)
+        response["code"] = 412
+        return json.dumps(response), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.warning("Problem while onboarding VNFD: ", str(e))
-        return message, 500
+        logger.warning("Problem while onboarding VNFD: {}".format(str(e)))
+        response["detail"] = message
+        response["code"] = 400
+        return json.dumps(response), 400
 
 
 @app.route('/validate/nsd', methods=['POST'])
@@ -250,18 +298,18 @@ def onboard_nsd():
 if __name__ == '__main__':
     logger.info("Starting app")
     # Load the schemas for validation
-    with open('experiment_schema.json', 'r') as f:
+    with open('schemas/experiment_schema.json', 'r') as f:
         ed_schema_data = f.read()
     ed_schema = json.loads(ed_schema_data)
-    logging.debug("Loaded Experiment descriptor schema")
-    with open('vnfd_schema.json', 'r') as f:
+    logger.debug("Loaded Experiment descriptor schema")
+    with open('schemas/vnfd_schema.json', 'r') as f:
         vnfd_schema_data = f.read()
     vnfd_schema = json.loads(vnfd_schema_data)
-    logging.debug("Loaded VNF descriptor schema")
-    with open('nsd_schema.json', 'r') as f:
+    logger.debug("Loaded VNF descriptor schema")
+    with open('schemas/nsd_schema.json', 'r') as f:
         nsd_schema_data = f.read()
     nsd_schema = json.loads(nsd_schema_data)
-    logging.debug("Loaded NS descriptor schema")
+    logger.debug("Loaded NS descriptor schema")
 
     http_server = WSGIServer(('', 5100), app)
     http_server.serve_forever()

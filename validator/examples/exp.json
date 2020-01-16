@@ -1,7 +1,7 @@
 {
 	"Id": 123,
 	"Name":"sfafd",
-	"User": 123,
+	"User": "123",
 	"Platform": "malaga",
 	"TestCases": ["TC1", "TC2"], 
 	"UEs": ["UE1", "UE2"], 
