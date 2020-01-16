@@ -210,6 +210,7 @@ def validate_vnfd():
 @app.route('/onboard/vnfd', methods=['POST'])
 def onboard_vnfd():
     try:
+        response = {}
         logger.info("Onboarding VNFD")
         file = request.files.get("vnfd")
         if not file:
@@ -222,6 +223,7 @@ def onboard_vnfd():
             # Valid descriptor: proceed with the onboarding
             logger.debug("Onboarding VNFD in the NFVO")
             data_obj = open(file.filename, 'rb')
+            print(MANO_VNFD_POST)
             r = requests.post(MANO_VNFD_POST, files={"vnfd": (file.filename, data_obj)})
             res = r.text
             code = r.status_code
@@ -229,11 +231,16 @@ def onboard_vnfd():
         os.remove(file.filename)
         logger.debug("Temporary VNFD deleted")
         return res, code
-    except AttributeError as ve:
-        logger.error("Problem while getting the vnfd the file: {}".format(str(ve)))
-        response["detail"] = str(ve)
+    except AttributeError as ae:
+        logger.error("Problem while getting the vnfd the file: {}".format(str(ae)))
+        response["detail"] = str(ae)
         response["code"] = 412
         return json.dumps(response), 412
+    except NameError as ne:
+        logger.error("Problem with the ENV vars: {}".format(str(ne)))
+        response["detail"] = str(ne)
+        response["code"] = 501
+        return json.dumps(response), 501
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
@@ -246,11 +253,11 @@ def onboard_vnfd():
 @app.route('/validate/nsd', methods=['POST'])
 def validate_nsd():
     try:
+        response = {}
         logger.info("Validating NSD")
         file = request.files.get("nsd")
         if not file:
-            logger.error("NSD file not present in the query")
-            return "VNFD file not present in the query", 404
+            raise AttributeError("NSD file not present in the query or wrong headers")
         # Write package file to static directory and validate it
         logger.debug("Saving temporary NSD")
         file.save(file.filename)
@@ -259,20 +266,27 @@ def validate_nsd():
         os.remove(file.filename)
         logger.debug("Temporary NSD deleted")
         return r, code
+    except AttributeError as ve:
+        logger.error("Problem while getting the nsd the file: {}".format(str(ve)))
+        response["detail"] = str(ve)
+        response["code"] = 412
+        return json.dumps(response), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating NSD: {}".format(str(e)))
-        return message, 500
+        response["detail"] = message
+        response["code"] = 400
+        return json.dumps(response), 400
 
 @app.route('/onboard/nsd', methods=['POST'])
 def onboard_nsd():
     try:
+        response = {}
         logger.info("Onbarding NSD")
         file = request.files.get("nsd")
         if not file:
-            logger.error("NSD file not present in the query")
-            return "NSD file not present in the query", 404
+            raise AttributeError("NSD file not present in the query or wrong headers")
         # Write package file to static directory and validate it
         logger.debug("Saving temporary NSD")
         file.save(file.filename)
@@ -288,11 +302,23 @@ def onboard_nsd():
         os.remove(file.filename)
         logger.debug("Temporary NSD deleted")
         return res, code
+    except AttributeError as ae:
+        logger.error("Problem while getting the nsd file: {}".format(str(ae)))
+        response["detail"] = str(ae)
+        response["code"] = 412
+        return json.dumps(response), 412
+    except NameError as ne:
+        logger.error("Problem with the ENV vars: {}".format(str(ne)))
+        response["detail"] = str(ne)
+        response["code"] = 501
+        return json.dumps(response), 501
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
-        logger.warning("Problem while onboarding VNFD: ", str(e))
-        return message, 500
+        logger.warning("Problem while onboarding NSD: {}".format(str(e)))
+        response["detail"] = message
+        response["code"] = 400
+        return json.dumps(response), 400
 
 
 if __name__ == '__main__':
