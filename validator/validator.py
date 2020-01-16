@@ -67,26 +67,31 @@ def validate_ed():
     except jsonschema.exceptions.ValidationError as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except fastjsonschema.JsonSchemaException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except Exception as e:
         logger.warning("Problem while validating Experiment descriptor: {} tipo: {}".format(str(e), type(e).__name__))
         response["detail"] = str(e)
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     logger.debug("Experiment descriptor sucessfully validated")
     response["detail"] = "Successful validation"
-    response["code"] = 200
+    response["code"] = "OK"
+    response["status"] = 200
     return json.dumps(response), 200
 
 
@@ -106,26 +111,30 @@ def onboard_ed():
     except jsonschema.exceptions.ValidationError as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except fastjsonschema.JsonSchemaException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except Exception as e:
         logger.warning("Problem while onboarding Experiment descriptor: {}".format(str(e)))
         response["detail"] = ve.message
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
-        return str(e), 500
     response["detail"] = r.text
-    response["code"] = r.status_code
+    response["status"] = r.status_code
+    response["code"] = "OK"
     return json.dumps(response), r.status_code
 
 
@@ -158,14 +167,16 @@ def validate_zip(file, schema):
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
         response["detail"] = "VNFD successfully validated"
-        response["code"] = 200
+        response["code"] = "OK"
+        response["status"] = 200
         return json.dumps(response), 200
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         logger.warning("Problem while validating VNFD: {}".format(ve.message))
         response["detail"] = "Problem while validating VNFD: {}".format(ve.message)
-        response["code"] = 400
+        response["code"] = "BAD_REQUEST"
+        response["status"] = 400
         return json.dumps(response), 400
     except Exception as e:
         # Delete the folder we just created
@@ -174,7 +185,8 @@ def validate_zip(file, schema):
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating VNFD: {}".format(str(e)))
         response["detail"] = message
-        response["code"] = r.status_code
+        response["status"] = 400
+        response["code"] = "BAD_REQUEST"
         return json.dumps(response), 400
 
 
@@ -194,17 +206,19 @@ def validate_vnfd():
         os.remove(file.filename)
         logger.debug("Temporary VNFD deleted")
         return r, code
-    except AttributeError as ve:
-        logger.error("Problem while getting the vnfd the file: {}".format(str(ve)))
-        response["detail"] = str(ve)
-        response["code"] = 412
+    except AttributeError as ae:
+        logger.error("Problem while getting the vnfd the file: {}".format(str(ae)))
+        response["detail"] = str(ae)
+        response["status"] = 412
+        response["code"] = "PRECONDITION_FAILED"
         return json.dumps(response), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating VNFD: {}".format(str(e)))
         response["detail"] = message
-        response["code"] = 400
+        response["status"] = 400
+        response["code"] = "BAD_REQUEST"
         return json.dumps(response), 400
 
 @app.route('/onboard/vnfd', methods=['POST'])
@@ -234,19 +248,22 @@ def onboard_vnfd():
     except AttributeError as ae:
         logger.error("Problem while getting the vnfd the file: {}".format(str(ae)))
         response["detail"] = str(ae)
-        response["code"] = 412
+        response["status"] = 412
+        response["code"] = "PRECONDITION_FAILED"
         return json.dumps(response), 412
     except NameError as ne:
         logger.error("Problem with the ENV vars: {}".format(str(ne)))
         response["detail"] = str(ne)
-        response["code"] = 501
-        return json.dumps(response), 501
+        response["status"] = 500
+        response["code"] = "INTERNAL_SERVER_ERROR"
+        return json.dumps(response), 500
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while onboarding VNFD: {}".format(str(e)))
         response["detail"] = message
-        response["code"] = 400
+        response["status"] = 400
+        response["code"] = "BAD_REQUEST"
         return json.dumps(response), 400
 
 
@@ -269,14 +286,16 @@ def validate_nsd():
     except AttributeError as ve:
         logger.error("Problem while getting the nsd the file: {}".format(str(ve)))
         response["detail"] = str(ve)
-        response["code"] = 412
+        response["status"] = 412
+        response["code"] = "PRECONDITION_FAILED"
         return json.dumps(response), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating NSD: {}".format(str(e)))
         response["detail"] = message
-        response["code"] = 400
+        response["status"] = 400
+        response["code"] = "BAD_REQUEST"
         return json.dumps(response), 400
 
 @app.route('/onboard/nsd', methods=['POST'])
@@ -305,19 +324,22 @@ def onboard_nsd():
     except AttributeError as ae:
         logger.error("Problem while getting the nsd file: {}".format(str(ae)))
         response["detail"] = str(ae)
-        response["code"] = 412
+        response["status"] = 412
+        response["code"] = "PRECONDITION_FAILED"
         return json.dumps(response), 412
     except NameError as ne:
         logger.error("Problem with the ENV vars: {}".format(str(ne)))
         response["detail"] = str(ne)
-        response["code"] = 501
+        response["status"] = 500
+        response["code"] = "INTERNAL_SERVER_ERROR"
         return json.dumps(response), 501
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while onboarding NSD: {}".format(str(e)))
         response["detail"] = message
-        response["code"] = 400
+        response["status"] = 400
+        response["code"] = "BAD_REQUEST"
         return json.dumps(response), 400
 
 

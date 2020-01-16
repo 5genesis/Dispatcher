@@ -39,13 +39,13 @@ paths:
         "200":
           description: Successful validation
           schema:
-            $ref: "#/definitions/String_ok"
+            $ref: "#/definitions/ResponseDetails"
         "400":
           description: Invalid input
         "500":
           description: Entry badly formed
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
   /create/ed:
     post:
       tags:
@@ -67,10 +67,12 @@ paths:
       responses:
         "200":
           description: Successful validation
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "400":
           description: Invalid input
-        "500":
-          description: Internal server error - No connection to the service or the ELCM
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validate/vnfd:
     post:
       tags:
@@ -96,9 +98,11 @@ paths:
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the vnfd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /onboard/vnfd:
     post:
       tags:
@@ -124,13 +128,19 @@ paths:
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - VNFD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the vnfd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validate/nsd:
     post:
       tags:
@@ -152,13 +162,15 @@ paths:
         "200":
           description: Valid NSD
           schema:
-            $ref: "#/definitions/String_ok"
+            $ref: "#/definitions/ObjectID"
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the nsd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /onboard/nsd:
     post:
       tags:
@@ -184,13 +196,19 @@ paths:
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - NSD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the nsd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
+          schema:
+            $ref: "#/definitions/ResponseDetails"
 definitions:
   ObjectID:
     type: object
@@ -198,26 +216,18 @@ definitions:
       id:
         type: string
         example: "123e4567-e89b-12d3-a456-426655440000"
-  ProblemDetails:
+  ResponseDetails:
     type: object
     properties:
       detail:
         type: string
-        example: "invalid file content file could not be opened successfully"
       status:
         type: integer
-        example: 400
       code:
         type: string
-        example: "BAD_REQUEST"
     required:
       - status
       - detail
-  String:
-    type: string
-  String_ok:
-    type: string
-    example: "ok"
   Experiment_descriptor:
     type: object
     properties:

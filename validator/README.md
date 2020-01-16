@@ -60,12 +60,12 @@ The Validator is available through the Dispatcher port (8082) and using the endp
 
 | **Method**  | **URI** | **Description** | **Data** | **Successful result** | **Error result** |
 | ------- | --- | ------------| ---- | --------- | ------------ |
-| POST  | /validate/ed | Validate Experiment descriptor | [ED](experiment_schema.json) | "ok" | "Error message" |
-| POST  | /onboard/ed | Validate and launch Experiment descriptor | [ED](experiment_schema.json) | ? | "Error message" |
-| POST  | /validate/vnfd | Validate VNFD | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | "ok" | "Error message" |
+| POST  | /validate/ed | Validate Experiment descriptor | [ED](experiment_schema.json) | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
+| POST  | /onboard/ed | Validate and launch Experiment descriptor | [ED](experiment_schema.json) | ? | [response message](schemas/response_detail.json) |
+| POST  | /validate/vnfd | Validate VNFD | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
 | POST  | /onboard/vnfd | Validate VNFD and add it to the NSD catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
-| POST  | /validate/nsd | Validate NSD | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | "ok" | "Error message" |
-| POST  | /onboard/nsd | Validate NSD and add it to the NSD catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
+| POST  | /validate/nsd | Validate NSD | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
+| POST  | /onboard/nsd | Validate NSD and add it to the NSD catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | [response message](schemas/response_detail.json) |
 
 
 ### Examples
@@ -115,11 +115,12 @@ Example:
 
 ## Responses
 
-The *Validator* issues a response in string format along with a status code:
+The *Validator* issues a [response message](schemas/response_detail.json) in json format along with a status code:
 
 - 200, 201: ok
 - 400: Error during the validation
 - 409: Conflict with descriptor already present
+- 412: Wrong file in the request
 - 500: Network error
 
 ## Logging
