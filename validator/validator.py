@@ -76,7 +76,7 @@ def validate_ed():
     return "ok", 200
 
 
-@app.route('/onboard/ed', methods=['POST'])
+@app.route('/create/ed', methods=['POST'])
 def onboard_ed():
     try:
         logger.info("Onboarding Experiment descriptor")
@@ -97,7 +97,7 @@ def onboard_ed():
     except Exception as e:
         logger.warning("Problem while onboarding Experiment descriptor: {}".format(str(e)))
         return str(e), 500
-    return r, r.status_code
+    return r.text, r.status_code
 
 
 def validate_zip(file, schema):

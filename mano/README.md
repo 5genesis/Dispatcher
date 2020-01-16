@@ -87,7 +87,7 @@ To start MANO wrapper, run:
 
 `$ ./start.sh`
 
-This will start your application on port 5001 along with a Swagger environment to test the API running on port 5002
+This will start your application on port 5101 along with a Swagger environment to test the API running on port 5002
 
 ### Stop
 
@@ -103,13 +103,43 @@ To stop MANO wrapper, run:
 
 You can find [here](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) examples of VNFD and NSD packages to populate and test the application
 
+## NBI REST API
+
+### VNFD 
+
+| **Method**  | **URI** | **Description** | **Data** | **Params** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | -------- | ------------ |
+| POST  | /vnfd | Add a new VNFD to the catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [id](schemas/osm_id.json) | [error](schemas/osm_error.json) |
+| GET  | /vnfd | List all available VNFDs | - | - | [VNFD](schemas/osm_vnfd_schema.json) | [error](schemas/osm_error.json) |
+| GET  | /vnfd/{vnfd id} | Find VNFD by id | - | VNFD id | [VNFD](schemas/osm_vnfd_schema.json) | [error](schemas/osm_error.json) |
+| DELETE  | /vnfd/{vnfd _id} | Deletes a VNFD | - | VNFD _id | - | [error](schemas/osm_error.json) |
+| PUT  | /vnfd/{vnfd _id} | Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - NSD _id | [id](schemas/id_im.json) | [error](schemas/osm_error.json) |
+
+### NSD 
+
+| **Method**  | **URI** | **Description** | **Data** | **Params** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | -------- | ------------ |
+| POST  | /nsd | Add a new NSD to the catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [id](schemas/osm_id.json) | [error](schemas/osm_error.json) |
+| GET  | /nsd | List all available NSDs | - | - | [NSD](schemas/osm_nsd_schema.json) | [error](schemas/osm_error.json) |
+| GET  | /nsd/{nsd id} | Find NSD by id | - | NSD id | [NSD](schemas/osm_nsd_schema.json) | [error](schemas/osm_error.json) |
+| DELETE  | /nsd/{nsd _id} | Deletes a NSD | - | NSD _id | - | [error](schemas/osm_error.json) |
+| PUT  | /nsd/{nsd _id} | Updates a NSD providing the new NSD package and the _ID of the old one that is being updated | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - NSD _id | [id](schemas/id_im.json) | [error](schemas/osm_error.json) |
+
+### VIM related operations 
+
+| **Method**  | **URI** | **Description** | **Data** | **Params** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | -------- | ------------ |
+| GET  | /vims | Retrieves the list of registered VIMs in the mano.conf file | - | - | [VIMs list](schemas/vim_list.json) | - |
+| POST  | /image/{vim name} | Uploads an image in the VIM | image | vim_name, disk_format, container_format | "Image status: active" | - |
+
+
 #### Examples on how to use it
 
 You can test the API using your favorite REST client following these simple workflow:
 
 - Insert a VNFD package:
 
-    `curl -X POST -F "vnfd=@./<vnfd_package_file>" http://<host>:5001/vnfd`
+    `curl -X POST -F "vnfd=@./<vnfd_package_file>" http://<host>:5101/vnfd`
 
     Response:
 
@@ -117,7 +147,7 @@ You can test the API using your favorite REST client following these simple work
 
 - Insert a NSD package:
 
-    `curl -X POST -F "nsd=@./<nsd_package_file>" http://<host>:5001/nsd`
+    `curl -X POST -F "nsd=@./<nsd_package_file>" http://<host>:5101/nsd`
 
     Response:
 
@@ -125,55 +155,60 @@ You can test the API using your favorite REST client following these simple work
 
 - List all available VNFDs:
 
-    `curl -X GET "http://<host>:5001/vnfd" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/vnfd" -H "accept: application/json"`
 
     Response:
 
     >List of available VNFDs in JSON format. (according to the NFVO information model) 
+    
     >Format of the response: [{...}]
     
 - Retrieve an individual VNFD descriptor:
 
-    `curl -X GET "http://<host>:5001/vnfd/<VNFD id>" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/vnfd/<VNFD id>" -H "accept: application/json"`
 
     Response:
 
     >VNF descriptor in JSON format. (according to the NFVO information model)
+    
     >Format of the response: [{...}]
 
 - List all available NSDs:
 
-    `curl -X GET "http://<host>:5001/nsd" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/nsd" -H "accept: application/json"`
 
     Result:
 
     >List of available NSDs in JSON format. (according to the NFVO information model)
+    
     >Format of the response: [{...}]
 
 - Retrieve an individual NSD descriptor:
 
-    `curl -X GET "http://<host>:5001/NSd/<NSD id>" -H "accept: application/json"`
+    `curl -X GET "http://<host>:5101/NSd/<NSD id>" -H "accept: application/json"`
 
     Result:
 
     >NS descriptor in JSON format. (according to the NFVO information model)
+    
     >Format of the response: [{...}]
 
 - Delete an individual NSD:
 
-    `curl -X DELETE "http://<host>:5001/nsd/<NSD _id>" -H "accept: application/json"`
+    `curl -X DELETE "http://<host>:5101/nsd/<NSD _id>" -H "accept: application/json"`
 
 - Delete an individual VNFD:
 
-    `curl -X DELETE "http://<host>:5001/vnfd/<VNFD _id>" -H "accept: application/json"`
+    `curl -X DELETE "http://<host>:5101/vnfd/<VNFD _id>" -H "accept: application/json"`
 
 - Upload an image file in a specific VIM:
 
-    `curl -X POST -F "image=@./<image_file>" http://<host>:5001/image/<vim_name>?disk_format=<raw|qcow2>&container_format=bare`
+    `curl -X POST -F "image=@./<image_file>" http://<host>:5101/image/<vim_name>?disk_format=<raw|qcow2>&container_format=bare`
 
     Result:
 
     >Image status: active
+    
     >Format of the response: String
 
 ## Logs
@@ -196,10 +231,6 @@ Application logs are available in the application directory as `mano.log`
 ## Next steps
 
 + Add OpenNebula as supported VIM
-
-## Identified bugs
-
-- The NFVO sometimes does not include the "_id" field in the response when retrieving a descriptor, which is necessary for deleting it. If this bug confirms, a *MANO Wrapper* database will be needed for storing such information associated to the descriptor "id".
 
 ## Authors
 

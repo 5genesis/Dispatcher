@@ -414,7 +414,7 @@ paths:
           description: Entry badly formed
           schema:
             $ref: "#/definitions/String"
-  /validator/onboard/ed:
+  /validator/create/ed:
     post:
       security:
         - basicAuth: []

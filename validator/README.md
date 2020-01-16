@@ -46,51 +46,72 @@ As part of the *Validator* features, it performs not only validation but also on
 ### config.env example:
 
     ELCM_ED_POST="http:///localhost:8082/elcm/v0/run"
-    MANO_NSD_POST=http://mano:5001/nsd
-    MANO_VNFD_POST=http://mano:5001/vnfd
+    MANO_NSD_POST=http://mano:5101/nsd
+    MANO_VNFD_POST=http://mano:5101/vnfd
 
-**NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed.
+**NOTE**: MANO_NSD_POST and MANO_VNFD_POST are known URLs, as the *MANO Wrapper* is installed along with the *Validator* and therefore, should not be changed (unless the *Validator* is installed stand-alone).
 
-## Available functions
 
-The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` with POST methods:
+## NBI REST API
+
+The Validator is available through the Dispatcher port (8082) and using the endpoint `/validator` or, if deployed stand-alone, in port `5100`:
+
+### Validator 
+
+| **Method**  | **URI** | **Description** | **Data** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | --------- | ------------ |
+| POST  | /validate/ed | Validate Experiment descriptor | [ED](experiment_schema.json) | "ok" | "Error message" |
+| POST  | /onboard/ed | Validate and launch Experiment descriptor | [ED](experiment_schema.json) | ? | "Error message" |
+| POST  | /validate/vnfd | Validate VNFD | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | "ok" | "Error message" |
+| POST  | /onboard/vnfd | Validate VNFD and add it to the NSD catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
+| POST  | /validate/nsd | Validate NSD | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | "ok" | "Error message" |
+| POST  | /onboard/nsd | Validate NSD and add it to the NSD catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
+
+
+### Examples
+Depending on how the application was installed (in stand-alone mode or along with the *Dispatcher*), the host, port and base path might change:
+
+- [x] Validator relative path: {validator_host}:5100
+
+- [x]  Dispatcher relative path: {dispatcher_host}:8082/validator
+
 
 - Validate Experiment descriptor:
 `/validate/ed`
 
 Example:
-> curl -X POST -d @descriptor.json <http://{dispatcher_host}:8082/validator/validate/ed>
+> curl -X POST -d @descriptor.json <http://{relative path}/validate/ed>
 
 - Validate and onboard Experiment descriptor:
 `/onboard/ed`
 
 Example:
-> curl -X POST -d @descriptor.json <http://{dispatcher_host}:8082/validator/onboard/ed>
+> curl -X POST -d @descriptor.json <http://{relative path}/onboard/ed>
 
 - Validate VNF descriptor:
 `/validate/vnfd`
 
 Example:
-> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/validate/vnfd>
+> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{relative path}/validate/vnfd>
 
 - Validate and onboard VNF descriptor:
 `/onboard/vnfd`
 
 Example:
-> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/onboard/vnfd>
+> curl -X POST -F "vnfd=@./vnf_descriptor.tar.gz" <http://{relative path}/onboard/vnfd>
 
 - Validate NS descriptor:
 `/validate/nsd`
 
 Example:
-> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/validate/nsd>
+> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{relative path}/validate/nsd>
 
 - Validate and onboard NS descriptor:
 
 `/onboard/nsd`
 
 Example:
-> curl -X POST -F "ns=@./ns_descriptor.tar.gz" <http://{dispatcher_host}:8082/validator/onboard/nsd>
+> curl -X POST -F "nsd=@./ns_descriptor.tar.gz" <http://{relative path}/onboard/nsd>
 
 ## Responses
 

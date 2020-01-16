@@ -356,7 +356,7 @@ if __name__ == '__main__':
             logger.error("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
             raise KeyError("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
         #app.run(host='0.0.0.0', debug=True)
-        http_server = WSGIServer(('', 5001), app)
+        http_server = WSGIServer(('', 5101), app)
         http_server.serve_forever()
     except KeyError as ex:
         logger.error("Config file {} badly formed: {}".format (config_file, ex.args))

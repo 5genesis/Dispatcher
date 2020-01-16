@@ -1,28 +1,30 @@
 swagger: "2.0"
 info:
-  description: Swagger 5GENESIS Dispatcher
+  description: Swagger 5GENESIS MANO Wrapper
   version: 1.0.0
-  title: 5GENESIS Dispatcher Swagger
+  title: 5GENESIS MANO Wrapper Swagger
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: javier.melian@atos.net
   license:
     name: Apache 2.0
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "DISPATCHER:8082"
+host: "localhost:5002"
 basePath: /
 tags:
-  - name: MANO
-    description: MANO catalogue operations
-  - name: Validator
-    description: Experiment descriptor validation and network service validation (VNFD + NSD)
+  - name: VNFD
+    description: VNFD catalogue operations
+  - name: NSD
+    description: NSD catalogue operations
+  - name: VIM
+    description: VIM related operations
 schemes:
   - http
 paths:
-  /mano/vnfd:
+  /vnfd:
     post:
       tags:
-        - MANO
+        - VNFD
       summary: Add a new VNFD to the catalogue
       description: ""
       operationId: addVNFD
@@ -53,7 +55,7 @@ paths:
           description: Internal server error - Network problems
     get:
       tags:
-        - MANO
+        - VNFD
       summary: List all available VNFDs
       description: List all available VNFDs as a json collection
       operationId: listVNFDs
@@ -70,10 +72,10 @@ paths:
             $ref: "#/definitions/ProblemDetails"
         "500":
           description: Internal server error - Network problems
-  "/mano/vnfd/{vnfdId}":
+  "/vnfd/{vnfdId}":
     get:
       tags:
-        - MANO
+        - VNFD
       summary: Find VNFD by id
       description: Returns a single VNFD
       operationId: getVNFDById
@@ -98,7 +100,7 @@ paths:
           description: Internal server error - Network problems
     delete:
       tags:
-        - MANO
+        - VNFD
       summary: Deletes a VNFD
       description: Deletes a VNFD given its _id
       operationId: deleteVNFD
@@ -123,7 +125,7 @@ paths:
             $ref: "#/definitions/ProblemDetails"
     put:
       tags:
-        - MANO
+        - VNFD
       summary: Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated
       description: ""
       operationId: updateVNFD
@@ -151,10 +153,10 @@ paths:
           description: VNFD not found
         "409":
           description: There was a conflict when updating this VNFD
-  /mano/nsd:
+  /nsd:
     post:
       tags:
-        - MANO
+        - NSD
       summary: Add a new NSD to the catalogue
       description: ""
       operationId: addNSD
@@ -185,7 +187,7 @@ paths:
           description: Internal server error - Network problems
     get:
       tags:
-        - MANO
+        - NSD
       summary: List all available NSDs
       description: List all available NSDs as a json collection
       operationId: listNSDs
@@ -205,7 +207,7 @@ paths:
   "/mano/nsd/{nsdId}":
     get:
       tags:
-        - MANO
+        - NSD
       summary: Find NSD by name
       description: Returns a single NSD identified by its name
       operationId: getNSDByName
@@ -228,7 +230,7 @@ paths:
           description: Internal server error - Network problems
     delete:
       tags:
-        - MANO
+        - NSD
       summary: Deletes an NSD by _ID
       description: ""
       operationId: deleteNSD
@@ -249,7 +251,7 @@ paths:
           description: NSD not found
     put:
       tags:
-        - MANO
+        - NSD
       summary: Updates an NSD providing the new NSD package and the _ID of the old one that is being updated
       description: ""
       operationId: updateNSD
@@ -279,10 +281,10 @@ paths:
           description: There was a conflict when updating this NSD
           schema:
             $ref: "#/definitions/ProblemDetails"
-  "/mano/vims":
+  /vims:
     get:
       tags:
-        - MANO
+        - VIM
       summary: Retrieves the list of registered VIMs in the mano.conf file 
       description: ""
       operationId: getVIMs
@@ -295,10 +297,10 @@ paths:
             $ref: "#/definitions/VimList"
         "400":
           description: Bad request
-  "/mano/image/{vim_name}":
+  /image/{vim_name}:
     post:
       tags:
-        - MANO
+        - VIM
       summary: Upload an image file in the VIM
       description: ""
       operationId: addImage
@@ -338,180 +340,6 @@ paths:
           description: File too large
         "500":
           description: Internal server error - Service is not accessible
-  /validator/validate/ed:
-    post:
-      tags:
-        - Validator
-      summary: Validate Experiment descriptor
-      description: ""
-      operationId: validateED
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: body
-          description: Experiment descriptor in JSON format
-          schema:
-            $ref: "#/definitions/Experiment_descriptor"
-          required: true
-      responses:
-        "200":
-          description: Successful validation
-          schema:
-            $ref: "#/definitions/String_ok"
-        "400":
-          description: Invalid input
-        "500":
-          description: Entry badly formed
-          schema:
-            $ref: "#/definitions/String"
-  /validator/create/ed:
-    post:
-      tags:
-        - Validator
-      summary: Validate Experiment descriptor and onboard it in the ELCM
-      description: ""
-      operationId: onboardED
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: body
-          description: Experiment descriptor in JSON format
-          schema:
-            $ref: "#/definitions/Experiment_descriptor"
-          required: true
-      responses:
-        "200":
-          description: Successful validation
-        "400":
-          description: Invalid input
-        "500":
-          description: Internal server error - No connection to the service or the ELCM
-  /validator/validate/vnfd:
-    post:
-      tags:
-        - Validator
-      summary: Validate VNFD
-      description: ""
-      operationId: validateVNFD
-      consumes:
-        - multipart/form-data
-      produces:
-        - application/json
-      parameters:
-        - name: vnfd
-          in: formData
-          description: VNFD Package
-          required: true
-          type: file
-      responses:
-        "200":
-          description: Valid VNFD
-          schema:
-            $ref: "#/definitions/ObjectID"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
-  /validator/onboard/vnfd:
-    post:
-      tags:
-        - Validator
-      summary: Validate VNFD and add it to the catalogue
-      description: ""
-      operationId: onboardVNFD
-      consumes:
-        - multipart/form-data
-      produces:
-        - application/json
-      parameters:
-        - name: vnfd
-          in: formData
-          description: VNFD Package
-          required: true
-          type: file
-      responses:
-        "201":
-          description: VNFD created
-          schema:
-            $ref: "#/definitions/ObjectID"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "409":
-          description: Conflict - VNFD already present
-          schema:
-            $ref: "#/definitions/ProblemDetails"
-        "500":
-          description: Internal server error - Network problems
-  /validator/validate/nsd:
-    post:
-      tags:
-        - Validator
-      summary: Validate NSD
-      description: ""
-      operationId: validateNSD
-      consumes:
-        - multipart/form-data
-      produces:
-        - application/json
-      parameters:
-        - name: nsd
-          in: formData
-          description: NSD Package
-          required: true
-          type: file
-      responses:
-        "200":
-          description: Valid NSD
-          schema:
-            $ref: "#/definitions/String_ok"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
-  /validator/onboard/nsd:
-    post:
-      tags:
-        - Validator
-      summary: Validate NSD and add it to the catalogue
-      description: ""
-      operationId: onboardNSD
-      consumes:
-        - multipart/form-data
-      produces:
-        - application/json
-      parameters:
-        - name: nsd
-          in: formData
-          description: NSD Package
-          required: true
-          type: file
-      responses:
-        "201":
-          description: NSD created
-          schema:
-            $ref: "#/definitions/ObjectID"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "409":
-          description: Conflict - NSD already present
-          schema:
-            $ref: "#/definitions/ProblemDetails"
-        "500":
-          description: Internal server error - Network problems
 definitions:
   ObjectID:
     type: object
@@ -578,70 +406,3 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/Vim"
-  Experiment_descriptor:
-    type: object
-    properties:
-      Id:
-        type: integer
-        format: int64
-        example: 123
-      Name:
-        type: string
-        example: "sfafd"
-      User:
-        type: integer
-        format: int64
-        example: 12345
-      Platform:
-        type: string
-        example: "malaga"
-      TestCases:
-        type: array
-        example:
-          - "TC1"
-          - "TC2"
-        items:
-          type: string
-      UEs:
-        type: array
-        example:
-          - "UE1"
-          - "UE2"
-        items:
-          type: string
-      Slice:
-        type: string
-        example: "slice_id"
-      NS:
-        type: string
-        example: "ns_id"
-      NS_Placement:
-        type: string
-        example: "Edge"
-      Limited:
-        type: boolean
-        example: true
-      Type_experiment:
-        type: boolean
-        example: false
-      Scenario:
-        type: array
-        example:
-          - "scenario1"
-          - "scemarop2"
-        items:
-          type: string
-      Application:
-        type: array
-        example:
-          - "app1"
-        items:
-          type: string
-      Attended:
-        type: boolean
-        example: true
-      Reservation_time:
-        type: integer
-        format: int64
-        example: 60
-        

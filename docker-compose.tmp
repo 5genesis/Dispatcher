@@ -29,7 +29,7 @@ services:
     volumes:
       - "./mano:/mano"
     ports:
-      - '5001:5001'
+      - '5101:5101'
     restart: always
   swagger:
     image: 'swaggerapi/swagger-ui'
