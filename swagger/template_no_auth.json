@@ -44,11 +44,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - VNFD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     get:
@@ -67,7 +67,7 @@ paths:
         "400":
           description: Invalid status value
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
   "/mano/vnfd/{vnfdId}":
@@ -116,11 +116,11 @@ paths:
         "404":
           description: VNFD not found
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - VNFD referenced by at least one NSD
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
     put:
       tags:
         - MANO
@@ -176,11 +176,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - NSD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     get:
@@ -199,7 +199,7 @@ paths:
         "400":
           description: Invalid status value
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
   "/mano/nsd/{nsdId}":
@@ -278,7 +278,7 @@ paths:
         "409":
           description: There was a conflict when updating this NSD
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
   "/mano/vims":
     get:
       tags:
@@ -357,14 +357,14 @@ paths:
             $ref: "#/definitions/Experiment_descriptor"
           required: true
       responses:
-      "200":
-        description: Successful validation
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "400":
-        description: Entry badly formed
-        schema:
-          $ref: "#/definitions/ResponseDetails"
+        "200":
+          description: Successful validation
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "400":
+          description: Entry badly formed
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/create/ed:
     post:
       tags:
@@ -384,14 +384,14 @@ paths:
             $ref: "#/definitions/Experiment_descriptor"
           required: true
       responses:
-      "200":
-        description: Successful validation
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "400":
-        description: Invalid input
-        schema:
-          $ref: "#/definitions/ResponseDetails"
+        "200":
+          description: Successful validation
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/validate/vnfd:
     post:
       tags:
@@ -410,18 +410,18 @@ paths:
           required: true
           type: file
       responses:
-      "200":
-        description: Valid VNFD
-        schema:
-          $ref: "#/definitions/ObjectID"
-      "400":
-        description: Descriptor with failures
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "412":
-        description: Problem while getting the vnfd the file
-        schema:
-          $ref: "#/definitions/ResponseDetails"
+        "200":
+          description: Valid VNFD
+          schema:
+            $ref: "#/definitions/ObjectID"
+        "400":
+          description: Descriptor with failures
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the vnfd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/onboard/vnfd:
     post:
       tags:
@@ -440,26 +440,26 @@ paths:
           required: true
           type: file
       responses:
-      "201":
-        description: VNFD created
-        schema:
-          $ref: "#/definitions/ObjectID"
-      "400":
-        description: Descriptor with failures
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "409":
-        description: Conflict - VNFD already present
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "412":
-        description: Problem while getting the vnfd the file
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "500":
-        description: Internal server error - Network problems
-        schema:
-          $ref: "#/definitions/ResponseDetails"
+        "201":
+          description: VNFD created
+          schema:
+            $ref: "#/definitions/ObjectID"
+        "400":
+          description: Descriptor with failures
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "409":
+          description: Conflict - VNFD already present
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the vnfd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "500":
+          description: Internal server error - Network problems
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/validate/nsd:
     post:
       tags:
@@ -478,18 +478,18 @@ paths:
           required: true
           type: file
       responses:
-      "200":
-        description: Valid NSD
-        schema:
-          $ref: "#/definitions/ObjectID"
-      "400":
-        description: Descriptor with failures
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "412":
-        description: Problem while getting the nsd the file
-        schema:
-          $ref: "#/definitions/ResponseDetails"
+        "200":
+          description: Valid NSD
+          schema:
+            $ref: "#/definitions/ObjectID"
+        "400":
+          description: Descriptor with failures
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the nsd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/onboard/nsd:
     post:
       tags:
@@ -508,26 +508,26 @@ paths:
           required: true
           type: file
       responses:
-      "201":
-        description: NSD created
-        schema:
-          $ref: "#/definitions/ObjectID"
-      "400":
-        description: Descriptor with failures
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "409":
-        description: Conflict - NSD already present
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "412":
-        description: Problem while getting the nsd the file
-        schema:
-          $ref: "#/definitions/ResponseDetails"
-      "500":
-        description: Internal server error - Network problems
-        schema:
-          $ref: "#/definitions/ResponseDetails"
+        "201":
+          description: NSD created
+          schema:
+            $ref: "#/definitions/ObjectID"
+        "400":
+          description: Descriptor with failures
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "409":
+          description: Conflict - NSD already present
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the nsd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "500":
+          description: Internal server error - Network problems
+          schema:
+            $ref: "#/definitions/ResponseDetails"
 definitions:
   ObjectID:
     type: object
