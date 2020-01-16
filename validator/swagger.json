@@ -41,8 +41,6 @@ paths:
           schema:
             $ref: "#/definitions/ResponseDetails"
         "400":
-          description: Invalid input
-        "500":
           description: Entry badly formed
           schema:
             $ref: "#/definitions/ResponseDetails"

@@ -357,16 +357,14 @@ paths:
             $ref: "#/definitions/Experiment_descriptor"
           required: true
       responses:
-        "200":
-          description: Successful validation
-          schema:
-            $ref: "#/definitions/String_ok"
-        "400":
-          description: Invalid input
-        "500":
-          description: Entry badly formed
-          schema:
-            $ref: "#/definitions/String"
+      "200":
+        description: Successful validation
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "400":
+        description: Entry badly formed
+        schema:
+          $ref: "#/definitions/ResponseDetails"
   /validator/create/ed:
     post:
       tags:
@@ -386,12 +384,14 @@ paths:
             $ref: "#/definitions/Experiment_descriptor"
           required: true
       responses:
-        "200":
-          description: Successful validation
-        "400":
-          description: Invalid input
-        "500":
-          description: Internal server error - No connection to the service or the ELCM
+      "200":
+        description: Successful validation
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "400":
+        description: Invalid input
+        schema:
+          $ref: "#/definitions/ResponseDetails"
   /validator/validate/vnfd:
     post:
       tags:
@@ -410,16 +410,18 @@ paths:
           required: true
           type: file
       responses:
-        "200":
-          description: Valid VNFD
-          schema:
-            $ref: "#/definitions/ObjectID"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+      "200":
+        description: Valid VNFD
+        schema:
+          $ref: "#/definitions/ObjectID"
+      "400":
+        description: Descriptor with failures
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "412":
+        description: Problem while getting the vnfd the file
+        schema:
+          $ref: "#/definitions/ResponseDetails"
   /validator/onboard/vnfd:
     post:
       tags:
@@ -438,20 +440,26 @@ paths:
           required: true
           type: file
       responses:
-        "201":
-          description: VNFD created
-          schema:
-            $ref: "#/definitions/ObjectID"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "409":
-          description: Conflict - VNFD already present
-          schema:
-            $ref: "#/definitions/ProblemDetails"
-        "500":
-          description: Internal server error - Network problems
+      "201":
+        description: VNFD created
+        schema:
+          $ref: "#/definitions/ObjectID"
+      "400":
+        description: Descriptor with failures
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "409":
+        description: Conflict - VNFD already present
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "412":
+        description: Problem while getting the vnfd the file
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "500":
+        description: Internal server error - Network problems
+        schema:
+          $ref: "#/definitions/ResponseDetails"
   /validator/validate/nsd:
     post:
       tags:
@@ -470,16 +478,18 @@ paths:
           required: true
           type: file
       responses:
-        "200":
-          description: Valid NSD
-          schema:
-            $ref: "#/definitions/String_ok"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+      "200":
+        description: Valid NSD
+        schema:
+          $ref: "#/definitions/ObjectID"
+      "400":
+        description: Descriptor with failures
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "412":
+        description: Problem while getting the nsd the file
+        schema:
+          $ref: "#/definitions/ResponseDetails"
   /validator/onboard/nsd:
     post:
       tags:
@@ -498,20 +508,26 @@ paths:
           required: true
           type: file
       responses:
-        "201":
-          description: NSD created
-          schema:
-            $ref: "#/definitions/ObjectID"
-        "400":
-          description: Descriptor with failures
-          schema:
-            $ref: "#/definitions/String"
-        "409":
-          description: Conflict - NSD already present
-          schema:
-            $ref: "#/definitions/ProblemDetails"
-        "500":
-          description: Internal server error - Network problems
+      "201":
+        description: NSD created
+        schema:
+          $ref: "#/definitions/ObjectID"
+      "400":
+        description: Descriptor with failures
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "409":
+        description: Conflict - NSD already present
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "412":
+        description: Problem while getting the nsd the file
+        schema:
+          $ref: "#/definitions/ResponseDetails"
+      "500":
+        description: Internal server error - Network problems
+        schema:
+          $ref: "#/definitions/ResponseDetails"
 definitions:
   ObjectID:
     type: object
@@ -533,18 +549,15 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/VnfDescriptor"
-  ProblemDetails:
+  ResponseDetails:
     type: object
     properties:
       detail:
         type: string
-        example: "invalid file content file could not be opened successfully"
       status:
         type: integer
-        example: 400
       code:
         type: string
-        example: "BAD_REQUEST"
     required:
       - status
       - detail
