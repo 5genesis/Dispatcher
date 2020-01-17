@@ -101,7 +101,7 @@ class NbiUtil():
             r = requests.get(url, params=None, verify=False, stream=True, headers=headers)
         except Exception as e:
             print("ERROR - get_nsd: ", e)
-            return e, type(e).__name__
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         return r.text, r.status_code
 
     @check_authorization
@@ -125,7 +125,7 @@ class NbiUtil():
         status code
         """
         if not name:
-            return {}, 404
+            return {"detail": "Descriptor id not included", "status": 404, "code": "NOT_FOUND"}, 404
         url = self.ns_descriptors_url
 
         try:
@@ -138,8 +138,8 @@ class NbiUtil():
                     return nsd, 200
         except Exception as e:
             print("ERROR - get_nsd: ", e)
-            return e, type(e).__name__
-        return [], 404
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
+        return {"detail": "NSD not found", "status": 404, "code": "NOT_FOUND"}, 404 
 
 
     @check_authorization
@@ -174,7 +174,7 @@ class NbiUtil():
             r = requests.get(url, params=None, verify=False, stream=True, headers=headers)
         except Exception as e:
             print("ERROR - get_onboarded_nsds: ", e)
-            return e, type(e).__name__
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         #print("INFO - NSDs query finalised")
         # print("\nNSD list: \n"+ r.text)
         return json.loads(r.text), r.status_code
@@ -215,7 +215,7 @@ class NbiUtil():
                 result['error'] = False
         except Exception as e:
             print("ERROR - get_onboarded_vnfds: ", e)
-            return e, type(e).__name__
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         print("INFO - VNFDs list successfully retrieved")
         # print("\nVNFD list: \n" + r.text)
         return json.loads(r.text), 200
@@ -260,7 +260,7 @@ class NbiUtil():
                     return vnfd['vnfd:vnfd-catalog'], r.status_code
         except Exception as e:
             print("ERROR - get_vnfd: ", e)
-            return e, type(e).__name__
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         return r.text, r.status_code
 
 
@@ -299,10 +299,10 @@ class NbiUtil():
                     return vnfd, status_code
         except Exception as e:
             print("ERROR - get VNFD: ", e)
-            return {"error": str(e), "status": type(e).__name__}
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
             #return r1.text, r1.status_code
         #print("INFO - The VNFD with name %s does not exist" % vnfd_name)
-        return "VNFD not found", 404
+        return {"detail": "VNFD not found", "status": 404, "code": "NOT_FOUND"}, 404 
 
 
     @check_authorization
@@ -327,7 +327,7 @@ class NbiUtil():
 
         #print("INFO - Uploading VNFD: ", file.filename)
         if not os.path.exists(file.filename):
-            return "File '{}' does not exist".format(file.filename), 404
+            return {"detail": "File '{}' does not exist".format(file.filename), "status": 404, "code": "NOT_FOUND"}, 404 
         data = open(file.filename, 'rb').read()
 
         vnfd_url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self.osm_nbi_url)
@@ -377,7 +377,7 @@ class NbiUtil():
             return r.text, r.status_code
         except Exception as e:
             print("ERROR - Modify VNFD: ", e)
-            return r.text, r.status_code
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
 
 
 
@@ -400,8 +400,6 @@ class NbiUtil():
         ------
         status code
         """
-
-        #print("INFO - Deleting VNFD with id: ", id)
 
         #url = "{0}/vnfpkgm/v1/vnf_packages_content/{1}".format(self.osm_nbi_url, id)
         url = "{0}/vnfpkgm/v1/vnf_packages/{1}".format(self.osm_nbi_url, id)
@@ -453,7 +451,7 @@ class NbiUtil():
             return r.json(), r.status_code
         except Exception as e:
             print("ERROR - post NSD: ", e)
-            return r.json(), r.status_code
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
 
 
     @check_authorization
@@ -488,7 +486,7 @@ class NbiUtil():
                 print("INFO - NSD %s successfully deleted" % id)
         except Exception as e:
             print("ERROR - delete_nsd: ", e)
-            return e, type(e).__name__
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         return yaml.load(r.text), r.status_code
 
 
@@ -512,8 +510,6 @@ class NbiUtil():
         status code
         """
 
-        #print("INFO - Updating VNFD with id: ", id)
-
         #url = "{0}/vnfpkgm/v1/vnf_packages_content/{1}".format(self.osm_nbi_url, id)
         url = "{0}/vnfpkgm/v1/vnf_packages/{1}".format(self.osm_nbi_url, id)
         headers = dict(self.headers)
@@ -525,7 +521,7 @@ class NbiUtil():
                 print("INFO - VNFD %s successfully updated" % id)
         except Exception as e:
             print("ERROR - update_vnfd: ", e)
-            return e, type(e).__name__
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         return r.json(), r.status_code
 
 

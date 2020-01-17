@@ -49,6 +49,10 @@ paths:
           description: Conflict - VNFD already present
           schema:
             $ref: "#/definitions/ResponseDetails"
+        "422":
+          description: Unprocessable entity
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     get:
@@ -90,10 +94,14 @@ paths:
           description: successful operation
           schema:
             $ref: "#/definitions/VnfDescriptor"
+        "400":
+          description: "Invalid status value"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: VNFD not found
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     delete:
@@ -113,6 +121,10 @@ paths:
       responses:
         "204":
           description: VNFD successfully deleted
+        "400":
+          description: Invalid status value
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: VNFD not found
           schema:
@@ -145,12 +157,20 @@ paths:
       responses:
         "201":
           description: VNFD successfully updated
+          schema:
+            $ref: "#/definitions/ObjectID"
         "400":
           description: Invalid VNFD _ID supplied
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: VNFD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: There was a conflict when updating this VNFD
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /mano/nsd:
     post:
       tags:
@@ -224,6 +244,8 @@ paths:
             $ref: "#/definitions/NsDescriptor"
         "404":
           description: NSD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     delete:
@@ -245,8 +267,12 @@ paths:
           description: NSD successfully deleted
         "400":
           description: Invalid NS _ID supplied
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: NSD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
     put:
       tags:
         - MANO
@@ -271,10 +297,16 @@ paths:
       responses:
         "201":
           description: NSD successfully updated
+          schema:
+            $ref: "#/definitions/ObjectID"
         "400":
           description: Invalid NS _ID supplied
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: NSD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: There was a conflict when updating this NSD
           schema:
@@ -295,6 +327,8 @@ paths:
             $ref: "#/definitions/VimList"
         "400":
           description: Bad request
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   "/mano/image/{vim_name}":
     post:
       tags:
@@ -331,11 +365,19 @@ paths:
         "201":
           description: "Image uploaded. Image status: active"
           schema:
-            $ref: "#/definitions/String_image"
+            $ref: "#/definitions/ResponseDetails"
         "406":
           description: Not acceptable - File not valid
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "413":
           description: File too large
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "422":
+          description: Image file not in the request or request badly formed
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Service is not accessible
   /validator/validate/ed:
@@ -567,14 +609,6 @@ definitions:
   NsdPackage:
     type: string
     format: binary
-  String:
-    type: string
-  String_ok:
-    type: string
-    example: "ok"
-  String_image:
-    type: string
-    example: "Image status: active"
   Vim:
     type: object
     properties:
