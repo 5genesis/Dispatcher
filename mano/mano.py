@@ -203,7 +203,8 @@ class NSD_get(Resource):
         else:
             logger.debug("NSD cannot be deleted: {} - {}".format(r, code))
         return r, code
-ºº
+
+
     def put(self, ns_name):
         import os
 
