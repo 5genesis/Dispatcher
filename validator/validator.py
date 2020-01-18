@@ -4,10 +4,10 @@ import simplejson as json
 import os
 from flask import Flask, jsonify, request
 import requests
+import pymongo
 import logging
 
 from gevent.pywsgi import WSGIServer
-import logging
 
 from flask_cors import CORS
 
@@ -39,6 +39,9 @@ json_obj = {
 	"Reservation_timme": 123
 }
 
+# DB parameters
+dbclient = pymongo.MongoClient("mongodb://database:27017/")
+
 # Logging Parameters
 logger = logging.getLogger("-VALIDATOR API-")
 fh = logging.FileHandler('validator.log')
@@ -56,7 +59,6 @@ logger.addHandler(stream_handler)
 @app.route('/validate/ed', methods=['POST'])
 def validate_ed():
     try:
-        response = {}
         logger.info("Validating Experiment descriptor")
         content = request.get_data()
         data = json.loads(content)
@@ -66,39 +68,76 @@ def validate_ed():
         j = validate(data)
     except jsonschema.exceptions.ValidationError as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except fastjsonschema.JsonSchemaException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except Exception as e:
-        logger.warning("Problem while validating Experiment descriptor: {} tipo: {}".format(str(e), type(e).__name__))
-        response["detail"] = str(e)
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
-    logger.debug("Experiment descriptor sucessfully validated")
-    response["detail"] = "Successful validation"
-    response["code"] = "OK"
-    response["status"] = 200
-    return json.dumps(response), 200
+        logger.warning("Problem while validating Experiment descriptor: {}".format(str(e)))
+    return jsonify({"detail": "Successful validation", "code": "OK", "status": 200}), 200
+
+
+@app.route('/ed', methods=['GET'])
+def list_descriptors():
+    logger.info("Getting list of experiments")
+    try:
+        db = dbclient["experimentsdb"]
+        experiments = db["experiments"]
+
+        l = [] 
+        # Create the list of experiments
+        for exp in experiments.find():
+            exp["_id"] = str(exp["_id"])
+            l.append(exp)
+    except Exception as e:
+        logger.warning("Problem while obtaining the list of stored experiments: {}".format(str(e)))
+        return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
+    return json.dumps(l), 200
+
+
+@app.route('/ed/<string:exp_id>', methods=['GET'])
+def single_descriptor(exp_id):
+    from bson.objectid import ObjectId
+    import bson
+
+    logger.info("Getting experiment descriptor {}".format(exp_id))
+    try:
+        db = dbclient["experimentsdb"]
+        experiments = db["experiments"]
+
+        exp_id_obj = ObjectId(exp_id)
+        #exp = experiments.find_one({ "Id": exp_id },{ "_id": 0 })
+        exp = experiments.find_one({ "_id": exp_id_obj })
+        if not exp:
+            logger.debug("Experiment with _id: {} not found in the database".format(str(exp_id)))
+            return jsonify({"detail": "Experiment with _id: {} not found in the database".format(str(exp_id)), "status": 404, "code": "NOT_FOUND"}), 404
+        exp["_id"] = str(exp["_id"])
+    except bson.errors.InvalidId as e:
+        logger.error("Parameter 'exp_id' format is not valid: {}".format(str(e)))
+        return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
+    except Exception as e:
+        logger.warning("Problem while obtaining experiment descriptor: {} - {}".format(str(e), type(e).__name__))
+        return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
+    return json.dumps(exp), 200
+
+
+
+def store_descriptor(descriptor):
+    db = dbclient["experimentsdb"]
+    experiments = db["experiments"]
+
+    _id = experiments.insert_one(descriptor).inserted_id
+    logger.debug("Experiment stored with _id: {}".format(str(_id)))
+    return jsonify({"_id": str(_id)})
+
 
 
 @app.route('/create/ed', methods=['POST'])
 def onboard_ed():
     try:
-        response = {}
         logger.info("Onboarding Experiment descriptor")
         content = request.get_data()
         data = json.loads(content)
@@ -108,34 +147,21 @@ def onboard_ed():
         j = validate(data)
         headers = {'Content-type': 'application/json'}
         r = requests.post(ELCM_ED_POST, data=data, headers=headers)
+        _id_json = store_descriptor(data)
     except jsonschema.exceptions.ValidationError as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except fastjsonschema.JsonSchemaException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except Exception as e:
         logger.warning("Problem while onboarding Experiment descriptor: {}".format(str(e)))
-        response["detail"] = ve.message
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
-    response["detail"] = r.text
-    response["status"] = r.status_code
-    response["code"] = "OK"
-    return json.dumps(response), r.status_code
+        return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
+    # TODO: include in the response data returned on the POST to the ELCM
+    return _id_json, 200
 
 
 def validate_zip(file, schema):
@@ -146,7 +172,6 @@ def validate_zip(file, schema):
 
     try:
         # TODO: Switch from jsonschema to fastjsonschema
-        response = {}
         logger.debug("Decompressing package file")
         # unzip the package
         tar = tarfile.open(file, "r:gz")
@@ -166,34 +191,24 @@ def validate_zip(file, schema):
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
-        response["detail"] = "VNFD successfully validated"
-        response["code"] = "OK"
-        response["status"] = 200
-        return json.dumps(response), 200
+        return jsonify({"detail": "VNFD successfully validated", "code": "OK", "status": 200}), 200
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         logger.warning("Problem while validating VNFD: {}".format(ve.message))
-        response["detail"] = "Problem while validating VNFD: {}".format(ve.message)
-        response["code"] = "BAD_REQUEST"
-        response["status"] = 400
-        return json.dumps(response), 400
+        return jsonify({"detail": "Problem while validating VNFD: {}".format(ve.message), "code": "BAD_REQUEST", "status": 400}), 400
     except Exception as e:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating VNFD: {}".format(str(e)))
-        response["detail"] = message
-        response["status"] = 400
-        response["code"] = "BAD_REQUEST"
-        return json.dumps(response), 400
+        return jsonify({"detail": message, "code": "BAD_REQUEST", "status": 400}), 400
 
 
 @app.route('/validate/vnfd', methods=['POST'])
 def validate_vnfd():
     try:
-        response = {}
         logger.info("Validating VNFD")
         file = request.files.get("vnfd")
         if not file:
@@ -208,23 +223,16 @@ def validate_vnfd():
         return r, code
     except AttributeError as ae:
         logger.error("Problem while getting the vnfd the file: {}".format(str(ae)))
-        response["detail"] = str(ae)
-        response["status"] = 412
-        response["code"] = "PRECONDITION_FAILED"
-        return json.dumps(response), 412
+        return jsonify({"detail": str(ae), "code": "PRECONDITION_FAILED", "status": 412}), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating VNFD: {}".format(str(e)))
-        response["detail"] = message
-        response["status"] = 400
-        response["code"] = "BAD_REQUEST"
-        return json.dumps(response), 400
+        return jsonify({"detail": message, "code": "BAD_REQUEST", "status": 400}), 400
 
 @app.route('/onboard/vnfd', methods=['POST'])
 def onboard_vnfd():
     try:
-        response = {}
         logger.info("Onboarding VNFD")
         file = request.files.get("vnfd")
         if not file:
@@ -247,30 +255,20 @@ def onboard_vnfd():
         return res, code
     except AttributeError as ae:
         logger.error("Problem while getting the vnfd the file: {}".format(str(ae)))
-        response["detail"] = str(ae)
-        response["status"] = 412
-        response["code"] = "PRECONDITION_FAILED"
-        return json.dumps(response), 412
+        return jsonify({"detail": str(ae), "code": "PRECONDITION_FAILED", "status": 412}), 412
     except NameError as ne:
         logger.error("Problem with the ENV vars: {}".format(str(ne)))
-        response["detail"] = str(ne)
-        response["status"] = 500
-        response["code"] = "INTERNAL_SERVER_ERROR"
-        return json.dumps(response), 500
+        return jsonify({"detail": str(ne), "code": "INTERNAL_SERVER_ERROR", "status": 500}), 500
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while onboarding VNFD: {}".format(str(e)))
-        response["detail"] = message
-        response["status"] = 400
-        response["code"] = "BAD_REQUEST"
-        return json.dumps(response), 400
+        return jsonify({"detail": message, "code": "BAD_REQUEST", "status": 400}), 400
 
 
 @app.route('/validate/nsd', methods=['POST'])
 def validate_nsd():
     try:
-        response = {}
         logger.info("Validating NSD")
         file = request.files.get("nsd")
         if not file:
@@ -285,23 +283,16 @@ def validate_nsd():
         return r, code
     except AttributeError as ve:
         logger.error("Problem while getting the nsd the file: {}".format(str(ve)))
-        response["detail"] = str(ve)
-        response["status"] = 412
-        response["code"] = "PRECONDITION_FAILED"
-        return json.dumps(response), 412
+        return jsonify({"detail": str(ve), "code": "PRECONDITION_FAILED", "status": 412}), 412
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while validating NSD: {}".format(str(e)))
-        response["detail"] = message
-        response["status"] = 400
-        response["code"] = "BAD_REQUEST"
-        return json.dumps(response), 400
+        return jsonify({"detail": message, "code": "BAD_REQUEST", "status": 400}), 400
 
 @app.route('/onboard/nsd', methods=['POST'])
 def onboard_nsd():
     try:
-        response = {}
         logger.info("Onbarding NSD")
         file = request.files.get("nsd")
         if not file:
@@ -323,24 +314,15 @@ def onboard_nsd():
         return res, code
     except AttributeError as ae:
         logger.error("Problem while getting the nsd file: {}".format(str(ae)))
-        response["detail"] = str(ae)
-        response["status"] = 412
-        response["code"] = "PRECONDITION_FAILED"
-        return json.dumps(response), 412
+        return jsonify({"detail": str(ae), "code": "PRECONDITION_FAILED", "status": 412}), 412
     except NameError as ne:
         logger.error("Problem with the ENV vars: {}".format(str(ne)))
-        response["detail"] = str(ne)
-        response["status"] = 500
-        response["code"] = "INTERNAL_SERVER_ERROR"
-        return json.dumps(response), 501
+        return jsonify({"detail": str(ne), "code": "INTERNAL_SERVER_ERROR", "status": 500}), 500
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         message = template.format(type(e).__name__, e.args)
         logger.warning("Problem while onboarding NSD: {}".format(str(e)))
-        response["detail"] = message
-        response["status"] = 400
-        response["code"] = "BAD_REQUEST"
-        return json.dumps(response), 400
+        return jsonify({"detail": message, "code": "BAD_REQUEST", "status": 400}), 400
 
 
 if __name__ == '__main__':
