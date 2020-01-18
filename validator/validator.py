@@ -98,7 +98,7 @@ def list_descriptors():
     return json.dumps(l), 200
 
 
-@app.route('/ed/<string:exp_id>', methods=['GET'])
+@app.route('/ed/<string:exp_id>', methods=['GET', 'DELETE'])
 def single_descriptor(exp_id):
     from bson.objectid import ObjectId
     import bson
@@ -114,14 +114,19 @@ def single_descriptor(exp_id):
         if not exp:
             logger.debug("Experiment with _id: {} not found in the database".format(str(exp_id)))
             return jsonify({"detail": "Experiment with _id: {} not found in the database".format(str(exp_id)), "status": 404, "code": "NOT_FOUND"}), 404
+        if request.method == 'DELETE':
+            logger.debug("Deleting experiment"
+            exp = experiments.delete_one({ "_id": exp_id_obj })
+            return 204
         exp["_id"] = str(exp["_id"])
+        return json.dumps(exp), 200
+        
     except bson.errors.InvalidId as e:
         logger.error("Parameter 'exp_id' format is not valid: {}".format(str(e)))
         return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
     except Exception as e:
         logger.warning("Problem while obtaining experiment descriptor: {} - {}".format(str(e), type(e).__name__))
         return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
-    return json.dumps(exp), 200
 
 
 
