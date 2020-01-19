@@ -802,7 +802,6 @@ paths:
     get:
       security:
         - basicAuth: []
-        - BearerToken: []
       description: "TODO: Add Description"
       summary: "Get token"
       tags:
@@ -829,7 +828,6 @@ paths:
     put:
       security:
         - basicAuth: []
-        - BearerToken: []
       description: "TODO: Add Description"
       summary: "Change Password"
       tags:
@@ -997,7 +995,7 @@ paths:
           schema:
             $ref: "#/definitions/AuthMsg"
         "401":
-          description: "Invalid permission
+          description: "Invalid permission"
           headers: {}
           schema:
             $ref: "#/definitions/AuthError"

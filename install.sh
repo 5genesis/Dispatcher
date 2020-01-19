@@ -244,7 +244,7 @@ if $authentication; then
     build: ./auth
     image: auth
     container_name: auth
-    command: python Auth.py
+    command: python auth.py
     volumes:
       - \"./auth:/auth\"
     ports:
