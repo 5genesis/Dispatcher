@@ -44,11 +44,15 @@ paths:
         "400":
           description: Invalid input
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - VNFD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "422":
+          description: Unprocessable entity
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     get:
@@ -67,7 +71,7 @@ paths:
         "400":
           description: Invalid status value
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
   "/mano/vnfd/{vnfdId}":
@@ -90,10 +94,14 @@ paths:
           description: successful operation
           schema:
             $ref: "#/definitions/VnfDescriptor"
+        "400":
+          description: "Invalid status value"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: VNFD not found
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     delete:
@@ -113,14 +121,18 @@ paths:
       responses:
         "204":
           description: VNFD successfully deleted
+        "400":
+          description: Invalid status value
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: VNFD not found
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - VNFD referenced by at least one NSD
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
     put:
       tags:
         - MANO
@@ -145,12 +157,20 @@ paths:
       responses:
         "201":
           description: VNFD successfully updated
+          schema:
+            $ref: "#/definitions/ObjectID"
         "400":
           description: Invalid VNFD _ID supplied
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: VNFD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: There was a conflict when updating this VNFD
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /mano/nsd:
     post:
       tags:
@@ -176,11 +196,11 @@ paths:
         "400":
           description: Invalid input
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - NSD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     get:
@@ -199,7 +219,7 @@ paths:
         "400":
           description: Invalid status value
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
   "/mano/nsd/{nsdId}":
@@ -224,6 +244,8 @@ paths:
             $ref: "#/definitions/NsDescriptor"
         "404":
           description: NSD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
     delete:
@@ -245,8 +267,12 @@ paths:
           description: NSD successfully deleted
         "400":
           description: Invalid NS _ID supplied
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: NSD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
     put:
       tags:
         - MANO
@@ -271,14 +297,20 @@ paths:
       responses:
         "201":
           description: NSD successfully updated
+          schema:
+            $ref: "#/definitions/ObjectID"
         "400":
           description: Invalid NS _ID supplied
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "404":
           description: NSD not found
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: There was a conflict when updating this NSD
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
   "/mano/vims":
     get:
       tags:
@@ -295,6 +327,8 @@ paths:
             $ref: "#/definitions/VimList"
         "400":
           description: Bad request
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   "/mano/image/{vim_name}":
     post:
       tags:
@@ -331,13 +365,98 @@ paths:
         "201":
           description: "Image uploaded. Image status: active"
           schema:
-            $ref: "#/definitions/String_image"
+            $ref: "#/definitions/ResponseDetails"
         "406":
           description: Not acceptable - File not valid
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "413":
           description: File too large
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "422":
+          description: Image file not in the request or request badly formed
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Service is not accessible
+  "/validator/ed":
+    get:
+      tags:
+        - Validator
+      summary: List registered Experiment descriptors
+      description: ""
+      operationId: listED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: List of experiments
+          schema:
+            $ref: "#/definitions/ArrayOfExperiments"
+        "400":
+          description: Problem while obtaining the list of experiments
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+  /validator/ed/{exp_id}:
+    get:
+      tags:
+        - Validator
+      summary: List a specific Experiment descriptor
+      description: ""
+      operationId: getED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: exp_id
+          in: path
+          description: _id of the experiment descriptor
+          required: true
+          type: string
+      responses:
+        "200":
+          description: List of experiments
+          schema:
+            $ref: "#/definitions/Mongo_experiment_descriptor"
+        "400":
+          description: Problem while retrieving the experiment
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "404":
+          description: Descriptor not found in the database
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+    delete:
+      tags:
+        - Validator
+      summary: Delete a specific Experiment descriptor from the database
+      description: ""
+      operationId: deleteED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: exp_id
+          in: path
+          description: _id of the experiment descriptor
+          required: true
+          type: string
+      responses:
+        "204":
+          description: Experiment descriptor deleted
+        "400":
+          description: Problem while deleting the experiment
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "404":
+          description: Descriptor not found in the database
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/validate/ed:
     post:
       tags:
@@ -360,18 +479,16 @@ paths:
         "200":
           description: Successful validation
           schema:
-            $ref: "#/definitions/String_ok"
+            $ref: "#/definitions/ResponseDetails"
         "400":
-          description: Invalid input
-        "500":
           description: Entry badly formed
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
   /validator/create/ed:
     post:
       tags:
         - Validator
-      summary: Validate Experiment descriptor and onboard it in the ELCM
+      summary: Validate Experiment descriptor, send it to the ELCM and store is in the internal database
       description: ""
       operationId: onboardED
       consumes:
@@ -387,11 +504,13 @@ paths:
           required: true
       responses:
         "200":
-          description: Successful validation
+          description: Successful validation. Returns the _id of the inserted experiment
+          schema:
+            $ref: "#/definitions/Object_id"
         "400":
           description: Invalid input
-        "500":
-          description: Internal server error - No connection to the service or the ELCM
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/validate/vnfd:
     post:
       tags:
@@ -417,9 +536,11 @@ paths:
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the vnfd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/onboard/vnfd:
     post:
       tags:
@@ -445,13 +566,19 @@ paths:
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - VNFD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the vnfd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/validate/nsd:
     post:
       tags:
@@ -473,13 +600,15 @@ paths:
         "200":
           description: Valid NSD
           schema:
-            $ref: "#/definitions/String_ok"
+            $ref: "#/definitions/ObjectID"
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the nsd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/onboard/nsd:
     post:
       tags:
@@ -505,13 +634,19 @@ paths:
         "400":
           description: Descriptor with failures
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "409":
           description: Conflict - NSD already present
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: Problem while getting the nsd the file
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Network problems
+          schema:
+            $ref: "#/definitions/ResponseDetails"
 definitions:
   ObjectID:
     type: object
@@ -533,18 +668,15 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/VnfDescriptor"
-  ProblemDetails:
+  ResponseDetails:
     type: object
     properties:
       detail:
         type: string
-        example: "invalid file content file could not be opened successfully"
       status:
         type: integer
-        example: 400
       code:
         type: string
-        example: "BAD_REQUEST"
     required:
       - status
       - detail
@@ -554,14 +686,6 @@ definitions:
   NsdPackage:
     type: string
     format: binary
-  String:
-    type: string
-  String_ok:
-    type: string
-    example: "ok"
-  String_image:
-    type: string
-    example: "Image status: active"
   Vim:
     type: object
     properties:
@@ -644,4 +768,82 @@ definitions:
         type: integer
         format: int64
         example: 60
-        
+  Object_id:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "5e23602463013ef934bff6e5"
+  ArrayOfExperiments:
+    type: array
+    items:
+      $ref: "#/definitions/Mongo_experiment_descriptor"
+  Mongo_experiment_descriptor:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "5e22e33fc72cffeca34f72a3"
+      Id:
+        type: integer
+        format: int64
+        example: 123
+      Name:
+        type: string
+        example: "sfafd"
+      User:
+        type: integer
+        format: int64
+        example: 12345
+      Platform:
+        type: string
+        example: "malaga"
+      TestCases:
+        type: array
+        example:
+          - "TC1"
+          - "TC2"
+        items:
+          type: string
+      UEs:
+        type: array
+        example:
+          - "UE1"
+          - "UE2"
+        items:
+          type: string
+      Slice:
+        type: string
+        example: "slice_id"
+      NS:
+        type: string
+        example: "ns_id"
+      NS_Placement:
+        type: string
+        example: "Edge"
+      Limited:
+        type: boolean
+        example: true
+      Type_experiment:
+        type: boolean
+        example: false
+      Scenario:
+        type: array
+        example:
+          - "scenario1"
+          - "scemarop2"
+        items:
+          type: string
+      Application:
+        type: array
+        example:
+          - "app1"
+        items:
+          type: string
+      Attended:
+        type: boolean
+        example: true
+      Reservation_time:
+        type: integer
+        format: int64
+        example: 60      
