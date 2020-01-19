@@ -29,6 +29,7 @@ All fields are required except the *Reservation_time* one, that is only required
         "Attended": true, 
         "Reservation_time": 123 
     }    
+**Note**: If the experiment is launched/created through the *validator*, the experiment is added to the __experiments database__ and an unique "_id" is automatically generated and added to the model. This field can be used to identify univocally the experiment for later use. 
 
 ## Network service descriptors
 
@@ -45,7 +46,7 @@ As part of the *Validator* features, it performs not only validation but also on
 
 ### config.env example:
 
-    ELCM_ED_POST="http:///localhost:8082/elcm/v0/run"
+    ELCM_ED_POST="http:///localhost:5001/api/v0/run"
     MANO_NSD_POST=http://mano:5101/nsd
     MANO_VNFD_POST=http://mano:5101/vnfd
 
@@ -58,16 +59,17 @@ The Validator is available through the Dispatcher port (8082) and using the endp
 
 ### Validator 
 
-| **Method**  | **URI** | **Description** | **Data** | **Successful result** | **Error result** |
-| ------- | --- | ------------| ---- | --------- | ------------ |
-| POST  | /validate/ed | Validate Experiment descriptor | [ED](experiment_schema.json) | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
-| POST  | /create/ed | Validate, launch Experiment descriptor and store it| [ED](experiment_schema.json) | ? | [response message](schemas/response_detail.json) |
-| GET  | /ed | List of Experiment descriptors | [ED](experiment_schema.json) | ? | [response message](schemas/response_detail.json) |
-| GET  | /ed/<exp_id> | Get a single experiment descriptor | [ED](experiment_schema.json) | ? | [response message](schemas/response_detail.json) |
-| POST  | /validate/vnfd | Validate VNFD | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
-| POST  | /onboard/vnfd | Validate VNFD and add it to the NSD catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | "Error message" |
-| POST  | /validate/nsd | Validate NSD | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
-| POST  | /onboard/nsd | Validate NSD and add it to the NSD catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | [id](schemas/osm_id.json) | [response message](schemas/response_detail.json) |
+| **Method**  | **URI** | **Description** | **Data** | **Parameters** | **Successful result** | **Error result** |
+| ------- | --- | ------------| ---- | ---------- | --------- | ------------ |
+| POST  | /validate/ed | Validate Experiment descriptor | [ED](experiment_schema.json) | - | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
+| POST  | /create/ed | Validate, launch Experiment descriptor and store it| [ED](experiment_schema.json) | - | [Experiment _id](schemas/_id_schema.json) | [response message](schemas/response_detail.json) |
+| GET  | /ed | List of Experiment descriptors | - | - | [ED list](db_experiment_list_schema.json) | [response message](schemas/response_detail.json) |
+| GET  | /ed/<exp_id> | Get a single experiment descriptor | - | Experiment _id | [ED db model](db_experiment_schema.json) | [response message](schemas/response_detail.json) |
+| DELETE  | /ed/<exp_id> | Delete a single experiment descriptor | - | Experiment _id | - | [response message](schemas/response_detail.json) |
+| POST  | /validate/vnfd | Validate VNFD | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
+| POST  | /onboard/vnfd | Validate VNFD and add it to the NSD catalogue | [VNFD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [id](schemas/osm_id.json) | [response message](schemas/response_detail.json) |
+| POST  | /validate/nsd | Validate NSD | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [response message](schemas/response_detail.json) | [response message](schemas/response_detail.json) |
+| POST  | /onboard/nsd | Validate NSD and add it to the NSD catalogue | [NSD Package](https://osm-download.etsi.org/ftp/osm-6.0-six/7th-hackfest/packages/) | - | [id](schemas/osm_id.json) | [response message](schemas/response_detail.json) |
 
 
 ### Examples
@@ -119,8 +121,10 @@ Example:
 
 The *Validator* issues a [response message](schemas/response_detail.json) in json format along with a status code:
 
-- 200, 201: ok
+- 200, 201: OK
+- 204: Delete OK
 - 400: Error during the validation
+- 404: Not found
 - 409: Conflict with descriptor already present
 - 412: Wrong file in the request
 - 500: Network error
