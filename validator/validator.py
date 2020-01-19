@@ -116,7 +116,7 @@ def single_descriptor(exp_id):
                 logger.warning("You don't have rights to delete Experiment {}".format(exp_id))
             if exp.deleted_count == 1:
                 logger.info("Experiment {} was successfully deleted".format(exp_id))
-                return 204
+                return '', 204
             logger.info("Experiment {} not found in the database".format(exp_id))
             return jsonify({"detail": "Experiment {} not found in the database".format(exp_id), "status": 404, "code": "NOT_FOUND"}), 404
         #exp = experiments.find_one({ "Id": exp_id },{ "_id": 0 })
