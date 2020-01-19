@@ -198,6 +198,34 @@
         "security": []
       }
     },
+    "/delete_account": {
+      "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Delete Account",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Delete Account",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
     "/show_users": {
       "get": {
         "security": [

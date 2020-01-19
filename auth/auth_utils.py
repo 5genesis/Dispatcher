@@ -16,10 +16,14 @@ key = Settings().KEY
 
 
 def preValidation(request, functional_part):
-    username = request.authorization.username
-    password = hashlib.md5(request.authorization.password.encode()).hexdigest()
 
-    data = User.query.filter_by(username=username, password=password).first()
+    if request.authorization:
+        username = request.authorization.username
+        password = hashlib.md5(request.authorization.password.encode()).hexdigest()
+
+        data = User.query.filter_by(username=username, password=password).first()
+    else:
+        data = None
     if data is not None and data.active:
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
@@ -50,13 +54,16 @@ def auth(f):
 def admin_auth(f):
     @wraps(f)
     def auth_validator(*args, **kwargs):
-        username = request.authorization.username
-        password = request.authorization.password
-        data_user = User.query.filter_by(username=username, password=hashlib.md5(password.encode()).hexdigest()).first()
-        data_rol = Rol.query.filter_by(username=username, rol_name='Admin').first()
-        if not (data_user and data_rol):
+        if request.authorization:
+            username = request.authorization.username
+            password = request.authorization.password
+            data_user = User.query.filter_by(username=username, password=hashlib.md5(password.encode()).hexdigest()).first()
+            data_rol = Rol.query.filter_by(username=username, rol_name='Admin').first()
+            if not (data_user and data_rol):
+                return jsonify(result='Invalid Permission'), 401
+            return f(*args, **kwargs)
+        else:
             return jsonify(result='Invalid Permission'), 401
-        return f(*args, **kwargs)
 
     return auth_validator
 
@@ -87,7 +94,8 @@ def validate_token(token, request):
         else:
             return 'Token expired'
         if data is not None:
-            if request.data:
+
+            if not isinstance(request, str) and request.data:
                 new_action = Registry(username=metadata.get('username'),
                                       action=str(request.method + ' ' + request.path),
                                       data=str(request.get_json()))
@@ -101,6 +109,7 @@ def validate_token(token, request):
             raise Exception()
     except:
         return 'No valid Token given'
+
 
 def randomPassword(stringLength=10):
     """Generate a random string of fixed length """

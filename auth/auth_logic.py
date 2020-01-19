@@ -6,13 +6,12 @@ from flask_mail import Message
 from jwcrypto import jwt, jwk
 import logging
 import json
-from Auth import app
+from auth import app
 from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword
 from DB_Model import init_db, User, Registry, db
 from MailConfig import mail
 
 auth_logic = Blueprint('auth_page', __name__, template_folder='templates')
-
 
 json1_file = open('key.json')
 json1_str = json1_file.read()
@@ -23,7 +22,7 @@ logger = logging.getLogger('REST API')
 
 @auth_logic.route('/get_token', methods=['GET'])
 def get_token():
-    """Login Form"""
+    """Get Token Form"""
     logger.info(str(request))
 
     def logic(token):
@@ -62,7 +61,6 @@ def login():
 @auth_logic.route('/validate_request', methods=['GET'])
 def validate_request():
     logger.info(str(request))
-    token_valid = True
     if request.authorization:
         username = request.authorization.username
         password = hashlib.md5(request.authorization.password.encode()).hexdigest()
@@ -91,15 +89,41 @@ def validate_request():
     return jsonify(result='Success')
 
 
+@auth_logic.route('/delete_account', methods=['DELETE'])
+def delete_account():
+    """change_Password Form"""
+    logger.info(str(request))
+    try:
+        data = None
+        if request.authorization:
+            name = request.authorization.username
+            passw = hashlib.md5(request.authorization.password.encode()).hexdigest()
+            data = User.query.filter_by(username=name, password=passw).first()
+        if data is not None and data.active and not data.deleted and data.username != 'Admin':
+            data.active = False
+            data.deleted = True
+            new_action = Registry(username=request.authorization.username, action='account_deleted')
+            db.session.add(new_action)
+            db.session.commit()
+            return jsonify(result=name + ' deleted')
+        else:
+            return jsonify(result='No user registered/active with that user/password'), 400
+    except Exception as e:
+        return jsonify(result=('Delete account failed: ' + str(e))), 400
+
+
 @auth_logic.route('/change_password', methods=['PUT'])
 def change_password():
     """change_Password Form"""
     logger.info(str(request))
-    name = request.authorization.username
-    passw = hashlib.md5(request.authorization.password.encode()).hexdigest()
-    new_password = hashlib.md5(request.form['password'].encode()).hexdigest()
     try:
-        data = User.query.filter_by(username=name, password=passw).first()
+        data = None
+        if request.authorization:
+            name = request.authorization.username
+            passw = hashlib.md5(request.authorization.password.encode()).hexdigest()
+            new_password = hashlib.md5(request.form['password'].encode()).hexdigest()
+            data = User.query.filter_by(username=name, password=passw).first()
+
         if data is not None and data.active:
             data.password = new_password
             new_action = Registry(username=request.authorization.username, action='ChangePassword')
@@ -167,7 +191,11 @@ def drop_db():
 def delete_one_user(user):
     logger.info(str(request))
     try:
-        # Drop DB & create a new instance of DB
+        data = User.query.filter_by(username=user).first()
+        if not data and user != 'Admin':
+            return jsonify(result=user + ' user does not exist'), 404
+
+        # Delete User
         Registry.query.filter_by(username=user).delete()
         User.query.filter_by(username=user).delete()
         db.session.commit()

@@ -48,10 +48,27 @@ auth/                                   Main Folder
 
 ### Database Model
 DB is defined in DB_Model.py and has the following structure:
-![DB](./images/DB.png)
-
+![DB](./images/DB.PNG)
 Once the DB is created, the Admin user is created, with username "Admin", password "Admin" and email "5genesismanagement@gmail.com", setted in the mail config.
 
+There are 3 tables.
+- For Role table we can found 3 attributes:
+  - id   >>      Primary key
+  - username >>  Foreign key to User table
+  - rol_name >>  Rol in the system 
+ - User table with 6 attributes:
+   - id    >>     Primary key
+   - username  >> Unique key to User
+   - email  >> Unique in the system 
+   - password >> Password for the user
+   - active >> Account validated, true for validated, false for not.
+   - deleted >> Account deleted by the users. But it persist for view the traces
+  - Registry table with 5 attributes:
+    - id    >>     Primary key
+    - username  >> Foreign key to User table
+    - action >> function requested by the User
+    - data >> parameters for the request given
+    - date >> timestamp with the exact time where the action was requested
 ### Email Config
 Email config is defined in MailConfig.py
 
@@ -108,6 +125,14 @@ The service will be exposed in port 2000.
 
 ### Detele a single user from the database
 ![Delete user](https://www.plantuml.com/plantuml/img/VP312i8m38RlVOh_Bdk17cGJ9moy2Txh6bYXxKQR2hwzMIVi89f3cwHV_gHfCvl49NYbJE4vbl2W9Fx8Sq9dWujAgKKGDxh5H4PNU9AKWbXzHtEiIOqpUM92oPHm04uckt7ZLtW_Z6SC5uqXFertTaUgfWHeLirLN6znd1cLhHZvJEYljrxZ_a_WQoWPbYT2VZ65dmstWa-dQEMhhLoo8Rm1)
+
+### Activate a single user from the database
+![Activate user](https://www.plantuml.com/plantuml/img/JL2x3i8m3Dpp5HvR8NwW0se7n0X2m9wcgMhHEAXnGFmzJiBh9Z_ETxRRm7hXw6QbT6HFqVLsaTYmN-0S92vXDpWafMv2HeCtJGnTv4abW23tORt9rIPFmaNFE6X6Jz0_eQfssnCya2Su-Qkb6lP7g0xdTotA16bdLs-ff5FNMRiOIFxJxmpZNRCjHfdmmHzRwAdVmDPfd84yuuYcR3JAKKX3IYs4Q8mDOOmptBzBfyEAlw2rDCYNu0K0)
+
+### Delete account
+![Activate user](https://www.plantuml.com/plantuml/img/JKx13SCm2Fnx2XR80drKITKLEW0bI45AxCY6Tls2hKYz1phWZcDkYbNjs5D2qvBjU7DrJbegl5hmqmL2Sc9MM4ot5017h66wz-4DdhopCY1HCLT-HJTuO1CQfZ3q4js_gtcMV7XSwueBaJ9yZfdpwc_23m00)
+
+
 
 ## Authors
 

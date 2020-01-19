@@ -1,4 +1,4 @@
-from Auth import app
+from auth import app
 from flask_mail import Mail
 mail_settings = {
     "MAIL_SERVER": 'smtp.gmail.com',

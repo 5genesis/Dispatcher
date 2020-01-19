@@ -1,4 +1,4 @@
-from Auth import app
+from auth import app
 from datetime import datetime
 import hashlib
 from MailConfig import mail_settings
