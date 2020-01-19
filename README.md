@@ -185,6 +185,7 @@ In case of needing any help, contact the [authors](#authors) for support.
 
 ## Versioning
 
+- 2.3.2 - Fix *Auth* typos
 - 2.3.1 - Improve *Auth* response messages
 - 2.3.0 - Update *validator* component to store the experiments
 - 2.2.0 - Update *MANO* component to provide list of registered VIMs
