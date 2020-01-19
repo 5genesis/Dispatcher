@@ -1,0 +1,106 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "array",
+    "items": [
+      {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "Id": {
+            "type": "integer"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "User": {
+            "type": "integer"
+          },
+          "Platform": {
+            "type": "string"
+          },
+          "TestCases": {
+            "type": "array",
+            "items": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "UEs": {
+            "type": "array",
+            "items": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "Slice": {
+            "type": "string"
+          },
+          "NS": {
+            "type": "string"
+          },
+          "NS_Placement": {
+            "type": "string"
+          },
+          "Limited": {
+            "type": "boolean"
+          },
+          "Type_experiment": {
+            "type": "boolean"
+          },
+          "Scenario": {
+            "type": "array",
+            "items": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "Application": {
+            "type": "array",
+            "items": [
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "Attended": {
+            "type": "boolean"
+          },
+          "Reservation_time": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "_id",
+          "Id",
+          "Name",
+          "User",
+          "Platform",
+          "TestCases",
+          "UEs",
+          "Slice",
+          "NS",
+          "NS_Placement",
+          "Limited",
+          "Type_experiment",
+          "Scenario",
+          "Application",
+          "Attended",
+          "Reservation_time"
+        ]
+      }
+    ]
+  }
