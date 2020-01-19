@@ -41,6 +41,7 @@ The available features will depend on the features exposed by each dispatched mo
 ##### Validator enabler
 
 - Validation service: Validate Experiment descriptor, VNFD or NSD as a standalone service
+- Retrieve stored experiments from the database
 - Validate and onboard directly the Experiment descriptor in the ELCM, and the VNF descriptor or the NS descriptor in the NFVO
 
 ## How the authentication works
@@ -184,7 +185,8 @@ In case of needing any help, contact the [authors](#authors) for support.
 
 ## Versioning
 
-- 2.2.0 - Update MANO component to provide list of registered VIMs
+- 2.3.1 - Update *validator* component to store the experiments
+- 2.2.0 - Update *MANO* component to provide list of registered VIMs
 - 2.1.0 - Make Authentication optional during the installation process
 - 2.0.1 - Auth module documentation updated
 - 2.0.0 - User registration and authentication

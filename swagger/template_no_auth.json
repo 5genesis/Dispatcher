@@ -380,6 +380,83 @@ paths:
             $ref: "#/definitions/ResponseDetails"
         "500":
           description: Internal server error - Service is not accessible
+  "/validator/ed":
+    get:
+      tags:
+        - Validator
+      summary: List registered Experiment descriptors
+      description: ""
+      operationId: listED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: List of experiments
+          schema:
+            $ref: "#/definitions/ArrayOfExperiments"
+        "400":
+          description: Problem while obtaining the list of experiments
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+  /validator/ed/{exp_id}:
+    get:
+      tags:
+        - Validator
+      summary: List a specific Experiment descriptor
+      description: ""
+      operationId: getED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: exp_id
+          in: path
+          description: _id of the experiment descriptor
+          required: true
+          type: string
+      responses:
+        "200":
+          description: List of experiments
+          schema:
+            $ref: "#/definitions/Mongo_experiment_descriptor"
+        "400":
+          description: Problem while retrieving the experiment
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "404":
+          description: Descriptor not found in the database
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+    delete:
+      tags:
+        - Validator
+      summary: Delete a specific Experiment descriptor from the database
+      description: ""
+      operationId: deleteED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: exp_id
+          in: path
+          description: _id of the experiment descriptor
+          required: true
+          type: string
+      responses:
+        "204":
+          description: Experiment descriptor deleted
+        "400":
+          description: Problem while deleting the experiment
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "404":
+          description: Descriptor not found in the database
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validator/validate/ed:
     post:
       tags:
@@ -411,7 +488,7 @@ paths:
     post:
       tags:
         - Validator
-      summary: Validate Experiment descriptor and onboard it in the ELCM
+      summary: Validate Experiment descriptor, send it to the ELCM and store is in the internal database
       description: ""
       operationId: onboardED
       consumes:
@@ -427,9 +504,9 @@ paths:
           required: true
       responses:
         "200":
-          description: Successful validation
+          description: Successful validation. Returns the _id of the inserted experiment
           schema:
-            $ref: "#/definitions/ResponseDetails"
+            $ref: "#/definitions/Object_id"
         "400":
           description: Invalid input
           schema:
@@ -691,4 +768,82 @@ definitions:
         type: integer
         format: int64
         example: 60
-        
+  Object_id:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "5e23602463013ef934bff6e5"
+  ArrayOfExperiments:
+    type: array
+    items:
+      $ref: "#/definitions/Mongo_experiment_descriptor"
+  Mongo_experiment_descriptor:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "5e22e33fc72cffeca34f72a3"
+      Id:
+        type: integer
+        format: int64
+        example: 123
+      Name:
+        type: string
+        example: "sfafd"
+      User:
+        type: integer
+        format: int64
+        example: 12345
+      Platform:
+        type: string
+        example: "malaga"
+      TestCases:
+        type: array
+        example:
+          - "TC1"
+          - "TC2"
+        items:
+          type: string
+      UEs:
+        type: array
+        example:
+          - "UE1"
+          - "UE2"
+        items:
+          type: string
+      Slice:
+        type: string
+        example: "slice_id"
+      NS:
+        type: string
+        example: "ns_id"
+      NS_Placement:
+        type: string
+        example: "Edge"
+      Limited:
+        type: boolean
+        example: true
+      Type_experiment:
+        type: boolean
+        example: false
+      Scenario:
+        type: array
+        example:
+          - "scenario1"
+          - "scemarop2"
+        items:
+          type: string
+      Application:
+        type: array
+        example:
+          - "app1"
+        items:
+          type: string
+      Attended:
+        type: boolean
+        example: true
+      Reservation_time:
+        type: integer
+        format: int64
+        example: 60      
