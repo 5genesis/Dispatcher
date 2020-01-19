@@ -109,15 +109,21 @@ def single_descriptor(exp_id):
         experiments = db["experiments"]
 
         exp_id_obj = ObjectId(exp_id)
+        if request.method == 'DELETE':
+            logger.debug("Deleting experiment")
+            exp = experiments.delete_one({ "_id": exp_id_obj })
+            if not exp.acknowledged:
+                logger.warning("You don't have rights to delete Experiment {}".format(exp_id))
+            if exp.deleted_count == 1:
+                logger.info("Experiment {} was successfully deleted".format(exp_id))
+                return 204
+            logger.info("Experiment {} not found in the database".format(exp_id))
+            return jsonify({"detail": "Experiment {} not found in the database".format(exp_id), "status": 404, "code": "NOT_FOUND"}), 404
         #exp = experiments.find_one({ "Id": exp_id },{ "_id": 0 })
         exp = experiments.find_one({ "_id": exp_id_obj })
         if not exp:
             logger.debug("Experiment with _id: {} not found in the database".format(str(exp_id)))
             return jsonify({"detail": "Experiment with _id: {} not found in the database".format(str(exp_id)), "status": 404, "code": "NOT_FOUND"}), 404
-        if request.method == 'DELETE':
-            logger.debug("Deleting experiment"
-            exp = experiments.delete_one({ "_id": exp_id_obj })
-            return 204
         exp["_id"] = str(exp["_id"])
         return json.dumps(exp), 200
         
