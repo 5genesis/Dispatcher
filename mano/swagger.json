@@ -1,8 +1,8 @@
 swagger: "2.0"
 info:
-  description: Swagger 5GENESIS MANO Wrapper
+  description: "Swagger 5GENESIS MANO Wrapper"
   version: 1.0.0
-  title: 5GENESIS MANO Wrapper Swagger
+  title: "5GENESIS MANO Wrapper Swagger"
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: javier.melian@atos.net
@@ -13,11 +13,11 @@ host: "localhost:5002"
 basePath: /
 tags:
   - name: VNFD
-    description: VNFD catalogue operations
+    description: "VNFD catalogue operations"
   - name: NSD
-    description: NSD catalogue operations
+    description: "NSD catalogue operations"
   - name: VIM
-    description: VIM related operations
+    description: "VIM related operations"
 schemes:
   - http
 paths:
@@ -25,7 +25,7 @@ paths:
     post:
       tags:
         - VNFD
-      summary: Add a new VNFD to the catalogue
+      summary: "Add a new VNFD to the catalogue"
       description: ""
       operationId: addVNFD
       consumes:
@@ -35,110 +35,110 @@ paths:
       parameters:
         - name: vnfd
           in: formData
-          description: VNFD Package
+          description: "VNFD Package"
           required: true
           type: file
       responses:
         "201":
-          description: VNFD created
+          description: "VNFD created"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Invalid input
+          description: "Invalid input"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "409":
-          description: Conflict - VNFD already present
+          description: "Conflict - VNFD already present"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "422":
-          description: VNFD file not present in the query or wrong headers
+          description: "VNFD file not present in the query or wrong headers"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
     get:
       tags:
         - VNFD
-      summary: List all available VNFDs
-      description: List all available VNFDs as a json collection
+      summary: "List all available VNFDs"
+      description: "List all available VNFDs as a json collection"
       operationId: listVNFDs
       produces:
         - application/json
       responses:
         "200":
-          description: successful operation
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/ArrayOfVnfd"
         "400":
-          description: Invalid status value
+          description: "Invalid status value"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
   "/vnfd/{vnfdId}":
     get:
       tags:
         - VNFD
-      summary: Find VNFD by id
-      description: Returns a single VNFD
+      summary: "Find VNFD by id"
+      description: "Returns a single VNFD"
       operationId: getVNFDById
       produces:
         - application/json
       parameters:
         - name: vnfdId
           in: path
-          description: ID of VNFD to return
+          description: "id of VNFD to return"
           required: true
           type: string
       responses:
         "200":
-          description: successful operation
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/VnfDescriptor"
         "400":
-          description: Invalid status value
+          description: "Invalid status value"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "404":
-          description: VNFD not found
+          description: "VNFD not found"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
     delete:
       tags:
         - VNFD
-      summary: Deletes a VNFD
-      description: Deletes a VNFD given its _id
+      summary: "Deletes a VNFD"
+      description: "Deletes a VNFD given its _id"
       operationId: deleteVNFD
       produces:
         - application/json
       parameters:
         - name: vnfdId
           in: path
-          description: VNFD _id to delete
+          description: "VNFD _id to delete"
           required: true
           type: string
       responses:
         "204":
-          description: VNFD successfully deleted
+          description: "VNFD successfully deleted"
         "400":
-          description: Invalid status value
+          description: "Invalid status value"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "404":
-          description: VNFD not found
+          description: "VNFD not found"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "409":
-          description: Conflict - VNFD referenced by at least one NSD
+          description: "Conflict - VNFD referenced by at least one NSD"
           schema:
             $ref: "#/definitions/ResponseDetails"
     put:
       tags:
         - VNFD
-      summary: Updates a VNFD providing the new VNFD package and the _ID of the old one that is being updated
+      summary: "Updates a VNFD providing the new VNFD package and the _id of the old one that is being updated"
       description: ""
       operationId: updateVNFD
       consumes:
@@ -148,36 +148,36 @@ paths:
       parameters:
         - name: vnfd
           in: formData
-          description: VNFD Package
+          description: "VNFD Package"
           required: true
           type: file
         - name: vnfdId
           in: path
-          description: VNFD _id to update
+          description: "VNFD _id to update"
           required: true
           type: string
       responses:
         "201":
-          description: VNFD successfully updated
+          description: "VNFD successfully updated"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Invalid VNFD _ID supplied
+          description: "Invalid VNFD _id supplied"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "404":
-          description: VNFD not found
+          description: "VNFD not found"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "409":
-          description: There was a conflict when updating this VNFD
+          description: "There was a conflict when updating this VNFD"
           schema:
             $ref: "#/definitions/ResponseDetails"
   /nsd:
     post:
       tags:
         - NSD
-      summary: Add a new NSD to the catalogue
+      summary: "Add a new NSD to the catalogue"
       description: ""
       operationId: addNSD
       consumes:
@@ -187,73 +187,73 @@ paths:
       parameters:
         - name: nsd
           in: formData
-          description: NSD Package
+          description: "NSD Package"
           required: true
           type: file
       responses:
         "201":
-          description: NSD created
+          description: "NSD created"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Invalid input
+          description: "Invalid input"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "409":
-          description: Conflict - NSD already present
+          description: "Conflict - NSD already present"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
     get:
       tags:
         - NSD
-      summary: List all available NSDs
-      description: List all available NSDs as a json collection
+      summary: "List all available NSDs"
+      description: "List all available NSDs as a json collection"
       operationId: listNSDs
       produces:
         - application/json
       responses:
         "200":
-          description: successful operation
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/ArrayOfNsd"
         "400":
-          description: Invalid status value
+          description: "Invalid status value"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
   "/mano/nsd/{nsdId}":
     get:
       tags:
         - NSD
-      summary: Find NSD by name
-      description: Returns a single NSD identified by its name
-      operationId: getNSDByName
+      summary: "Find NSD by id"
+      description: "Returns a single NSD identified by its id"
+      operationId: getNSDById
       produces:
         - application/json
       parameters:
         - name: nsdId
           in: path
-          description: Name of the NSD to return
+          description: "Id of the NSD to return"
           required: true
           type: string
       responses:
         "200":
-          description: successful operation
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/NsDescriptor"
         "404":
-          description: NSD not found
+          description: "NSD not found"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
     delete:
       tags:
         - NSD
-      summary: Deletes an NSD by _ID
+      summary: "Deletes an NSD by _id"
       description: ""
       operationId: deleteNSD
       produces:
@@ -261,24 +261,24 @@ paths:
       parameters:
         - name: nsdId
           in: path
-          description: NSD id to delete
+          description: "NSD _id to delete"
           required: true
           type: string
       responses:
         "204":
-          description: NSD successfully deleted
+          description: "NSD successfully deleted"
         "400":
-          description: Invalid NS _ID supplied
+          description: "Invalid NS _id supplied"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "404":
-          description: NSD not found
+          description: "NSD not found"
           schema:
             $ref: "#/definitions/ResponseDetails"
     put:
       tags:
         - NSD
-      summary: Updates an NSD providing the new NSD package and the _ID of the old one that is being updated
+      summary: "Updates an NSD providing the new NSD package and the _ID of the old one that is being updated"
       description: ""
       operationId: updateNSD
       consumes:
@@ -288,54 +288,54 @@ paths:
       parameters:
         - name: nsd
           in: formData
-          description: NSD Package
+          description: "NSD Package"
           required: true
           type: file
         - name: nsdId
           in: path
-          description: NSD _id to update
+          description: "NSD _id to update"
           required: true
           type: string
       responses:
         "201":
-          description: NSD successfully updated
+          description: "NSD successfully updated"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Invalid NS _ID supplied
+          description: "Invalid NS _ID supplied"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "404":
-          description: NSD not found
+          description: "NSD not found"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "409":
-          description: There was a conflict when updating this NSD
+          description: "There was a conflict when updating this NSD"
           schema:
             $ref: "#/definitions/ResponseDetails"
   /vims:
     get:
       tags:
         - VIM
-      summary: Retrieves the list of registered VIMs in the mano.conf file 
+      summary: "Retrieves the list of registered VIMs in the mano.conf file"
       description: ""
       operationId: getVIMs
       produces:
         - application/json
       responses:
         "200":
-          description: List of VIMs
+          description: "List of VIMs"
           schema:
             $ref: "#/definitions/VimList"
         "400":
-          description: Bad request
+          description: "Bad request"
           schema:
             $ref: "#/definitions/ResponseDetails"
   /image/{vim_name}:
     post:
       tags:
         - VIM
-      summary: Upload an image file in the VIM
+      summary: "Upload an image file in the VIM"
       description: ""
       operationId: addImage
       consumes:
@@ -345,12 +345,12 @@ paths:
       parameters:
         - name: image
           in: formData
-          description: Image file
+          description: "Image file"
           required: true
           type: file
         - name: vim_name
           in: path
-          description: Name of the VIM
+          description: "Name of the VIM"
           required: true
           type: string
         - name: disk_format
@@ -369,19 +369,19 @@ paths:
           schema:
             $ref: "#/definitions/ResponseDetails"
         "406":
-          description: Not acceptable - File not valid
+          description: "Not acceptable - File not valid"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "413":
-          description: File too large
+          description: "File too large"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "422":
-          description: Image file not in the request or request badly formed
+          description: "Image file not in the request or request badly formed"
           schema:
             $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Service is not accessible
+          description: "Internal server error - Service is not accessible"
 definitions:
   ObjectID:
     type: object
@@ -440,4 +440,3 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/Vim"
-
