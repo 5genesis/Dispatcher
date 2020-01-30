@@ -9,6 +9,21 @@ services:
     ports:
       - 8082:8082
       - 443:443
+    depends_on:
+      - validator
+      - mano
+  database:
+    image: mongo:latest
+    container_name: database
+    environment:
+      - MONGO_INITDB_DATABASE=experimentsdb
+      #- MONGO_INITDB_ROOT_USERNAME=5genesis
+      #- MONGO_INITDB_ROOT_PASSWORD=5genesisPASS
+    volumes:
+      #- ./database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./database/mongo-volume:/data/db
+    ports:
+      - '27017-27019:27017-27019'
   validator:
     build: ./validator
     image: validator
@@ -21,6 +36,8 @@ services:
     ports:
       - '5100:5100'
     restart: always
+    depends_on:
+      - database
   mano:
     build: ./mano
     image: mano
@@ -40,4 +57,7 @@ services:
       - '5002:8080'
     volumes:
       - './swagger:/my_swagger'
+    depends_on:
+      - mano
+      - validator
 

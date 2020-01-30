@@ -17,11 +17,88 @@ tags:
 schemes:
   - http
 paths:
+  /ed:
+    get:
+      tags:
+        - Validator
+      summary: "List registered Experiment descriptors"
+      description: ""
+      operationId: listED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: "List of experiments"
+          schema:
+            $ref: "#/definitions/ArrayOfExperiments"
+        "400":
+          description: "Problem while obtaining the list of experiments"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+  /ed/{exp_id}:
+    get:
+      tags:
+        - Validator
+      summary: "List a specific Experiment descriptor"
+      description: ""
+      operationId: getED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: exp_id
+          in: path
+          description: "_id of the experiment descriptor"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "List of experiments"
+          schema:
+            $ref: "#/definitions/Mongo_experiment_descriptor"
+        "400":
+          description: "Problem while retrieving the experiment"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "404":
+          description: "Descriptor not found in the database"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+    delete:
+      tags:
+        - Validator
+      summary: "Delete a specific Experiment descriptor from the database"
+      description: ""
+      operationId: deleteED
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: exp_id
+          in: path
+          description: "_id of the experiment descriptor"
+          required: true
+          type: string
+      responses:
+        "204":
+          description: "Experiment descriptor deleted"
+        "400":
+          description: "Problem while deleting the experiment"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
+        "404":
+          description: "Descriptor not found in the database"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validate/ed:
     post:
       tags:
         - Validator
-      summary: Validate Experiment descriptor
+      summary: "Validate Experiment descriptor"
       description: ""
       operationId: validateED
       consumes:
@@ -31,26 +108,24 @@ paths:
       parameters:
         - in: body
           name: body
-          description: Experiment descriptor in JSON format
+          description: "Experiment descriptor in JSON format"
           schema:
             $ref: "#/definitions/Experiment_descriptor"
           required: true
       responses:
         "200":
-          description: Successful validation
+          description: "Successful validation"
           schema:
-            $ref: "#/definitions/String_ok"
+            $ref: "#/definitions/ResponseDetails"
         "400":
-          description: Invalid input
-        "500":
-          description: Entry badly formed
+          description: "Entry badly formed"
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
   /create/ed:
     post:
       tags:
         - Validator
-      summary: Validate Experiment descriptor and onboard it in the ELCM
+      summary: "Validate Experiment descriptor, send it to the ELCM and store is in the internal database"
       description: ""
       operationId: onboardED
       consumes:
@@ -60,22 +135,24 @@ paths:
       parameters:
         - in: body
           name: body
-          description: Experiment descriptor in JSON format
+          description: "Experiment descriptor in JSON format"
           schema:
             $ref: "#/definitions/Experiment_descriptor"
           required: true
       responses:
         "200":
-          description: Successful validation
+          description: "Successful validation. Returns the _id of the inserted experiment"
+          schema:
+            $ref: "#/definitions/Object_id"
         "400":
-          description: Invalid input
-        "500":
-          description: Internal server error - No connection to the service or the ELCM
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validate/vnfd:
     post:
       tags:
         - Validator
-      summary: Validate VNFD
+      summary: "Validate VNFD"
       description: ""
       operationId: validateVNFD
       consumes:
@@ -85,25 +162,27 @@ paths:
       parameters:
         - name: vnfd
           in: formData
-          description: VNFD Package
+          description: "VNFD Package"
           required: true
           type: file
       responses:
         "200":
-          description: Valid VNFD
+          description: "Valid VNFD"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Descriptor with failures
+          description: "Descriptor with failures"
           schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: "Problem while getting the vnfd the file"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /onboard/vnfd:
     post:
       tags:
         - Validator
-      summary: Validate VNFD and add it to the catalogue
+      summary: "Validate VNFD and add it to the catalogue"
       description: ""
       operationId: onboardVNFD
       consumes:
@@ -113,29 +192,35 @@ paths:
       parameters:
         - name: vnfd
           in: formData
-          description: VNFD Package
+          description: "VNFD Package"
           required: true
           type: file
       responses:
         "201":
-          description: VNFD created
+          description: "VNFD created"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Descriptor with failures
+          description: "Descriptor with failures"
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "409":
-          description: Conflict - VNFD already present
+          description: "Conflict - VNFD already present"
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: "Problem while getting the vnfd the file"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /validate/nsd:
     post:
       tags:
         - Validator
-      summary: Validate NSD
+      summary: "Validate NSD"
       description: ""
       operationId: validateNSD
       consumes:
@@ -145,25 +230,27 @@ paths:
       parameters:
         - name: nsd
           in: formData
-          description: NSD Package
+          description: "NSD Package"
           required: true
           type: file
       responses:
         "200":
-          description: Valid NSD
+          description: "Valid NSD"
           schema:
-            $ref: "#/definitions/String_ok"
+            $ref: "#/definitions/ObjectID"
         "400":
-          description: Descriptor with failures
+          description: "Descriptor with failures"
           schema:
-            $ref: "#/definitions/String"
-        "500":
-          description: Internal server error - Network problems
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: "Problem while getting the nsd the file"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
   /onboard/nsd:
     post:
       tags:
         - Validator
-      summary: Validate NSD and add it to the catalogue
+      summary: "Validate NSD and add it to the catalogue"
       description: ""
       operationId: onboardNSD
       consumes:
@@ -173,24 +260,30 @@ paths:
       parameters:
         - name: nsd
           in: formData
-          description: NSD Package
+          description: "NSD Package"
           required: true
           type: file
       responses:
         "201":
-          description: NSD created
+          description: "NSD created"
           schema:
             $ref: "#/definitions/ObjectID"
         "400":
-          description: Descriptor with failures
+          description: "Descriptor with failures"
           schema:
-            $ref: "#/definitions/String"
+            $ref: "#/definitions/ResponseDetails"
         "409":
-          description: Conflict - NSD already present
+          description: "Conflict - NSD already present"
           schema:
-            $ref: "#/definitions/ProblemDetails"
+            $ref: "#/definitions/ResponseDetails"
+        "412":
+          description: "Problem while getting the nsd the file"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
         "500":
-          description: Internal server error - Network problems
+          description: "Internal server error - Network problems"
+          schema:
+            $ref: "#/definitions/ResponseDetails"
 definitions:
   ObjectID:
     type: object
@@ -198,26 +291,18 @@ definitions:
       id:
         type: string
         example: "123e4567-e89b-12d3-a456-426655440000"
-  ProblemDetails:
+  ResponseDetails:
     type: object
     properties:
       detail:
         type: string
-        example: "invalid file content file could not be opened successfully"
       status:
         type: integer
-        example: 400
       code:
         type: string
-        example: "BAD_REQUEST"
     required:
       - status
       - detail
-  String:
-    type: string
-  String_ok:
-    type: string
-    example: "ok"
   Experiment_descriptor:
     type: object
     properties:
@@ -284,4 +369,82 @@ definitions:
         type: integer
         format: int64
         example: 60
-        
+  Object_id:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "5e23602463013ef934bff6e5"
+  ArrayOfExperiments:
+    type: array
+    items:
+      $ref: "#/definitions/Mongo_experiment_descriptor"
+  Mongo_experiment_descriptor:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "5e22e33fc72cffeca34f72a3"
+      Id:
+        type: integer
+        format: int64
+        example: 123
+      Name:
+        type: string
+        example: "sfafd"
+      User:
+        type: integer
+        format: int64
+        example: 12345
+      Platform:
+        type: string
+        example: "malaga"
+      TestCases:
+        type: array
+        example:
+          - "TC1"
+          - "TC2"
+        items:
+          type: string
+      UEs:
+        type: array
+        example:
+          - "UE1"
+          - "UE2"
+        items:
+          type: string
+      Slice:
+        type: string
+        example: "slice_id"
+      NS:
+        type: string
+        example: "ns_id"
+      NS_Placement:
+        type: string
+        example: "Edge"
+      Limited:
+        type: boolean
+        example: true
+      Type_experiment:
+        type: boolean
+        example: false
+      Scenario:
+        type: array
+        example:
+          - "scenario1"
+          - "scemarop2"
+        items:
+          type: string
+      Application:
+        type: array
+        example:
+          - "app1"
+        items:
+          type: string
+      Attended:
+        type: boolean
+        example: true
+      Reservation_time:
+        type: integer
+        format: int64
+        example: 60      

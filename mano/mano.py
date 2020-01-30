@@ -131,8 +131,7 @@ class VNFD_get(Resource):
         try:
             file = request.files.get("vnfd")
             if not file:
-                logger.error("VNFD file not present in the query")
-                return "VNFD file not present in the query", 404
+                raise AttributeError("VNFD file not present in the query or wrong headers")
             logger.debug(file)
             # delete the old VNFD package
             r, status_code = nbiUtil.delete_vnfd(vnf_name)
@@ -145,8 +144,11 @@ class VNFD_get(Resource):
                 os.remove(file.filename)
                 logger.info("VNFD successfully modified")
             return r, status_code
+        except AttributeError as ve:
+            logger.error("Problem while getting the vnfd file: {}".format(str(ve)))
+            return {"detail": str(ve), "code":"UNPROCESSABLE_ENTITY", "status": 422}, 422
         except Exception as e:
-            return {"error": str(e), "status": type(e).__name__}
+            return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
 
 
 class VNFD(Resource):
@@ -156,17 +158,19 @@ class VNFD(Resource):
         try:
             file = request.files.get("vnfd")
             if not file:
-                logger.error("VNFD file not present in the query")
-                return "VNFD file not present in the query", 404
+                raise AttributeError("VNFD file not present in the query or wrong headers")
             logger.debug(file)
             # Write package file to static directory
             file.save(file.filename)
             r, status_code = nbiUtil.upload_vnfd_package(file)
+            # Delete package file
             os.remove(file.filename)
             return r, status_code
-            # Delete package file when done with validation
+        except AttributeError as ve:
+            logger.error("Problem while getting the vnfd file: {}".format(str(ve)))
+            return {"detail": str(ve), "code":"UNPROCESSABLE_ENTITY", "status": 422}, 422
         except Exception as e:
-            return {"error": str(e), "status": type(e).__name__}
+            return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
         
 
 
@@ -200,6 +204,7 @@ class NSD_get(Resource):
             logger.debug("NSD cannot be deleted: {} - {}".format(r, code))
         return r, code
 
+
     def put(self, ns_name):
         import os
 
@@ -208,8 +213,7 @@ class NSD_get(Resource):
         try:
             file = request.files.get("nsd")
             if not file:
-                logger.error("NSD file not present in the query")
-                return "NSD file not present in the query", 404
+                raise AttributeError("VNFD file not present in the query or wrong headers")
             logger.debug(file)
             # delete the old NSD package
             r, status_code = nbiUtil.delete_nsd(ns_name)
@@ -222,8 +226,11 @@ class NSD_get(Resource):
                 os.remove(file.filename)
                 logger.info("NSD successfully modified")
             return r, status_code
+        except AttributeError as ve:
+            logger.error("Problem while getting the nsd file: {}".format(str(ve)))
+            return {"detail": str(ve), "code":"UNPROCESSABLE_ENTITY", "status": 422}, 422
         except Exception as e:
-            return {"error": str(e), "status": type(e).__name__}
+            return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
 
 
 
@@ -235,8 +242,7 @@ class NSD_post(Resource):
             logger.info("Uploading NSD")
             file = request.files.get("nsd")
             if not file:
-                logger.error("NSD file not present in the query. Example: curl -X POST -F \"nsd=@<file path>\" http://<server IP>:5000/nsd")
-                return "NSD file not present in the query", 404
+                raise AttributeError("VNFD file not present in the query or wrong headers")
             # Write package file to static directory and validate it
             file.save(file.filename)
             r, status_code = nbiUtil.upload_nsd_package(file)
@@ -244,15 +250,19 @@ class NSD_post(Resource):
             # Delete package file when done with validation
             os.remove(file.filename)
             return r, status_code
+        except AttributeError as ve:
+            logger.error("Problem while getting the nsd file: {}".format(str(ve)))
+            return {"detail": str(ve), "code":"UNPROCESSABLE_ENTITY", "status": 422}, 422
         except Exception as e:
-            return {"error": str(e), "status": type(e).__name__}
+            return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
 
 
     def get(self):
         logger.info("Retrieving available NSDs")
-        res, code = nbiUtil.get_onboarded_nsds()
-        logger.debug(res)
-        return res, code
+        r, code = nbiUtil.get_onboarded_nsds()
+        logger.debug(r)
+        return r, code
+
 
 class VIM_image_post(Resource):
     def post(self, vim_name):
@@ -263,15 +273,12 @@ class VIM_image_post(Resource):
         if vim["TYPE"] == "openstack":
             vim_conn = osUtils.connection(auth_url=vim["AUTH_URL"], region="RegionOne", project_name=vim["PROJECT"], username=vim["USER"], password=vim["PASSWORD"])
         else:
-            logger.error("VIM type {} not supported".format(vim["TYPE"]))
             raise KeyError("VIM type {} not supported".format(vim["TYPE"]))
-        
         try:
             logger.info("Uploading image")
             file = request.files.get("image")
             if not file:
-                logger.error("Image file not present in the query. Example: curl -X POST -F \"image=@<file path>\" <URL>")
-                return "Image file not present in the query", 404
+                raise AttributeError("Image file not present in the query or wrong headers")
             # Save file to static directory and validate it
             file.save(file.filename)
 
@@ -282,24 +289,33 @@ class VIM_image_post(Resource):
             r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
             # Delete file when done with validation
             os.remove(file.filename)
+        except KeyError as ke:
+            logger.error("VIM type {} not supported".format(vim["TYPE"]))
+            return {"detail": str(ve), "code":"NOT_ACCEPTABLE", "status": 406}, 406
+        except AttributeError as ve:
+            logger.error("Problem while getting the image file: {}".format(str(ve)))
+            return {"detail": str(ve), "code":"UNPROCESSABLE_ENTITY", "status": 422}, 422
         except Exception as e:
-            return {"error": str(e), "status": type(e).__name__}
+            return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
         #osUtils.list_images(vim_conn) 
-        return "Image status: {}".format(r.status), 201
+        return {"detail": "Image status: {}".format(r.status), "code": "CREATED", "status": 201}, 201
 
 
 class VIM_list(Resource):
     def get(self):
         logger.info("Retrieving VIMs list")
         list = []
-        for vim in conf["VIM"]:
-            new_vim = {}
-            new_vim["name"] = conf["VIM"][vim]["NAME"]
-            new_vim["type"] = conf["VIM"][vim]["TYPE"]
-            new_vim["location"] = conf["VIM"][vim]["LOCATION"]
-            list.append(new_vim) 
+        try:
+            for vim in conf["VIM"]:
+                new_vim = {}
+                new_vim["name"] = conf["VIM"][vim]["NAME"]
+                new_vim["type"] = conf["VIM"][vim]["TYPE"]
+                new_vim["location"] = conf["VIM"][vim]["LOCATION"]
+                list.append(new_vim) 
+        except Exception as e:
+            return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
         logger.debug("VIMs list: {}".format(list))
-        return list
+        return list, 200
 
 
 #api.add_resource(InstantiateNSD, '/instantiate_nsd/<string:nsd_id>')
