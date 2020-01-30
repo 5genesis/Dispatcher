@@ -11,9 +11,14 @@ Auth have the following  features for each rol:
   - User Change Password
   - User Recover password
 - Admin
+  - Register Platform in another platform
   - Show Users
-  - Drop Users Data Base
   - Delete one User
+  - Validate one User
+  - Show Platforms
+  - Validate Platform
+  - Delete Platform
+  - Drop Data Base
 
 ## Technologies
 Pythhon 3.6 with dependencies:
@@ -30,9 +35,14 @@ flask-restful
 ## File Structure
 ``` 
 auth/                                   Main Folder
-├─ templates/                           Folder for 
+|
+├─ swagger/                             Swagger Folder
+|   └──swagger.json                     Swagger Specification
+|
+├─ templates/                           Folder for different templates
 │   ├─ recover.html                     Recover password template
-│   └──validate_user.html               Validate users template
+│   ├─ validate_platform.html           Validate platform template
+|   └──validate_user.html               Validate users template
 │ 
 ├─ auth.db                              SQL Database
 ├─ Auth.py                              Server
@@ -40,6 +50,7 @@ auth/                                   Main Folder
 ├─ auth_utils.py                        Utils tools
 ├─ constants.py                         Constans file
 ├─ DB_Model.py                          Database Model
+├─ DockerFile                           DockerFile for building the conatiner
 ├─ key.json                             Key for encrypt/desencrypt Tokens
 ├─ MailConfig.py                        Mail config
 ├─ requirements.txt                     Python  Dependencies

@@ -11,12 +11,10 @@ from flask import session, jsonify
 from datetime import datetime
 from settings import Settings
 
-
 key = Settings().KEY
 
 
 def preValidation(request, functional_part):
-
     if request.authorization:
         username = request.authorization.username
         password = hashlib.md5(request.authorization.password.encode()).hexdigest()
@@ -27,7 +25,8 @@ def preValidation(request, functional_part):
     if data is not None and data.active:
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                         claims={'username': username, 'password': password, 'timeout': datetime.timestamp(now) + Settings.Timeout})
+                         claims={'username': username, 'password': password,
+                                 'timeout': datetime.timestamp(now) + Settings.Timeout})
 
         Etoken.make_encrypted_token(key)
         token = Etoken.serialize()
@@ -57,7 +56,8 @@ def admin_auth(f):
         if request.authorization:
             username = request.authorization.username
             password = request.authorization.password
-            data_user = User.query.filter_by(username=username, password=hashlib.md5(password.encode()).hexdigest()).first()
+            data_user = User.query.filter_by(username=username,
+                                             password=hashlib.md5(password.encode()).hexdigest()).first()
             data_rol = Rol.query.filter_by(username=username, rol_name='Admin').first()
             if not (data_user and data_rol):
                 return jsonify(result='Invalid Permission'), 401
@@ -128,4 +128,7 @@ def check_mail(email):
         return False
 
 
-
+def string_to_boolean(string):
+    if string.lower() in ['true', '1', 't', 'y', 'yes']:
+        return True
+    return False

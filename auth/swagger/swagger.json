@@ -226,6 +226,39 @@
         }
       }
     },
+    "/register_platform_in_platform": {
+      "post": {
+        "description": "TODO: Add Description",
+        "summary": "Register User",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "RegisterPlatform",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "IP of the platform allowed to use the "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
     "/show_users": {
       "get": {
         "security": [
@@ -297,6 +330,77 @@
         }
       }
     },
+    "/show_platforms": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Show platforms",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ShowPlatforms",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "activated",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/validate_platform/{platform_name}": {
+      "put": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Validate User",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ValidatePlatform",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "platform_name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
     "/drop_db": {
       "delete": {
         "security": [
@@ -346,6 +450,43 @@
         "parameters": [
           {
             "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/delete_platform/{platformName}": {
+      "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "description": "TODO: Add Description",
+        "summary": "Delete User",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DeletePlatform",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "platformName",
             "in": "path",
             "required": true,
             "type": "string",

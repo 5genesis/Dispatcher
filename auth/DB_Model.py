@@ -15,7 +15,6 @@ settings = Settings()
 key = settings.KEY
 
 
-
 class User(db.Model):
     """ Create user table"""
     id = db.Column(db.Integer, primary_key=True)
@@ -57,6 +56,28 @@ class Registry(db.Model):
             self.data = data
         self.date = datetime.now()
 
+
+class Platform(db.Model):
+    platformName = db.Column(db.String(40), nullable=False, primary_key=True)
+    ip = db.Column(db.String(40), nullable=False, unique=True)
+    active = db.Column(db.Boolean)
+
+    def __init__(self, platformName, ip):
+        self.platformName = platformName
+        self.ip = ip
+        self.active = False
+
+
+"""
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(40), db.ForeignKey('user.username'), nullable=False)
+    platformName = db.Column(db.String(40), db.ForeignKey('platform.platformName'), nullable=False)
+
+    def __init__(self, username, platformName):
+        self.platformName = platformName
+        self.username = username
+"""
 
 def init_db():
     admin_user = User('Admin', mail_settings.get('MAIL_USERNAME'), hashlib.md5('Admin'.encode()).hexdigest())

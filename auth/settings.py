@@ -11,6 +11,7 @@ def set_key():
 
 class Settings:
     Timeout = 5 * 60  # Time in seconds
+    RequestPrefix = ':8082/auth'
     KEY = None
 
     def __init__(self):
