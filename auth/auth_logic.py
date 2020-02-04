@@ -141,9 +141,15 @@ def register():
     """Register Form"""
     logger.info(str(request))
     try:
-        username = request.form['username']
-        password = hashlib.md5(request.form['password'].encode()).hexdigest()
-        email = request.form['email']
+        if len(request.form) != 0:
+            payload = request.form
+        elif len(request.data) != 0:
+            payload = json.loads(request.data)
+        else: raise Exception("No data received")
+
+        username = payload['username']
+        password = hashlib.md5(payload['password'].encode()).hexdigest()
+        email = payload['email']
 
         if not check_mail(email):
             return jsonify(result='Registration failed: Not valid email'), 400
