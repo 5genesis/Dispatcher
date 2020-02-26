@@ -6,3 +6,4 @@ requests
 flask_mail
 flask-cors
 flask-restful
+pymongo==3.8.0

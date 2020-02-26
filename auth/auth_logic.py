@@ -12,14 +12,19 @@ from DB_Model import init_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
 from settings import Settings
+import pymongo
 
 auth_logic = Blueprint('auth_page', __name__, template_folder='templates')
 
+# Key
 json1_file = open('key.json')
 json1_str = json1_file.read()
 json1_data = json.loads(json1_str)
 key = jwk.JWK(**json1_data)
 logger = logging.getLogger('REST API')
+
+# DB parameters
+mongoDBClient = pymongo.MongoClient("mongodb://database:27017/")
 
 
 @auth_logic.route('/get_token', methods=['GET'])
@@ -211,6 +216,9 @@ def delete_one_user(user):
 def delete_platform(platformName):
     logger.info(str(request))
     try:
+        mongodb = mongoDBClient["PlatformsDB"]
+        platforms = mongodb["platforms"]
+
         data = Platform.query.filter_by(platformName=platformName).first()
         if not data:
             return jsonify(result=platformName + ' platform does not exist'), 404
@@ -219,6 +227,7 @@ def delete_platform(platformName):
 
         Platform.query.filter_by(platformName=platformName).delete()
         db.session.commit()
+        platforms.delete_one({"platform": platformName})
         return jsonify(result=platformName + ' platform is removed')
     except Exception as e:
         return jsonify(result=('Remove platform' + platformName + 'failed: ' + str(e))), 400
@@ -445,6 +454,8 @@ def register_platform_in_platform():
 def validate_platform(data):
     logger.info(str(request))
     try:
+        mongodb = mongoDBClient["PlatformsDB"]
+        platforms = mongodb["platforms"]
 
         metadata = ast.literal_eval(jwt.JWT(key=key, jwt=data).claims)
         platformName = metadata['platformName']
@@ -453,11 +464,13 @@ def validate_platform(data):
         if action == 'delete':
 
             Platform.query.filter_by(platformName=platformName).delete()
+            db.session.commit()
         else:
             data = Platform.query.filter_by(platformName=platformName).first()
             data.active = True
+            db.session.commit()
+            platforms.insert_one({'platform': platformName, 'ip': data.ip})
 
-        db.session.commit()
         return jsonify(result='Changes applied')
 
     except Exception as e:
@@ -488,6 +501,7 @@ def validate_platform_manually(data):
         data = Platform.query.filter_by(platformName=platformName).first()
         data.active = True
         db.session.commit()
+        platforms.insert_one({'platform': platformName, 'ip': data.ip})
         return jsonify(result='Changes applied')
 
     except Exception as e:
