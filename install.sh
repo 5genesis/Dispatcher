@@ -43,8 +43,12 @@ http {
     server_names_hash_bucket_size 128; # this seems to be required for some vhosts
 
     server {
-        listen 8082 default_server;
-        listen [::]:8082 default_server;
+        listen 8082 ssl default_server;
+        listen [::]:8082 ssl default_server;
+
+        ssl_certificate /etc/ssl/server.crt;
+	      ssl_certificate_key /etc/ssl/server.key;
+
         access_log   /var/log/nginx/dispatcher.log  main;
         client_max_body_size 8000M;
         server_name localhost;" > $1
