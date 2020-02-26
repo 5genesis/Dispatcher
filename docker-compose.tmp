@@ -46,6 +46,7 @@ services:
     command: python mano.py
     volumes:
       - "./mano:/mano"
+      - data-volume:/tmp/onboarding
     ports:
       - '5101:5101'
     restart: always
@@ -62,3 +63,11 @@ services:
       - mano
       - validator
 
+  clean-files:
+    image: clean-files
+    container_name: clean-files
+    volumes:
+      - data-volume:/tmp/onboarding
+
+volumes:
+  data-volume:
