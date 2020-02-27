@@ -168,7 +168,7 @@ def register():
             db.session.add(new_user)
         db.session.add(new_action)
         db.session.commit()
-        admin_confirmation(username, email)
+        admin_confirmation(email, username)
         return jsonify(result='User registered. Keep an eye with your email for knowing when your account is activated')
 
     except Exception as e:
