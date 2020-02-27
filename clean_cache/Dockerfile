@@ -1,7 +1,4 @@
-FROM python:3.7.4-slim
-
-RUN apt-get update && apt-get install -qq -y \
-  build-essential libpq-dev --no-install-recommends
+FROM python:3.7-alpine
 
 COPY clean_cache.py ./
 
