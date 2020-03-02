@@ -7,7 +7,8 @@ from jwcrypto import jwt, jwk
 import logging
 import json
 from auth import app
-from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, string_to_boolean
+from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
+    string_to_boolean, get_user_from_token
 from DB_Model import init_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
@@ -63,6 +64,17 @@ def login():
             return jsonify(result=('Login fails: ' + str(e))), 401
 
     return preValidation(request, logic)
+
+
+@auth_logic.route('/get_user_from_token', methods=['GET'])
+def get_user():
+    logger.info(str(request))
+    if request.headers.environ.get('HTTP_AUTHORIZATION', ''):
+        token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+    else :
+        token = ''
+    result, code = get_user_from_token(token)
+    return jsonify(result=result), code
 
 
 @auth_logic.route('/validate_request', methods=['GET'])
@@ -426,7 +438,7 @@ def register_platform(platform_name):
 @auth_logic.route('/register_platform_in_platform', methods=['POST'])
 def register_platform_in_platform():
     logger.info(str(request))
-    #TODO set platform_name
+    # TODO set platform_name
     platform_name = 'default'
     try:
         url = request.form['ip']
@@ -496,8 +508,8 @@ def validate_platform_manually(data):
     try:
         admin_auth(validate_platform)
         platformName = data
-        action = "create"
-
+        mongodb = mongoDBClient["PlatformsDB"]
+        platforms = mongodb["platforms"]
         data = Platform.query.filter_by(platformName=platformName).first()
         data.active = True
         db.session.commit()
@@ -514,7 +526,7 @@ def admin_confirmation(email=None, username=None, platformName=None, ip=None):
     if username:
         claims_not_provide = {'username': username, 'email': email, 'action': 'delete', 'time': datetime.timestamp(now)}
         claims_provide = {'username': username, 'email': email, 'action': 'activated',
-                             'time': datetime.timestamp(now)}
+                          'time': datetime.timestamp(now)}
     else:
 
         claims_not_provide = {'platformName': platformName, 'action': 'delete', 'time': datetime.timestamp(now)}
@@ -532,8 +544,8 @@ def admin_confirmation(email=None, username=None, platformName=None, ip=None):
 
     if username:
         subject = 'User validation'
-        template = render_template('validate_user.html', user=username, email=email,token_provide=token_provide,
-                                  token_not_provide=token_not_provide)
+        template = render_template('validate_user.html', user=username, email=email, token_provide=token_provide,
+                                   token_not_provide=token_not_provide)
     else:
         subject = 'Platform validation'
         template = render_template('validate_platform.html', platform=platformName, ip=ip, token_provide=token_provide,

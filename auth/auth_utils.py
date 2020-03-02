@@ -81,6 +81,17 @@ def token_auth_validator(request=None):
     return result
 
 
+def get_user_from_token(token):
+    try:
+        if not token:
+            return 'Token access is required', 400
+
+        return ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('username'), 200
+
+    except:
+        return 'No valid Token given', 400
+
+
 def validate_token(token, request):
     try:
         if not token:
