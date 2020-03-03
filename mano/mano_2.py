@@ -1,7 +1,7 @@
 import hashlib
 import sys
 import time
-
+import ast
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 import json
@@ -38,6 +38,7 @@ def set_config():
         """
         try:
             id = str(uuid4())
+            token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
             form = request.form
             name = form.get('name')
             description = form.get('description')
@@ -57,6 +58,10 @@ def set_config():
             else:
                 private = False
             data['private'] = private
+            data['user'] = ast.literal_eval(
+                requests.get('http://auth:2000/get_user_from_token', headers={'Authorization': str(token)}).text)[
+                'result']
+
             data['timestamp'] = datetime.timestamp(datetime.now())
             with open(target + '/data.json', 'w') as outfile:
                 json.dump(data, outfile)
@@ -179,6 +184,7 @@ def preonboard_vim_image(id):
     except Exception as e:
         return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400
     return jsonify({"status": "updated"}), 201
+
 
 @app.route('/onboard/<id>', methods=['POST'])
 def onboard(id):
