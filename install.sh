@@ -166,6 +166,11 @@ function add_enabler {
         }" >> $3
 }
 
+echo "Platform Name: "
+read answer
+echo $answer > auth/platform_name
+uuidgen > auth/platformID
+
 # Check the user has configured the validator env file
 while true; do
     read -p "Have you prepared the Validator environment file in the 'validator' folder? " yn

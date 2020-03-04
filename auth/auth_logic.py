@@ -8,7 +8,7 @@ import logging
 import json
 from auth import app
 from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
-    string_to_boolean, get_user_from_token
+    string_to_boolean, get_user_from_token, get_platform_name,get_platform_id
 from DB_Model import init_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
@@ -409,14 +409,13 @@ def register_platform(platform_name):
             if metadata.get('timeout') < datetime.timestamp(now):
                 return jsonify(result='Token expired'), 401
 
-        platform_name = platform_name
         ip = request.remote_addr
         if ip.find(':') != -1:
             ip = ip.split(':')[-1]
 
         data = Platform.query.filter_by(platformName=platform_name).first()
         if not data:
-            data = Platform(platformName=platform_name, ip=ip)
+            data = Platform(platform_id=metadata.get('platform_id'), platformName=platform_name, ip=ip)
             db.session.add(data)
             db.session.commit()
 
@@ -439,14 +438,16 @@ def register_platform(platform_name):
 def register_platform_in_platform():
     logger.info(str(request))
     # TODO set platform_name
-    platform_name = 'default'
+    platform_name = get_platform_name
+    platform_id = get_platform_id
     try:
         url = request.form['ip']
+
         if url.find('http') == -1:
             url = 'http://' + url
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                         claims={'platform': platform_name,
+                         claims={'platform': platform_name,  'platform_id': platform_id,
                                  'timeout': datetime.timestamp(now) + 20})
 
         Etoken.make_encrypted_token(key)
@@ -481,7 +482,15 @@ def validate_platform(data):
             data = Platform.query.filter_by(platformName=platformName).first()
             data.active = True
             db.session.commit()
-            platforms.insert_one({'platform': platformName, 'ip': data.ip})
+
+            Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                             claims={'platform': platformName, 'platform_id': data.platform_id,
+                                     'timeout': datetime(2025, 1, 1)})
+
+            Etoken.make_encrypted_token(key)
+            token = str(Etoken.serialize())
+
+            platforms.insert_one({'platform': platformName, 'token': token, 'ip': data.ip})
 
         return jsonify(result='Changes applied')
 

@@ -13,6 +13,9 @@ from settings import Settings
 
 key = Settings().KEY
 
+get_platform_name = lambda name: open("platform_name", "r").read()
+get_platform_id = lambda name: open("platformID", "r").read()
+
 
 def preValidation(request, functional_part):
     if request.authorization:

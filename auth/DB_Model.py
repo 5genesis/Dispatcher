@@ -58,11 +58,13 @@ class Registry(db.Model):
 
 
 class Platform(db.Model):
-    platformName = db.Column(db.String(40), nullable=False, primary_key=True)
+    platform_id = db.Column(db.String(40), nullable=False, primary_key=True)
+    platformName = db.Column(db.String(40), nullable=False, unique= True)
     ip = db.Column(db.String(40), nullable=False, unique=True)
     active = db.Column(db.Boolean)
 
-    def __init__(self, platformName, ip):
+    def __init__(self, platform_id, platformName, ip):
+        self.platform_id = platform_id
         self.platformName = platformName
         self.ip = ip
         self.active = False
