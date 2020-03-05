@@ -300,6 +300,7 @@ def get_platforms(active=False):
 
     for item in query.all():
         users_dict[item.platformName] = {
+            'platform_id': item.platform_id,
             'ip': item.ip,
             'active': item.active
         }
@@ -438,13 +439,13 @@ def register_platform(platform_name):
 def register_platform_in_platform():
     logger.info(str(request))
     # TODO set platform_name
-    platform_name = get_platform_name
-    platform_id = get_platform_id
+    platform_name = get_platform_name()
+    platform_id = get_platform_id()
     try:
         url = request.form['ip']
 
-        if url.find('http') == -1:
-            url = 'http://' + url
+        if url.find('https') == -1:
+            url = 'https://' + url
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
                          claims={'platform': platform_name,  'platform_id': platform_id,
@@ -455,7 +456,7 @@ def register_platform_in_platform():
         header = {'Authorization': 'Bearer ' + str(token)}
         url = url + Settings.RequestPrefix + '/register_platform/' + platform_name
 
-        req = requests.post(url, headers=header)
+        req = requests.post(url, headers=header, verify=False)
         if req.status_code != 200:
             raise Exception(req.text)
         return jsonify(result='Platform registration Sucessfull'), 200
@@ -522,7 +523,13 @@ def validate_platform_manually(data):
         data = Platform.query.filter_by(platformName=platformName).first()
         data.active = True
         db.session.commit()
-        platforms.insert_one({'platform': platformName, 'ip': data.ip})
+        Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                         claims={'platform': platformName, 'platform_id': data.platform_id,
+                                 'timeout': datetime(2025, 1, 1)})
+        Etoken.make_encrypted_token(key)
+        token = str(Etoken.serialize())
+
+        platforms.insert_one({'platform': platformName, 'token': token, 'ip': data.ip})
         return jsonify(result='Changes applied')
 
     except Exception as e:
