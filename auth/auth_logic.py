@@ -486,7 +486,7 @@ def validate_platform(data):
 
             Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
                              claims={'platform': platformName, 'platform_id': data.platform_id,
-                                     'timeout': datetime(2025, 1, 1)})
+                                     'timeout': datetime(2025, 1, 1).timestamp()})
 
             Etoken.make_encrypted_token(key)
             token = str(Etoken.serialize())
@@ -525,7 +525,7 @@ def validate_platform_manually(data):
         db.session.commit()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
                          claims={'platform': platformName, 'platform_id': data.platform_id,
-                                 'timeout': datetime(2025, 1, 1)})
+                                 'timeout': datetime(2025, 1, 1).timestamp()})
         Etoken.make_encrypted_token(key)
         token = str(Etoken.serialize())
 
