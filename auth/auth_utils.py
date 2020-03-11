@@ -104,7 +104,11 @@ def validate_token(token, request):
 
         now = datetime.now()
         if metadata.get('timeout') >= datetime.timestamp(now):
-            data = User.query.filter_by(username=metadata.get('username'), password=metadata.get('password')).first()
+            if metadata.get('username'):
+                data = User.query.filter_by(username=metadata.get('username'), password=metadata.get('password')).first()
+            else:
+                if metadata.get('platform_id') == get_platform_id():
+                    return
         else:
             return 'Token expired'
         if data is not None:
