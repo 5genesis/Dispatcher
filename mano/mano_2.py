@@ -2,7 +2,7 @@ import hashlib
 import sys
 import time
 import ast
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Blueprint
 from flask_restful import Resource, Api
 import json
 import yaml
@@ -28,6 +28,8 @@ logger = logging.getLogger("-MANO API-")
 
 
 dbclient = pymongo.MongoClient("mongodb://database:27017/")
+
+mano_cache = Blueprint('mano_cache', __name__)
 
 @app.route('/set_config', methods=['POST'])
 def set_config():

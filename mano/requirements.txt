@@ -7,3 +7,4 @@ PyYAML==3.13
 Flask-Cors==3.0.8
 openstacksdk==0.38.0
 configobj==5.0.6
+jsonschema==2.6.0
