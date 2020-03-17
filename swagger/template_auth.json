@@ -1663,7 +1663,7 @@
         }
       }
     },
-    "/register_platform_in_platform": {
+    "/auth/register_platform_in_platform": {
       "post": {
         "description": "TODO: Add Description",
         "summary": "Register this current Platform in another platform",
@@ -1700,7 +1700,7 @@
         ]
       }
     },
-    "/show_platforms": {
+    "/auth/show_platforms": {
       "get": {
         "security": [
           {
@@ -1734,7 +1734,7 @@
         }
       }
     },
-    "/validate_platform/{platform_name}": {
+    "/auth/validate_platform/{platform_name}": {
       "put": {
         "security": [
           {
