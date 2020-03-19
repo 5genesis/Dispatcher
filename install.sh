@@ -45,13 +45,18 @@ http {
     server {
         listen 8082 ssl default_server;
         listen [::]:8082 ssl default_server;
-
+        root /repository;
         ssl_certificate /etc/ssl/server.crt;
 	      ssl_certificate_key /etc/ssl/server.key;
 
         access_log   /var/log/nginx/dispatcher.log  main;
         client_max_body_size 8000M;
-        server_name localhost;" > $1
+        server_name localhost;
+
+        location /repository {
+            alias /repository/;
+            autoindex on;
+                          }" > $1
 }
 
 function write_footer_auth {
