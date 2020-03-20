@@ -60,6 +60,14 @@ The user that wants to have access to the platform services will have to request
 
 ![User registration](./images/user_registration.png)
 
+
+#### Platform registration
+The Admin of one platform that wants to allow another platforms for using their services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
+
+![Platform registration](./images/register_platform_in_platform.png)
+
+
+
 #### Sending a request to a service
 The *Dispatcher* allows two different authentication methods: Token authentication (JWT) and Basic authentication.
 
@@ -184,7 +192,10 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Versioning
-
+- 2.5.0 - Swagger updated with new requests, and HTTPS
+- 2.5.0 - SSL added (Self-sign certification )
+- 2.4.1 - Auth Registration of Platforms With Token Service
+- 2.4.0 - Auth Registration of Platforms
 - 2.3.2 - Fix *Auth* typos
 - 2.3.1 - Improve *Auth* response messages
 - 2.3.0 - Update *validator* component to store the experiments

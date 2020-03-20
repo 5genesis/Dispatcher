@@ -34,7 +34,7 @@
     }
   ],
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/mano/vnfd": {
