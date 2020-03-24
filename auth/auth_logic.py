@@ -564,7 +564,7 @@ def admin_confirmation(email=None, username=None, platformName=None, ip=None):
                                    token_not_provide=token_not_provide)
     else:
         subject = 'Platform validation'
-        template = render_template('validate_platform.html', platform=platformName, ip=ip, token_provide=token_provide,
+        template = render_template('validate_platform.html', current_platform=get_platform_name(), platform=platformName, ip=ip, token_provide=token_provide,
                                    token_not_provide=token_not_provide)
 
     msg = Message(subject=subject,
