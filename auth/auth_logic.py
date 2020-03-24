@@ -11,7 +11,10 @@ from auth_utils import session, admin_auth, validate_token, preValidation, check
 from DB_Model import init_db, User, Registry, db
 from MailConfig import mail
 
+
+
 auth_logic = Blueprint('auth_page', __name__, template_folder='templates')
+
 
 json1_file = open('key.json')
 json1_str = json1_file.read()

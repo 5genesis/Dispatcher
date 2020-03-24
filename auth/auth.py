@@ -3,8 +3,10 @@ from gevent.pywsgi import WSGIServer
 from flask import Flask
 import logging
 from flask_mail import Mail
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 Mail(app)
 
