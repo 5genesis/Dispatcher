@@ -4,6 +4,7 @@ Flask
 Flask-SQLAlchemy==2.1
 requests
 flask_mail
-flask-cors
+Flask-Cors==3.0.8
 flask-restful
 pymongo==3.8.0
+

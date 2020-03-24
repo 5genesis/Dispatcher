@@ -6,9 +6,9 @@ from flask_mail import Mail
 from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 Mail(app)
-CORS(app)
 
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(asctime)s\t %(module)-s\t msg="%(message)s"',
                     datefmt='%a, %d %b %Y %H:%M:%S', filemode='w')

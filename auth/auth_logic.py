@@ -8,7 +8,7 @@ import logging
 import json
 from auth import app
 from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
-    string_to_boolean, get_user_from_token, get_platform_name,get_platform_id
+    string_to_boolean, get_user_from_token, get_platform_name, get_platform_id
 from DB_Model import init_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
@@ -17,7 +17,6 @@ import pymongo
 
 auth_logic = Blueprint('auth_page', __name__, template_folder='templates')
 
-# Key
 json1_file = open('key.json')
 json1_str = json1_file.read()
 json1_data = json.loads(json1_str)
@@ -71,7 +70,7 @@ def get_user():
     logger.info(str(request))
     if request.headers.environ.get('HTTP_AUTHORIZATION', ''):
         token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
-    else :
+    else:
         token = ''
     result, code = get_user_from_token(token)
     return jsonify(result=result), code
@@ -448,7 +447,7 @@ def register_platform_in_platform():
             url = 'https://' + url
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                         claims={'platform': platform_name,  'platform_id': platform_id,
+                         claims={'platform': platform_name, 'platform_id': platform_id,
                                  'timeout': datetime.timestamp(now) + 20})
 
         Etoken.make_encrypted_token(key)
@@ -564,7 +563,8 @@ def admin_confirmation(email=None, username=None, platformName=None, ip=None):
                                    token_not_provide=token_not_provide)
     else:
         subject = 'Platform validation'
-        template = render_template('validate_platform.html', current_platform=get_platform_name(), platform=platformName, ip=ip, token_provide=token_provide,
+        template = render_template('validate_platform.html', current_platform=get_platform_name(),
+                                   platform=platformName, ip=ip, token_provide=token_provide,
                                    token_not_provide=token_not_provide)
 
     msg = Message(subject=subject,
