@@ -23,6 +23,7 @@ services:
     container_name: database
     environment:
       - MONGO_INITDB_DATABASE=experimentsdb
+      - MONGODB_DATABASE=PlatformsDB
       #- MONGO_INITDB_ROOT_USERNAME=5genesis
       #- MONGO_INITDB_ROOT_PASSWORD=5genesisPASS
     volumes:
@@ -68,12 +69,4 @@ services:
       - mano
       - validator
 
-  clean_cache:
-    build: ./clean_cache
-    image: clean_cache
-    command: python clean_cache.py
-    container_name: clean_cache
-    volumes:
-      - data-volume:/tmp/onboarding
-    restart: always
 

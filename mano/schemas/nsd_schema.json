@@ -1311,7 +1311,13 @@
                       "pattern": "",
                       "description": "Description of the FGD."
                     }
-                  }
+                  },
+                  "required": [
+                    "name",
+                    "id",
+                    "description",
+                    "version"
+                  ]
                 }
               }
             }
