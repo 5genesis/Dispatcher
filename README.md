@@ -216,6 +216,7 @@ In case of needing any help, contact the [authors](#authors) for support.
 ## Authors
 
 Javier Melian (javier.melian@atos.net)
+Luis Gómez (luis.gomez.external@atos.net)
 
 ## License
 
