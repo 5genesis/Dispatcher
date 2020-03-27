@@ -132,7 +132,7 @@ def nsd():
                 fields['user'] = user
                 fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
                 data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
-                nsd_path = '/repository/nsd'
+                nsd_path = '/repository/ns'
                 final_path = nsd_path + '/' + fields.get('id') + '/' + fields.get('version')
                 if os.path.isdir(nsd_path + '/' + fields.get('id')):
                     if os.path.isdir(final_path):

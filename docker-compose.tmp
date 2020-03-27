@@ -52,7 +52,7 @@ services:
     command: python mano.py
     volumes:
       - "./mano:/mano"
-      - data-volume:/tmp/onboarding
+      - data-volume:/repository
     ports:
       - '5101:5101'
     restart: always

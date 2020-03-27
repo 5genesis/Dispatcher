@@ -25,7 +25,7 @@ def str_to_bool(string):
 def init_directory():
     if not os.path.isfile('/repository/index.yaml'):
         os.mkdir('/repository/vnf')
-        os.mkdir('/repository/nsd')
+        os.mkdir('/repository/ns')
         index_data = {'apiVersion': 'v1', 'generated': current_datatime(), 'vnf_packages': {}, 'nsd_packages': {}}
         with open('/repository/index.yaml', 'w') as outfile:
             yaml.dump(index_data, outfile, default_flow_style=False)
