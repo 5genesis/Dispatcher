@@ -1,0 +1,11 @@
+<h2 style="color: #2e6c80;">Dear {{ current_platform }} Admin,</h2>
+<p>There is a request from "{{ platform }}" with IP&nbsp;{{ ip }}&nbsp;to register the platform for executing a Distributed Expermient.</p>
+<h3 style="color: #2e6c80;">Take a decision:</h3>
+<ol style="list-style: none; font-size: 14px; line-height: 32px; font-weight: bold;">
+<a href="{{ url_for('auth_page.validate_platform', data=token_provide, _external=True) }}"> <li style="clear: both;"><img style="float: left;" src="https://html-online.com/img/01-interactive-connection.png" alt="interactive connection" width="45" />Allow access</li></a>
+<a href="{{ url_for('auth_page.validate_platform', data=token_not_provide, _external=True) }}"> <li style="clear: both;"><img style="float: left;" src="https://html-online.com/img/02-html-clean.png" alt="html cleaner" width="45" />Deny access</li></a>
+</ol>
+<p>&nbsp;</p>
+<h2 style="color: #2e6c80;">Sincerely,</h2>
+<h2 style="color: #2e6c80;">The Auth Team</h2>
+<p>&nbsp;</p>

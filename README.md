@@ -4,7 +4,7 @@ The 5GENESIS Dispatcher is the entry point to the system, offering the functiona
 
 This implementation is based on a NGINX reverse proxy containerised in a Docker environment.
 
-By default, The *Dispatcher* includes as added on modules, the [Validator](validator/README.md "Validator"), the [MANO Wrapper](mano/README.md "MANO Wrapper") and a Swagger environment to test the available features.
+By default, The *Dispatcher* includes as added on modules, the [Auth](auth/README.md "Validator"), the [MANO Wrapper](mano/README.md "MANO Wrapper") and a Swagger environment to test the available features.
 On top of all that and to secure all the requests, the Dispatcher provides user registration and authentication using JWT. Consult the [Auth documentation](auth/README.md "Auth") for the available actions and how to use them.
 
 **NOTE:** As shown below in the architecture diagram, the *Dispatcher* does not deal with the MANO directly but through a wrapper that simplies the communication. Also for simplification, in this document we will refer to the *MANO Wrapper* as ***mano***, which is conceptually correct from the *Dispatcher* point of view.
@@ -18,7 +18,7 @@ On top of all that and to secure all the requests, the Dispatcher provides user 
 The available features will depend on the features exposed by each dispatched module. The currently available features are:
 
 ##### MANO enabler
-
+- Validation service: Validate VNFD or NSD as a standalone service
 - Onboard VNFD
 - List VNFDs
 - Retrieve single VNFD
@@ -34,15 +34,11 @@ The available features will depend on the features exposed by each dispatched mo
 
 ##### ELCM enabler
 
+- Validation of Experiment descriptor
+- Retrieve stored experiments from the database
 - Launch experiment (create)
 - Cancel execution
 - Get execution logs
-
-##### Validator enabler
-
-- Validation service: Validate Experiment descriptor, VNFD or NSD as a standalone service
-- Retrieve stored experiments from the database
-- Validate and onboard directly the Experiment descriptor in the ELCM, and the VNF descriptor or the NS descriptor in the NFVO
 
 ## How the authentication works
 
@@ -59,6 +55,14 @@ Instead of requesting an access token, it is also possible to authenticate every
 The user that wants to have access to the platform services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
 
 ![User registration](./images/user_registration.png)
+
+
+#### Platform registration
+The Admin of one platform that wants to allow another platforms for using their services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
+
+![Platform registration](./images/register_platform_in_platform.png)
+
+
 
 #### Sending a request to a service
 The *Dispatcher* allows two different authentication methods: Token authentication (JWT) and Basic authentication.
@@ -86,7 +90,6 @@ For running the 5Genesis Dispatcher, you will need:
 + docker version >= 18.09.6
 + docker-compose version >= 1.17.1
 + Configuration files correctly filled up:
-    + [Validator](validator/README.md#validator-configuration "Validator") module config: Environment variables file (`config.env`) inside the *validator* folder
     + [MANO Wrapper](mano/README.md#config-file "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder
 + NFVO + VIM
 
@@ -152,9 +155,19 @@ The start script will deploy and run the *Dispatcher* container, the [Validator]
 
 `$ ./start.sh`
 
-Dispatcher will be accessible through port `8082`.
+Dispatcher will be accessible through port `8082` through a SSL certificate, so HTTPS is required.
 
 Swagger environment will be accessible through port `5002`.
+### Installation of the SSL certificate
+
+The SSL certificate is self-signed. It is not supervised by a Certification Authority because in this current moment is not possible know where the platforms will be hosted.
+
+For installing the certificate is required to open the internet navigator in: *https://<IP_OF_DISPATCHER>:8082*
+
+Something like this will apear, the web page format depends of your browser:
+![Installation of the certificate](./images/ssl_self_signed_warning.png)
+
+You must add the exception/believe in the certificate or something like that. After this step, you are able to use the dispatcher through SSL certification.
 
 ### Stop
 
@@ -184,7 +197,10 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Versioning
-
+- 2.5.0 - Swagger updated with new requests, and HTTPS
+- 2.5.0 - SSL added (Self-sign certification )
+- 2.4.1 - Auth Registration of Platforms With Token Service
+- 2.4.0 - Auth Registration of Platforms
 - 2.3.2 - Fix *Auth* typos
 - 2.3.1 - Improve *Auth* response messages
 - 2.3.0 - Update *validator* component to store the experiments
@@ -205,6 +221,8 @@ In case of needing any help, contact the [authors](#authors) for support.
 ## Authors
 
 Javier Melian (javier.melian@atos.net)
+
+Luis Gómez (luis.gomez.external@atos.net)
 
 ## License
 

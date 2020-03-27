@@ -1,15 +1,9 @@
-FROM python:3.7.4-slim
-
-RUN apt-get update && apt-get install -qq -y \
-  build-essential libpq-dev --no-install-recommends
-
-#ENV INSTALL_PATH /OSM
-#RUN mkdir -p $INSTALL_PATH
+FROM python:3.7.4-alpine
 
 WORKDIR /auth
-
 COPY requirements.txt ./
 
+RUN apk add gcc musl-dev python-dev libffi-dev openssl-dev
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt

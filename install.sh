@@ -43,11 +43,20 @@ http {
     server_names_hash_bucket_size 128; # this seems to be required for some vhosts
 
     server {
-        listen 8082 default_server;
-        listen [::]:8082 default_server;
+        listen 8082 ssl default_server;
+        listen [::]:8082 ssl default_server;
+        root /repository;
+        ssl_certificate /etc/ssl/server.crt;
+	      ssl_certificate_key /etc/ssl/server.key;
+
         access_log   /var/log/nginx/dispatcher.log  main;
         client_max_body_size 8000M;
-        server_name localhost;" > $1
+        server_name localhost;
+
+        location /repository {
+            alias /repository/;
+            autoindex on;
+                          }" > $1
 }
 
 function write_footer_auth {
@@ -61,22 +70,25 @@ echo "
             proxy_set_header   X-Real-IP \$remote_addr;
             proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
             proxy_set_header   X-Forwarded-Host \$server_name;
-            add_header 'Access-Control-Allow-Origin' '*';
-            add_header 'Access-Control-Allow-Credentials' 'true';
-            add_header 'Access-Control-Allow-Methods' 'GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH';
-            add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
             if (\$request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
+                #
+                # Custom headers and headers various browsers *should* be OK with but aren't
+                #
+                #add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
+                #
                 # Tell client that this pre-flight info is valid for 20 days
                 #
-                add_header Access-Control-Allow-Headers Authorization;
-                add_header Access-Control-Allow-Credentials true;
+                add_header Access-Control-Allow-Headers "Authorization";
+                add_header Access-Control-Allow-Credentials "true";
                 add_header 'Access-Control-Max-Age' 1728000;
-                add_header 'Content-Type' 'text/plain charset=UTF-8';
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
                 add_header 'Content-Length' 0;
                 return 204;
             }
         }
-
         location = /mandatory_auth {
             internal;
             proxy_pass              http://auth:2000/validate_request;
@@ -107,17 +119,21 @@ function add_enabler_auth {
             proxy_set_header   X-Real-IP \$remote_addr;
             proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
             proxy_set_header   X-Forwarded-Host \$server_name;
-            add_header 'Access-Control-Allow-Origin' '*';
-            add_header 'Access-Control-Allow-Credentials' 'true';
-            add_header 'Access-Control-Allow-Methods' 'GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH';
-            add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
             if (\$request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
+                #
+                # Custom headers and headers various browsers *should* be OK with but aren't
+                #
+                #add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
+                #
                 # Tell client that this pre-flight info is valid for 20 days
                 #
-                add_header Access-Control-Allow-Headers Authorization;
-                add_header Access-Control-Allow-Credentials true;
+                add_header Access-Control-Allow-Headers "Authorization";
+                add_header Access-Control-Allow-Credentials "true";
                 add_header 'Access-Control-Max-Age' 1728000;
-                add_header 'Content-Type' 'text/plain charset=UTF-8';
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
                 add_header 'Content-Length' 0;
                 return 204;
             }
@@ -135,22 +151,30 @@ function add_enabler {
             proxy_set_header   X-Real-IP \$remote_addr;
             proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
             proxy_set_header   X-Forwarded-Host \$server_name;
-            add_header 'Access-Control-Allow-Origin' '*';
-            add_header 'Access-Control-Allow-Credentials' 'true';
-            add_header 'Access-Control-Allow-Methods' 'GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH';
-            add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range';
             if (\$request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, OPTIONS';
+                #
+                # Custom headers and headers various browsers *should* be OK with but aren't
+                #
+                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+                #
                 # Tell client that this pre-flight info is valid for 20 days
                 #
-                add_header Access-Control-Allow-Headers Authorization;
-                add_header Access-Control-Allow-Credentials true;
+                add_header Access-Control-Allow-Headers "Authorization";
+                add_header Access-Control-Allow-Credentials "true";
                 add_header 'Access-Control-Max-Age' 1728000;
-                add_header 'Content-Type' 'text/plain charset=UTF-8';
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
                 add_header 'Content-Length' 0;
                 return 204;
             }
         }" >> $3
 }
+
+echo "Platform Name: "
+read answer
+echo $answer > auth/platform_name
+uuidgen > auth/platformID
 
 # Check the user has configured the validator env file
 while true; do

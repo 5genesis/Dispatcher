@@ -33,7 +33,8 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(fh)
 logger.addHandler(stream_handler)
 
-
+from mano_2 import mano_cache
+app.register_blueprint(mano_cache)
 
 def reachable_interface(interface):
     """

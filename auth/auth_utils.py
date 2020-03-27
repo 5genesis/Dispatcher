@@ -11,12 +11,13 @@ from flask import session, jsonify
 from datetime import datetime
 from settings import Settings
 
-
 key = Settings().KEY
+
+get_platform_name = lambda: open("platform_name", "r").read().split()[0]
+get_platform_id = lambda: open("platformID", "r").read().split()[0]
 
 
 def preValidation(request, functional_part):
-
     if request.authorization:
         username = request.authorization.username
         password = hashlib.md5(request.authorization.password.encode()).hexdigest()
@@ -27,7 +28,8 @@ def preValidation(request, functional_part):
     if data is not None and data.active:
         now = datetime.now()
         Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                         claims={'username': username, 'password': password, 'timeout': datetime.timestamp(now) + Settings.Timeout})
+                         claims={'username': username, 'password': password,
+                                 'timeout': datetime.timestamp(now) + Settings.Timeout})
 
         Etoken.make_encrypted_token(key)
         token = Etoken.serialize()
@@ -57,7 +59,8 @@ def admin_auth(f):
         if request.authorization:
             username = request.authorization.username
             password = request.authorization.password
-            data_user = User.query.filter_by(username=username, password=hashlib.md5(password.encode()).hexdigest()).first()
+            data_user = User.query.filter_by(username=username,
+                                             password=hashlib.md5(password.encode()).hexdigest()).first()
             data_rol = Rol.query.filter_by(username=username, rol_name='Admin').first()
             if not (data_user and data_rol):
                 return jsonify(result='Invalid Permission'), 401
@@ -81,6 +84,17 @@ def token_auth_validator(request=None):
     return result
 
 
+def get_user_from_token(token):
+    try:
+        if not token:
+            return 'Token access is required', 400
+
+        return ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('username'), 200
+
+    except:
+        return 'No valid Token given', 400
+
+
 def validate_token(token, request):
     try:
         if not token:
@@ -90,7 +104,11 @@ def validate_token(token, request):
 
         now = datetime.now()
         if metadata.get('timeout') >= datetime.timestamp(now):
-            data = User.query.filter_by(username=metadata.get('username'), password=metadata.get('password')).first()
+            if metadata.get('username'):
+                data = User.query.filter_by(username=metadata.get('username'), password=metadata.get('password')).first()
+            else:
+                if metadata.get('platform_id') == get_platform_id():
+                    return
         else:
             return 'Token expired'
         if data is not None:
@@ -128,4 +146,7 @@ def check_mail(email):
         return False
 
 
-
+def string_to_boolean(string):
+    if string.lower() in ['true', '1', 't', 'y', 'yes']:
+        return True
+    return False

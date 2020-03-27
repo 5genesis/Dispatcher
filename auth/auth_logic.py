@@ -7,20 +7,24 @@ from jwcrypto import jwt, jwk
 import logging
 import json
 from auth import app
-from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword
-from DB_Model import init_db, User, Registry, db
+from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
+    string_to_boolean, get_user_from_token, get_platform_name, get_platform_id
+from DB_Model import init_db, User, Registry, Platform, db
 from MailConfig import mail
-
-
+import requests
+from settings import Settings
+import pymongo
 
 auth_logic = Blueprint('auth_page', __name__, template_folder='templates')
-
 
 json1_file = open('key.json')
 json1_str = json1_file.read()
 json1_data = json.loads(json1_str)
 key = jwk.JWK(**json1_data)
 logger = logging.getLogger('REST API')
+
+# DB parameters
+mongoDBClient = pymongo.MongoClient("mongodb://database:27017/")
 
 
 @auth_logic.route('/get_token', methods=['GET'])
@@ -59,6 +63,17 @@ def login():
             return jsonify(result=('Login fails: ' + str(e))), 401
 
     return preValidation(request, logic)
+
+
+@auth_logic.route('/get_user_from_token', methods=['GET'])
+def get_user():
+    logger.info(str(request))
+    if request.headers.environ.get('HTTP_AUTHORIZATION', ''):
+        token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+    else:
+        token = ''
+    result, code = get_user_from_token(token)
+    return jsonify(result=result), code
 
 
 @auth_logic.route('/validate_request', methods=['GET'])
@@ -164,7 +179,7 @@ def register():
             db.session.add(new_user)
         db.session.add(new_action)
         db.session.commit()
-        admin_confirmation(username, email)
+        admin_confirmation(email, username)
         return jsonify(result='User registered. Keep an eye with your email for knowing when your account is activated')
 
     except Exception as e:
@@ -207,6 +222,28 @@ def delete_one_user(user):
         return jsonify(result=('Remove user' + user + 'failed: ' + str(e))), 400
 
 
+@auth_logic.route('/delete_platform/<platformName>', methods=['DELETE'])
+@admin_auth
+def delete_platform(platformName):
+    logger.info(str(request))
+    try:
+        mongodb = mongoDBClient["PlatformsDB"]
+        platforms = mongodb["platforms"]
+
+        data = Platform.query.filter_by(platformName=platformName).first()
+        if not data:
+            return jsonify(result=platformName + ' platform does not exist'), 404
+
+        # Delete User
+
+        Platform.query.filter_by(platformName=platformName).delete()
+        db.session.commit()
+        platforms.delete_one({"platform": platformName})
+        return jsonify(result=platformName + ' platform is removed')
+    except Exception as e:
+        return jsonify(result=('Remove platform' + platformName + 'failed: ' + str(e))), 400
+
+
 @auth_logic.route('/show_users', methods=['GET'])
 @admin_auth
 def show_users():
@@ -222,7 +259,7 @@ def show_users():
 
         return jsonify(result=(get_users(username=user, verbose=verbose, active=active, deleted=deleted)))
     except Exception as e:
-        return jsonify(result=('Remove user' + user + 'failed: ' + str(e))), 400
+        return jsonify(result=('Show users failed: ' + str(e))), 400
 
 
 def get_users(username=None, verbose=False, active=False, deleted=False):
@@ -252,6 +289,20 @@ def get_users(username=None, verbose=False, active=False, deleted=False):
                     traces_list.append({'action': item.action, 'date': str(item.date)})
             users_dict[aux_key]['traces'] = traces_list
 
+    return users_dict
+
+
+def get_platforms(active=False):
+    users_dict = {}
+    query = Platform.query
+    query = query.filter_by(active=active)
+
+    for item in query.all():
+        users_dict[item.platformName] = {
+            'platform_id': item.platform_id,
+            'ip': item.ip,
+            'active': item.active
+        }
     return users_dict
 
 
@@ -346,25 +397,180 @@ def validate_user_manually(data):
         return jsonify(result=('Validation process interrupted: ' + str(e))), 400
 
 
-def admin_confirmation(username, email):
+@auth_logic.route('/register_platform/<platform_name>', methods=['POST'])
+def register_platform(platform_name):
+    logger.info(str(request))
+    try:
+        token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+        if token != '' is not None:
+            metadata = ast.literal_eval(jwt.JWT(key=key, jwt=token).claims)
+
+            now = datetime.now()
+            if metadata.get('timeout') < datetime.timestamp(now):
+                return jsonify(result='Token expired'), 401
+
+        ip = request.remote_addr
+        if ip.find(':') != -1:
+            ip = ip.split(':')[-1]
+
+        data = Platform.query.filter_by(platformName=platform_name).first()
+        if not data:
+            data = Platform(platform_id=metadata.get('platform_id'), platformName=platform_name, ip=ip)
+            db.session.add(data)
+            db.session.commit()
+
+        else:
+            raise Exception('Platform already exists')
+
+        admin_confirmation(platformName=platform_name, ip=ip)
+
+        return jsonify(result='Platform registered. Keep an eye with your email for knowing when the platform allows '
+                              'your platform')
+
+    except Exception as e:
+        if str(type(e)).find('IntegrityError') > 0:
+            e = 'User already exists'
+        return jsonify(result=('Platform registration failed: ' + str(e))), 400
+
+
+@admin_auth
+@auth_logic.route('/register_platform_in_platform', methods=['POST'])
+def register_platform_in_platform():
+    logger.info(str(request))
+    # TODO set platform_name
+    platform_name = get_platform_name()
+    platform_id = get_platform_id()
+    try:
+        url = request.form['ip']
+
+        if url.find('https') == -1:
+            url = 'https://' + url
+        now = datetime.now()
+        Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                         claims={'platform': platform_name, 'platform_id': platform_id,
+                                 'timeout': datetime.timestamp(now) + 20})
+
+        Etoken.make_encrypted_token(key)
+        token = Etoken.serialize()
+        header = {'Authorization': 'Bearer ' + str(token)}
+        url = url + Settings.RequestPrefix + '/register_platform/' + platform_name
+
+        req = requests.post(url, headers=header, verify=False)
+        if req.status_code != 200:
+            raise Exception(req.text)
+        return jsonify(result='Platform registration Sucessfull'), 200
+    except Exception as e:
+        return jsonify(result=('Platform registration failed: ' + str(e))), 400
+
+
+@auth_logic.route('/validate_platform/<data>', methods=['GET'])
+def validate_platform(data):
+    logger.info(str(request))
+    try:
+        mongodb = mongoDBClient["PlatformsDB"]
+        platforms = mongodb["platforms"]
+
+        metadata = ast.literal_eval(jwt.JWT(key=key, jwt=data).claims)
+        platformName = metadata['platformName']
+        action = metadata['action']
+
+        if action == 'delete':
+
+            Platform.query.filter_by(platformName=platformName).delete()
+            db.session.commit()
+        else:
+            data = Platform.query.filter_by(platformName=platformName).first()
+            data.active = True
+            db.session.commit()
+
+            Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                             claims={'platform': platformName, 'platform_id': data.platform_id,
+                                     'timeout': datetime(2025, 1, 1).timestamp()})
+
+            Etoken.make_encrypted_token(key)
+            token = str(Etoken.serialize())
+
+            platforms.insert_one({'platform': platformName, 'token': token, 'ip': data.ip})
+
+        return jsonify(result='Changes applied')
+
+    except Exception as e:
+        return jsonify(result=('Validation process interrupted: ' + str(e))), 400
+
+
+@auth_logic.route('/show_platforms', methods=['GET'])
+@admin_auth
+def show_platforms():
+    logger.info(str(request))
+    try:
+
+        active = string_to_boolean(request.args.get('activated', 't'))
+        return jsonify(result=(get_platforms(active=active)))
+    except Exception as e:
+        return jsonify(result=('Show platforms failed: ' + str(e))), 400
+
+
+@auth_logic.route('/validate_platform/<data>', methods=['PUT'])
+@admin_auth
+def validate_platform_manually(data):
+    logger.info(str(request))
+    try:
+        admin_auth(validate_platform)
+        platformName = data
+        mongodb = mongoDBClient["PlatformsDB"]
+        platforms = mongodb["platforms"]
+        data = Platform.query.filter_by(platformName=platformName).first()
+        data.active = True
+        db.session.commit()
+        Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
+                         claims={'platform': platformName, 'platform_id': data.platform_id,
+                                 'timeout': datetime(2025, 1, 1).timestamp()})
+        Etoken.make_encrypted_token(key)
+        token = str(Etoken.serialize())
+
+        platforms.insert_one({'platform': platformName, 'token': token, 'ip': data.ip})
+        return jsonify(result='Changes applied')
+
+    except Exception as e:
+        return jsonify(result=('Validation process interrupted: ' + str(e))), 400
+
+
+def admin_confirmation(email=None, username=None, platformName=None, ip=None):
     now = datetime.now()
-    Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                     claims={'username': username, 'email': email, 'action': 'delete', 'time': datetime.timestamp(now)})
+    header_token = {'alg': 'A256KW', 'enc': 'A256CBC-HS512'}
+    if username:
+        claims_not_provide = {'username': username, 'email': email, 'action': 'delete', 'time': datetime.timestamp(now)}
+        claims_provide = {'username': username, 'email': email, 'action': 'activated',
+                          'time': datetime.timestamp(now)}
+    else:
+
+        claims_not_provide = {'platformName': platformName, 'action': 'delete', 'time': datetime.timestamp(now)}
+        claims_provide = {'platformName': platformName, 'action': 'activated', 'time': datetime.timestamp(now)}
+
+    Etoken = jwt.JWT(header=header_token,
+                     claims=claims_not_provide)
     Etoken.make_encrypted_token(key)
     token_not_provide = str(Etoken.serialize())
 
-    Etoken = jwt.JWT(header={'alg': 'A256KW', 'enc': 'A256CBC-HS512'},
-                     claims={'username': username, 'email': email, 'action': 'activated',
-                             'time': datetime.timestamp(now)})
+    Etoken = jwt.JWT(header=header_token,
+                     claims=claims_provide)
     Etoken.make_encrypted_token(key)
     token_provide = str(Etoken.serialize())
 
-    msg = Message(subject='User validation',
+    if username:
+        subject = 'User validation'
+        template = render_template('validate_user.html', user=username, email=email, token_provide=token_provide,
+                                   token_not_provide=token_not_provide)
+    else:
+        subject = 'Platform validation'
+        template = render_template('validate_platform.html', current_platform=get_platform_name(),
+                                   platform=platformName, ip=ip, token_provide=token_provide,
+                                   token_not_provide=token_not_provide)
+
+    msg = Message(subject=subject,
                   sender=app.config.get('MAIL_USERNAME'),
                   recipients=[app.config.get('MAIL_USERNAME')],  # replace with your email for testing
-                  html=render_template('validate_user.html',
-                                       user=username, email=email, token_provide=token_provide,
-                                       token_not_provide=token_not_provide))
+                  html=template)
     mail.send(msg)
 
 
