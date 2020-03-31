@@ -32,10 +32,6 @@ logger.addHandler(fh)
 logger.addHandler(stream_handler)
 
 dbclient = MongoClient("mongodb://database:27017/")
-config_file = 'mano.conf'
-
-
-# conf = ConfigObj(config_file)
 
 
 @app.route('/vnfd', methods=['POST'])
@@ -168,9 +164,8 @@ def nsd():
         return jsonify({'error': str(e), 'loaded VNFDs': files_uploaded}), 400
 
 
-@app.route('/image/', methods=['POST'])
+@app.route('/image', methods=['POST'])
 def onboard_vim_image():
-
     try:
         logger.info("Uploading image")
         vim_id = request.form.get('vim_id')
@@ -225,6 +220,23 @@ def openstack_upload_image(vim_id, file, container_format):
 
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
     return r
+
+
+@app.route('/vims', methods=['GET'])
+def get_vims(self):
+    logger.info("Retrieving VIMs list")
+    aux_list = []
+    try:
+        for vim in conf["VIM"]:
+            new_vim = {}
+            new_vim["name"] = conf["VIM"][vim]["NAME"]
+            new_vim["type"] = conf["VIM"][vim]["TYPE"]
+            new_vim["location"] = conf["VIM"][vim]["LOCATION"]
+            aux_list.append(new_vim)
+    except Exception as e:
+        return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400
+    logger.debug("VIMs list: {}".format(aux_list))
+    return jsonify(aux_list), 200
 
 
 if __name__ == '__main__':
