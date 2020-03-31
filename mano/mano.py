@@ -5,13 +5,13 @@ import json
 from utils import init_directory, str_to_bool
 import requests
 from pymongo import MongoClient
-from datetime import datetime
+from libs.openstack_util import OSUtils as osUtils
 import os
 from gevent.pywsgi import WSGIServer
 import logging
 import yaml
 from flask_cors import CORS
-from uuid import uuid4
+from configobj import ConfigObj
 from validator import validate_zip
 from shutil import copyfile
 import hashlib
@@ -168,32 +168,32 @@ def nsd():
         return jsonify({'error': str(e), 'loaded VNFDs': files_uploaded}), 400
 
 
-"""
 @app.route('/image/', methods=['POST'])
 def onboard_vim_image():
 
     try:
         logger.info("Uploading image")
         vim_id = request.form.get('vim_id')
-        db = dbclient["images"]
-        vim = db[request.form.get('vim_id')]
+        container_format = request.form.get('container_format', 'bare')
+        vim = dbclient["images"][vim_id]
         # Save file to static directory and validate it
-        target = "/tmp/vim"
-        if not os.path.isdir(target):
-            os.mkdir(target)
-        checksum = hashlib.md5(request.files['file'].read(2**5)).hexdigest()
 
-        file = request.files.get("file")
-
+        checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
         if len(list(vim.find({'checksum': checksum}))) > 0:
-            return jsonify({"status": "Image already exists in " + vim_id}), 400
+            return jsonify({'status': 'Image already exists in ' + vim_id + ' With image name "' +
+                                      + list(vim.find({'checksum': checksum}))[0].get('name') + '"'}), 400
         else:
 
-            filename = file.filename.rsplit("/")[0]
+            file = request.files.get("file")
+            file.save(file.filename)
             # Write package file to static directory and validate it
             logger.debug("Saving temporary VIM")
-            file.save(target + '/' + filename)
-            filename_without_extension, file_extension = os.path.splitext(target + '/' + filename)
+            logger.debug("Saving temporary VIM2")
+            if conf["VIM"][vim_id]['TYPE']:
+                logger.debug("Saving temporary VIM3")
+                r = openstack_upload_image(vim_id, file, container_format)
+
+            os.remove(file.filename)
 
     except AttributeError as ve:
         logger.error("Problem while getting the image file: {}".format(str(ve)))
@@ -203,47 +203,32 @@ def onboard_vim_image():
     try:
         return jsonify({"status": "updated"}), 201
     finally:
-        vim.insert_one({'checksum': checksum, 'filename': filename, })
+        filename_without_extension, file_extension = os.path.splitext(file.filename)
+        vim.insert_one({'checksum': checksum, 'name': filename_without_extension})
 
 
+def openstack_upload_image(vim_id, file, container_format):
+    vim_conf = conf["VIM"][vim_id]
+    filename_without_extension, file_extension = os.path.splitext(file.filename)
+    traductor = {
+        '.qcow2': 'qcow2',
+        '.img': 'qcow2',
+        '.iso': 'iso',
+        '.ova': 'ova',
+        '.vhd': 'vhd'
+    }
+    disk_format = traductor[file_extension]
+
+    # logger.debug(str(auth_url=vim_conf["AUTH_URL"], region="RegionOne", project_name=vim_conf["PROJECT"], username=vim_conf["USER"], password=vim_conf["PASSWORD"]))
+    vim_conn = osUtils.connection(auth_url=vim_conf["AUTH_URL"], region="RegionOne", project_name=vim_conf["PROJECT"],
+                                  username=vim_conf["USER"], password=vim_conf["PASSWORD"])
+
+    r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
+    return r
 
 
-def post_image(self, vim_name):
-    import os
-    vim = conf["VIM"][vim_name]
-    # init the VIM
-    logger.info("Adding VIM- Type: {}, Auth URL:{}, User:{}, Project:{}".format(vim["TYPE"], vim["AUTH_URL"], vim["USER"], vim["PROJECT"]))
-    if vim["TYPE"] == "openstack":
-        vim_conn = osUtils.connection(auth_url=vim["AUTH_URL"], region="RegionOne", project_name=vim["PROJECT"], username=vim["USER"], password=vim["PASSWORD"])
-    else:
-        raise KeyError("VIM type {} not supported".format(vim["TYPE"]))
-    try:
-        logger.info("Uploading image")
-        file = request.files.get("image")
-        if not file:
-            raise AttributeError("Image file not present in the query or wrong headers")
-        # Save file to static directory and validate it
-        file.save(file.filename)
-
-        # get image parameters
-        disk_format = request.args.get('disk_format')
-        container_format = request.args.get('container_format')
-
-        r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
-        # Delete file when done with validation
-        os.remove(file.filename)
-    except KeyError as ke:
-        logger.error("VIM type {} not supported".format(vim["TYPE"]))
-        return {"detail": str(ve), "code":"NOT_ACCEPTABLE", "status": 406}, 406
-    except AttributeError as ve:
-        logger.error("Problem while getting the image file: {}".format(str(ve)))
-        return {"detail": str(ve), "code":"UNPROCESSABLE_ENTITY", "status": 422}, 422
-    except Exception as e:
-        return {"detail": str(e), "code": type(e).__name__, "status": 400}, 400
-    #osUtils.list_images(vim_conn)
-    return {"detail": "Image status: {}".format(r.status), "code": "CREATED", "status": 201}, 201
-"""
 if __name__ == '__main__':
     init_directory()
+    conf = ConfigObj('mano.conf')
     http_server = WSGIServer(('', 5101), app)
     http_server.serve_forever()
