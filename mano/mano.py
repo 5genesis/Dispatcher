@@ -117,7 +117,7 @@ def nsd():
         for upload in request.files.getlist('file'):
             filename = upload.filename.rsplit("/")[0]
             # Write package file to static directory and validate it
-            logger.debug('Saving temporary VNFD')
+            logger.debug('Saving temporary NSD')
             upload.save(filename)
             res, code, fields = validate_zip(filename, nsd_schema, type='ns')
             if code != 200:
@@ -159,13 +159,17 @@ def nsd():
         if global_code != 200:
             # Valid descriptor: proceed with the onboarding
             raise Exception('A NSD has invalid descriptors. Please reupload the invalid VNFD well formed. ')
-        return jsonify({'loaded VNFDs': files_uploaded}), 200
+        return jsonify({'loaded NSDs': files_uploaded}), 200
     except Exception as e:
-        return jsonify({'error': str(e), 'loaded VNFDs': files_uploaded}), 400
+        return jsonify({'error': str(e), 'loaded NSDs': files_uploaded}), 400
 
 
 @app.route('/image', methods=['POST'])
 def onboard_vim_image():
+    """
+    Input: Image
+    Output: 200 code
+    """
     try:
         logger.info("Uploading image")
         vim_id = request.form.get('vim_id')
@@ -214,7 +218,6 @@ def openstack_upload_image(vim_id, file, container_format):
     }
     disk_format = traductor[file_extension]
 
-    # logger.debug(str(auth_url=vim_conf["AUTH_URL"], region="RegionOne", project_name=vim_conf["PROJECT"], username=vim_conf["USER"], password=vim_conf["PASSWORD"]))
     vim_conn = osUtils.connection(auth_url=vim_conf["AUTH_URL"], region="RegionOne", project_name=vim_conf["PROJECT"],
                                   username=vim_conf["USER"], password=vim_conf["PASSWORD"])
 
@@ -224,6 +227,9 @@ def openstack_upload_image(vim_id, file, container_format):
 
 @app.route('/vims', methods=['GET'])
 def get_vims(self):
+    """
+    Output: 200 code and list of current vims
+    """
     logger.info("Retrieving VIMs list")
     aux_list = []
     try:

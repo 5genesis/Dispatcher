@@ -32,20 +32,6 @@ services:
       - ./database/mongo-volume:/data/db
     ports:
       - '27017-27019:27017-27019'
-  validator:
-    build: ./validator
-    image: validator
-    container_name: validator
-    env_file:
-      - ./validator/config.env
-    command: python validator.py
-    volumes:
-      - "./validator:/validator"
-    ports:
-      - '5100:5100'
-    restart: always
-    depends_on:
-      - database
   mano:
     build: ./mano
     image: mano
