@@ -16,7 +16,6 @@ services:
       - 8082:8082
       - 443:443
     depends_on:
-      - validator
       - mano
   database:
     image: mongo:latest
@@ -54,6 +53,5 @@ services:
       - './swagger:/my_swagger'
     depends_on:
       - mano
-      - validator
 
 
