@@ -18,7 +18,7 @@ class OSUtils():
         # Build the image attributes and upload the image.
         filename_without_extension, file_extension = os.path.splitext(f.filename)
         image_attrs = {
-            'name': f.filename_without_extension,
+            'name': filename_without_extension,
             'filename': f.filename,
             'disk_format': disk_format,
             'container_format': container_format,

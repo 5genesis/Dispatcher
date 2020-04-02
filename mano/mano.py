@@ -57,6 +57,7 @@ def vnfds():
             res, code, fields = validate_zip(filename, vnfd_schema, type='vnf')
             fields['user'] = user
             fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
+            existing_image_test(fields['images'])
             data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
             if code != 200:
                 global_code = 400
@@ -97,6 +98,18 @@ def vnfds():
         return jsonify({'loaded VNFDs': files_uploaded}), 200
     except Exception as e:
         return jsonify({'error': str(e), 'files_uploaded': files_uploaded}), 400
+
+
+def existing_image_test(images):
+    vim_list = list(dbclient["images"].list_collection_names())
+    for name in images:
+        result = False
+        for vim in vim_list:
+            if len(list(dbclient["images"][vim].find({'name': name}))) > 0:
+                result = True
+        if not result:
+            raise Exception('None of VIM have the image requested by the VNF. Please Upload the image "' + name + '".')
+
 
 
 @app.route('/nsd', methods=['POST'])
