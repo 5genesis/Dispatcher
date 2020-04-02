@@ -100,7 +100,6 @@ def validate_zip(file, schema, type):
         return {"detail": "Problem while validating VNFD: {}".format(ve.message)}, 400, {}
     except Exception as e:
         # Delete the folder we just created
-        logger.debug("Hemos llegado a la excepcion")
         shutil.rmtree(folder, ignore_errors=True)
 
         logger.warning("Problem while validating VNFD: {}".format(str(e)))
