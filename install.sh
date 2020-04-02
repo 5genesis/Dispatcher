@@ -196,7 +196,7 @@ while true; do
     esac
 done
 
-#copy the docker-compose template to the final docker-compose file   
+#copy the docker-compose template to the final docker-compose file
 cp docker-compose.tmp docker-compose.yml
 
 # Before the config file is processed, the nginx config file is created and filled up

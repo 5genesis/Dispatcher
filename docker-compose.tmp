@@ -39,6 +39,7 @@ services:
     volumes:
       - "./mano:/mano"
       - data-volume:/repository
+
     ports:
       - '5101:5101'
     restart: always
@@ -53,5 +54,4 @@ services:
       - './swagger:/my_swagger'
     depends_on:
       - mano
-
 
