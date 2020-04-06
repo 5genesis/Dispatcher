@@ -15,6 +15,7 @@ from configobj import ConfigObj
 from validator import validate_zip
 from shutil import copyfile
 import hashlib
+from packaging import version
 
 app = Flask(__name__)
 api = Api(app)
@@ -76,6 +77,8 @@ def vnfds():
                         index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
 
                         index['vnf_packages'][fields.get('id')][fields.get('version')] = data_ind
+                        if version.parse(index['vnf_packages'][fields.get('id')]['latest'])< version.parse(fields.get('version')):
+                            index['vnf_packages'][fields.get('id')]['latest'] = fields.get('version')
                         yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))  # metadata
                         files_uploaded[filename] = 'VNF version added'
                 else:
@@ -87,6 +90,7 @@ def vnfds():
                     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
 
                     index['vnf_packages'][fields.get('id')] = {fields.get('version'): data_ind}
+                    index['vnf_packages'][fields.get('id')]['latest'] = fields.get('version')
                     yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))  # metadata
                     files_uploaded[filename] = 'VNF added'
             os.remove(filename)
@@ -152,8 +156,9 @@ def nsd():
                                  final_path + '/' + fields.get('id') + "-" + fields.get('version') + '.tar.gz')  # VNF
                         yaml.dump(fields, open(final_path + '/' + 'metadata.yaml', 'w'))  # metadata
                         index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-
                         index['nsd_packages'][fields.get('id')][fields.get('version')] = data_ind
+                        if version.parse(index['nsd_packages'][fields.get('id')]['latest'])< version.parse(fields.get('version')):
+                            index['nsd_packages'][fields.get('id')]['latest'] = fields.get('version')
                         yaml.dump(index, open('/repository/index.yaml', 'w'))  # metadata
                         files_uploaded[filename] = 'NSD version added'
                 else:
@@ -163,8 +168,8 @@ def nsd():
                              final_path + '/' + fields.get('id') + "-" + fields.get('version') + '.tar.gz')  # VNF
                     yaml.dump(fields, open(final_path + '/' + 'metadata.yaml', 'w'))  # metadata
                     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-
                     index['nsd_packages'][fields.get('id')] = {fields.get('version'): data_ind}
+                    index['nsd_packages'][fields.get('id')]['latest'] = fields.get('version')
                     yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))  # metadata
                     files_uploaded[filename] = 'NSD added'
             os.remove(filename)
@@ -239,7 +244,7 @@ def openstack_upload_image(vim_id, file, container_format):
 
 
 @app.route('/vims', methods=['GET'])
-def get_vims(self):
+def get_vims():
     """
     Output: 200 code and list of current vims
     """
