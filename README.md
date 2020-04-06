@@ -154,6 +154,34 @@ To stop the Dispatcher service just run the following:
 A swagger testing framework is deployed on port 5002 with the following API specifications:
 ![Dispatcher Swagger](./images/swagger.PNG)
 
+## Repository
+The repository is embedded in the Dispatcher component. The dispatcher, exports the filesystem created in the Mano component.
+The repository allows the version control of VNFs and NSDs. In the main route (https://<IP<IP>>:8082/repository) we can found the following: 
+![Repository_root](./images/repository_root.PNG)
+
+There are 2 directories and one index. 'ns' directory is for hosting the network services and 'vnf' directory is for hosting the virtual network functions.
+Also, we can found an index that will have the minimum information of each artifact:
+
+![Repository_index](./images/repository_index.png)
+
+We can observe 1 nsd_package and 2 vnf_package.
+With the index metadata we can compose the path for looking every artifact. For instance, we can check one of them:
+
+![Repository_vnf](./images/repository_vnfd.png)
+
+In the directory we can observe 2 files. The VNF package and the metadata.yaml that will have the detailed information of the file.
+The metadata.yaml looks like:
+
+![Repository_vnf_metadata](./images/repository_vnf_metadata.png)
+
+The data composed with the VNFD specification and some parameters provided by the open APIs.
+
+## Mano onboarding flow 
+The mano microservice is in charge of validating all the artifacts for the NS onboarding (Images, VNFDs & NSDs). 
+The following flow explains how this component analyze the current resources available and validate the new ingestion of each artifact.
+![Mano Flow](./images/mano-flow.PNG)
+
+
 ## Logging
 
 *Dispatcher* logs containing all access attemtps to the application are available in the `log` folder of the application.
@@ -193,7 +221,7 @@ In case of needing any help, contact the [authors](#authors) for support.
 
 ## Next steps
 
-- Add cross-platform features.
+- Introduce the Distributor microservice that will be in charge of validate experiments, distribute them, and obtain the results through the result catalog.
 
 ## Authors
 
