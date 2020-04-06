@@ -162,24 +162,24 @@ The repository allows the version control of VNFs and NSDs. In the main route (h
 There are 2 directories and one index. 'ns' directory is for hosting the network services and 'vnf' directory is for hosting the virtual network functions.
 Also, we can found an index that will have the minimum information of each artifact:
 
-![Repository_index](./images/repository_index.png)
+![Repository_index](./images/repository_index.PNG)
 
 We can observe 1 nsd_package and 2 vnf_package.
 With the index metadata we can compose the path for looking every artifact. For instance, we can check one of them:
 
-![Repository_vnf](./images/repository_vnfd.png)
+![Repository_vnf](./images/repository_vnfd.PNG)
 
 In the directory we can observe 2 files. The VNF package and the metadata.yaml that will have the detailed information of the file.
 The metadata.yaml looks like:
 
-![Repository_vnf_metadata](./images/repository_vnf_metadata.png)
+![Repository_vnf_metadata](./images/repository_vnf_metadata.PNG)
 
 The data composed with the VNFD specification and some parameters provided by the open APIs.
 
 ## Mano onboarding flow 
 The mano microservice is in charge of validating all the artifacts for the NS onboarding (Images, VNFDs & NSDs). 
 The following flow explains how this component analyze the current resources available and validate the new ingestion of each artifact.
-![Mano Flow](./images/mano-flow.PNG)
+![Mano Flow](./images/mano-flow.png)
 
 
 ## Logging
