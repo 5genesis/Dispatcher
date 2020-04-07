@@ -41,7 +41,6 @@ Modify the file `mano.conf` to adapt it to your testbed needs, with **one** NFVO
 
     [VIM]
     [[vim-1-name]]
-        NAME=<name of the VIM 1, only for later identification>
         TYPE=<type of VIM. Currently only 'openstack' is supported>
         LOCATION=<Location of the VIM: [core|edge]>
         AUTH_URL=<VIM 1 auth URL>
@@ -49,7 +48,6 @@ Modify the file `mano.conf` to adapt it to your testbed needs, with **one** NFVO
         PASSWORD=<VIM username password>
         PROJECT=<VIM project>
     [[vim-2-name]]
-        NAME=<name of the VIM 2>
         TYPE=<type of VIM. Currently only 'openstack' is supported>
         LOCATION=<Location of the VIM: [core|edge]>
         AUTH_URL=<VIM 2 auth URL>

@@ -253,7 +253,7 @@ def get_vims():
     try:
         for vim in conf["VIM"]:
             new_vim = {}
-            new_vim["name"] = conf["VIM"][vim]["NAME"]
+            new_vim["name"] = vim
             new_vim["type"] = conf["VIM"][vim]["TYPE"]
             new_vim["location"] = conf["VIM"][vim]["LOCATION"]
             aux_list.append(new_vim)
