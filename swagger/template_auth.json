@@ -2,11 +2,11 @@
   "swagger": "2.0",
   "info": {
     "description": "Swagger 5GENESIS Dispatcher",
-    "version": "1.0.0",
+    "version": "2.0.",
     "title": "5GENESIS Dispatcher Swagger",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
-      "email": "javier.melian@atos.net"
+      "email": "luis.gomez.external@atos.net"
     },
     "license": {
       "name": "Apache 2.0",
@@ -179,6 +179,64 @@
                     "hackfest_1_nsd_fixed.tar.gz": {
                       "type": "string",
                       "example": "NSD with this version already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems"
+          }
+        }
+      },
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "MANO"
+        ],
+        "summary": "List NSDs located in the repository",
+        "description": "This request list all the NSDs located in the repository.",
+        "operationId": "ListNSD",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of NSDs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hackfest-nsd": {
+                  "type": "object",
+                  "properties": {
+                    "1.0": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "example": "hackfest1-ns"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Simple NS with a single VNF and a single VL"
+                        },
+                        "vendor": {
+                          "type": "string",
+                          "example": "Atos"
+                        }
+                      }
+                    },
+                    "latest": {
+                      "type": "string",
+                      "example": "1.0"
                     }
                   }
                 }

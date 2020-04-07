@@ -262,6 +262,16 @@ def get_vims():
     logger.debug("VIMs list: {}".format(aux_list))
     return jsonify(aux_list), 200
 
+@app.route('/nsd', methods=['GET'])
+def list_nsd():
+    index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
+    return jsonify(index['nsd_packages']), 200
+
+
+@app.route('/vnfd', methods=['GET'])
+def list_vnf():
+    index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
+    return jsonify(index['vnf_packages']), 200
 
 if __name__ == '__main__':
     init_directory()

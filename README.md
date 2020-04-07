@@ -21,8 +21,15 @@ The available features will depend on the features exposed by each dispatched mo
 - Validation service: Validate VNFD or NSD as a standalone service
 - Retrieve registered VIMs
 - Upload VIM images
+- List VNFDs
+- Update VNFD with a new version
+- List NSDs
+- Update NSD with a new version
 
-##### ELCM enabler
+##### Repository
+- Expose the directory of the NS and VNF artifacts.
+- Integration with ETSI OSM
+##### ELCM (Future Distributor)
 
 - Validation of Experiment descriptor
 - Retrieve stored experiments from the database
