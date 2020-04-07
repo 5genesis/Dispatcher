@@ -65,7 +65,7 @@
           },
           {
             "name": "visibility",
-            "in": "query",
+            "in": "formData",
             "description": "visibility of the NSD",
             "required": true,
             "type": "boolean"
@@ -144,7 +144,7 @@
           },
           {
             "name": "visibility",
-            "in": "query",
+            "in": "formData",
             "description": "visibility of the NSD",
             "required": true,
             "type": "boolean"
@@ -280,8 +280,15 @@
             "type": "file"
           },
           {
+            "name": "vim_id",
+            "in": "formData",
+            "description": "VIM where do you want to onboard the image",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "container_format",
-            "in": "query",
+            "in": "formData",
             "description": "Container format: bare",
             "required": false,
             "type": "string"
