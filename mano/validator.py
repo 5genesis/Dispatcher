@@ -29,6 +29,7 @@ def md5(fname):
 
 def fields_building(descriptor_json, file, type):
     fields = {}
+    base_path ='/' + type + '/'
     if type == "vnf":
         aux_dict = descriptor_json.get('vnfd-catalog', {}).get('vnfd', [{}])[0]
         fields['name'] = aux_dict.get('name')
@@ -55,6 +56,8 @@ def fields_building(descriptor_json, file, type):
         logger.debug('Used VNFS in the NSD: ' + str(vnfs))
         check_existing_vnfs(vnfs)
         fields['vnfd-id-ref'] = vnfs
+        fields['path'] = base_path + fields['id'] + '/' + fields['version'] + '/' + fields.get('id') + "-" + \
+                         fields.get('version') + '.tar.gz'
         fields['checksum'] = md5(file)
     return fields
 

@@ -144,7 +144,8 @@ def nsd():
             if code == 200:
                 fields['user'] = user
                 fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
-                data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
+                data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor'],
+                            'path': fields['path']}
                 nsd_path = '/repository/ns'
                 final_path = nsd_path + '/' + fields.get('id') + '/' + fields.get('version')
                 if os.path.isdir(nsd_path + '/' + fields.get('id')):
@@ -205,9 +206,7 @@ def onboard_vim_image():
             file.save(file.filename)
             # Write package file to static directory and validate it
             logger.debug("Saving temporary VIM")
-            logger.debug("Saving temporary VIM2")
             if conf["VIM"][vim_id]['TYPE']:
-                logger.debug("Saving temporary VIM3")
                 r = openstack_upload_image(vim_id, file, container_format)
 
             os.remove(file.filename)

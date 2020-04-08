@@ -1,5 +1,5 @@
 jwcrypto==0.6.0
-gevent==1.4.0
+waitress==1.4.3
 Flask==1.0.2
 Flask-SQLAlchemy==2.1
 requests==2.20.1
