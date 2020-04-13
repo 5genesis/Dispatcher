@@ -58,7 +58,7 @@ def vnfds():
             res, code, fields = validate_zip(filename, vnfd_schema, type='vnf')
             fields['user'] = user
             fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
-            existing_image_test(fields['images'])
+            existing_image_test(fields.get('images', []))
             data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
             if code != 200:
                 global_code = 400

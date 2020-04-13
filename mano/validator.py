@@ -31,7 +31,11 @@ def fields_building(descriptor_json, file, type):
     fields = {}
     base_path ='/' + type + '/'
     if type == "vnf":
-        aux_dict = descriptor_json.get('vnfd-catalog', {}).get('vnfd', [{}])[0]
+        if descriptor_json.get('vnfd-catalog', False):
+            aux_dict = descriptor_json.get('vnfd-catalog', {}).get('vnfd', [{}])[0]
+        else:
+            aux_dict = descriptor_json.get('vnfd:vnfd-catalog', {}).get('vnfd', [{}])[0]
+
         fields['name'] = aux_dict.get('name')
         fields['id'] = aux_dict.get('id')
         fields['description'] = aux_dict.get('description')
@@ -88,11 +92,11 @@ def validate_zip(file, schema, type):
         # load the data inside the file in the 'descriptor_json' variable
         descriptor_json = yaml.safe_load(descriptor_data)
 
-        fields = fields_building(descriptor_json, file, type)
         logger.debug("Descriptor: {}".format(descriptor_json))
         # compare the json with the proper schema
         jsonschema.validate(descriptor_json, schema)
         # Delete the folder we just created
+        fields = fields_building(descriptor_json, file, type)
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
         return jsonify({"detail": "VNFD successfully validated", "code": "OK", "status": 200}), 200, fields
