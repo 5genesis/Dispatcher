@@ -56,15 +56,16 @@ def vnfds():
             logger.debug('Saving temporary VNFD')
             upload.save(filename)
             res, code, fields = validate_zip(filename, vnfd_schema, type='vnf')
-            fields['user'] = user
-            fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
-            existing_image_test(fields.get('images', []))
-            data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
+
             if code != 200:
                 global_code = 400
                 files_uploaded[filename] = res
-
             if code == 200:
+                fields['user'] = user
+                fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
+                existing_image_test(fields.get('images', []))
+                data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
+
                 final_path = '/repository/vnf/' + fields.get('id') + '/' + fields.get('version')
                 if os.path.isdir('/repository/vnf/' + fields.get('id')):
                     if os.path.isdir(final_path):
@@ -101,7 +102,7 @@ def vnfds():
             raise Exception('A VNF has invalid descriptors. Please reupload the invalid VNFD well formed."')
         return jsonify({'loaded VNFDs': files_uploaded}), 200
     except Exception as e:
-        return jsonify({'error': str(e), 'files_uploaded': files_uploaded}), 400
+        return jsonify({'error': str(e), 'VNFDs': files_uploaded}), 400
 
 
 def existing_image_test(images):
@@ -180,7 +181,7 @@ def nsd():
             raise Exception('A NSD has invalid descriptors. Please reupload the invalid VNFD well formed. ')
         return jsonify({'loaded NSDs': files_uploaded}), 200
     except Exception as e:
-        return jsonify({'error': str(e), 'loaded NSDs': files_uploaded}), 400
+        return jsonify({'error': str(e), 'NSDs': files_uploaded}), 400
 
 
 @app.route('/image', methods=['POST'])
@@ -198,7 +199,7 @@ def onboard_vim_image():
 
         checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
         if len(list(vim.find({'checksum': checksum}))) > 0:
-            return jsonify({'status': 'Image already exists in ' + vim_id + ' With image name "' +
+            return jsonify({'status': 'Image already exists in ' + vim_id + ' With image name "'
                                       + list(vim.find({'checksum': checksum}))[0].get('name') + '"'}), 400
         else:
 

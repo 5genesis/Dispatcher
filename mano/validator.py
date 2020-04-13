@@ -103,8 +103,8 @@ def validate_zip(file, schema, type):
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
-        logger.warning("Problem while validating VNFD: {}".format(ve.message))
-        return {"detail": "Problem while validating VNFD: {}".format(ve.message)}, 400, {}
+        logger.warning("Problem while validating VNFD: {} in the path {}".format(ve.message, list(ve.path)))
+        return {"detail": "Problem while validating VNFD: {}".format(ve.message), "path": list(ve.path)}, 400, {}
     except Exception as e:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
