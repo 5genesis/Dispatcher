@@ -99,10 +99,10 @@ def vnfds():
 
         if global_code != 200:
             # Valid descriptor: proceed with the onboarding
-            raise Exception('A VNF has invalid descriptors. Please reupload the invalid VNFD well formed."')
-        return jsonify({'loaded VNFDs': files_uploaded}), 200
+            raise Exception('Some VNFs have invalid descriptors')
+        return jsonify({'VNFs': files_uploaded}), 200
     except Exception as e:
-        return jsonify({'error': str(e), 'VNFDs': files_uploaded}), 400
+        return jsonify({'error': str(e), 'VNFs': files_uploaded}), 400
 
 
 def existing_image_test(images):
@@ -178,10 +178,10 @@ def nsd():
 
         if global_code != 200:
             # Valid descriptor: proceed with the onboarding
-            raise Exception('A NSD has invalid descriptors. Please reupload the invalid VNFD well formed. ')
-        return jsonify({'loaded NSDs': files_uploaded}), 200
+            raise Exception('Some NSD have invalid descriptors')
+        return jsonify({'NSs': files_uploaded}), 200
     except Exception as e:
-        return jsonify({'error': str(e), 'NSDs': files_uploaded}), 400
+        return jsonify({'error': str(e), 'NSs': files_uploaded}), 400
 
 
 @app.route('/image', methods=['POST'])

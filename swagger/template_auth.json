@@ -47,7 +47,7 @@
           "MANO"
         ],
         "summary": "Add a VNFD or new VNFD version to the repository",
-        "description": "This request accepts 1 to many VNFDs files. The file first is validated with the images dependencies and syntactic analysis.",
+        "description": "This request accepts 1 to many VNFs files. The file first is validated with the images dependencies and syntactic analysis.",
         "operationId": "addVNFD",
         "consumes": [
           "multipart/form-data"
@@ -73,11 +73,11 @@
         ],
         "responses": {
           "200": {
-            "description": "VNFDs uploaded",
+            "description": "VNFs Added",
             "schema": {
               "type": "object",
               "properties": {
-                "loaded VNFDs": {
+                "VNFs": {
                   "type": "object",
                   "properties": {
                     "hackfest_1_vnfd_fixed.tar.gz": {
@@ -90,11 +90,11 @@
             }
           },
           "400": {
-            "description": "VNFDs uploaded",
+            "description": "VNFs not uploaded",
             "schema": {
               "type": "object",
               "properties": {
-                "loaded VNFDs": {
+                "VNFs": {
                   "type": "object",
                   "properties": {
                     "hackfest_1_vnfd_fixed.tar.gz": {
@@ -126,7 +126,7 @@
           "MANO"
         ],
         "summary": "Add a NSD or new NSD version to the repository",
-        "description": "This request accepts 1 NSD file. The file first is validated with the VNFDs dependencies and syntactic analysis.",
+        "description": "This request accepts 1 NS file. The file first is validated with the VNFDs dependencies and syntactic analysis.",
         "operationId": "addNSD",
         "consumes": [
           "multipart/form-data"
@@ -152,11 +152,11 @@
         ],
         "responses": {
           "200": {
-            "description": "VNFDs uploaded",
+            "description": "NSs uploaded",
             "schema": {
               "type": "object",
               "properties": {
-                "loaded NSDs": {
+                "NSs": {
                   "type": "object",
                   "properties": {
                     "hackfest_1_nsd_fixed.tar.gz": {
@@ -169,11 +169,11 @@
             }
           },
           "400": {
-            "description": "VNFDs uploaded",
+            "description": "NSs not uploaded",
             "schema": {
               "type": "object",
               "properties": {
-                "loaded NSDs": {
+                "NSs": {
                   "type": "object",
                   "properties": {
                     "hackfest_1_nsd_fixed.tar.gz": {

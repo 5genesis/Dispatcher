@@ -47,7 +47,10 @@ def fields_building(descriptor_json, file, type):
         fields['images'] = images
         fields['checksum'] = md5(file)
     if type == "ns":
-        aux_dict = descriptor_json.get('nsd-catalog', {}).get('nsd', [{}])[0]
+        if descriptor_json.get('nsd-catalog', False):
+            aux_dict = descriptor_json.get('nsd-catalog', {}).get('nsd', [{}])[0]
+        else:
+            aux_dict = descriptor_json.get('nsd:nsd-catalog', {}).get('nsd', [{}])[0]
         fields['name'] = aux_dict.get('name')
         fields['id'] = aux_dict.get('id')
         fields['description'] = aux_dict.get('description')
@@ -99,15 +102,16 @@ def validate_zip(file, schema, type):
         fields = fields_building(descriptor_json, file, type)
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
-        return jsonify({"detail": "VNFD successfully validated", "code": "OK", "status": 200}), 200, fields
+        return jsonify({"detail": "{}D successfully validated".format(type.upper()), "code": "OK"}), 200, fields
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
-        logger.warning("Problem while validating VNFD: {} in the path {}".format(ve.message, list(ve.path)))
-        return {"detail": "Problem while validating VNFD: {}".format(ve.message), "path": list(ve.path)}, 400, {}
+        path = ''.join('["'+str(bit) + '"]' for bit in ve.path)
+        logger.warning("Problem validating the {}D: {} in the path {}".format(type.upper(), ve.message, path))
+        return {"detail": "Problem validating the {}D: {}".format(type.upper(), ve.message), "path": path}, 400, {}
     except Exception as e:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
 
-        logger.warning("Problem while validating VNFD: {}".format(str(e)))
+        logger.warning("Problem while validating {}D: {}".format(type.upper(), str(e)))
         return {"detail": str(e)}, 400, {}
