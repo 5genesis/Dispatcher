@@ -176,16 +176,6 @@ read answer
 echo $answer > auth/platform_name
 uuidgen > auth/platformID
 
-# Check the user has configured the validator env file
-while true; do
-    read -p "Have you prepared the Validator environment file in the 'validator' folder? " yn
-    case $yn in
-        [Yy]* ) echo "Let's continue"; break;;
-        [Nn]* ) echo "Please, fill in Validator 'config.env' in the proper way"; exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
 # Check the user has configured the dispatcher config file
 while true; do
     read -p "Have you prepared the '$config_file' file? " yn
@@ -206,7 +196,7 @@ while true; do
     esac
 done
 
-#copy the docker-compose template to the final docker-compose file   
+#copy the docker-compose template to the final docker-compose file
 cp docker-compose.tmp docker-compose.yml
 
 # Before the config file is processed, the nginx config file is created and filled up

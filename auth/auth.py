@@ -1,9 +1,10 @@
 from flask_restful import Resource, Api
-from gevent.pywsgi import WSGIServer
+
 from flask import Flask
 import logging
 from flask_mail import Mail
 from flask_cors import CORS
+from waitress import serve
 
 app = Flask(__name__)
 CORS(app)
@@ -25,5 +26,4 @@ if __name__ == '__main__':
     app.register_blueprint(auth_logic)
 
     # Start server
-    http_server = WSGIServer(('', 2000), app)
-    http_server.serve_forever()
+    serve(app, host='0.0.0.0', port=2000)

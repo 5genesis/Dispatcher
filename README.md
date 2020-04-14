@@ -19,20 +19,17 @@ The available features will depend on the features exposed by each dispatched mo
 
 ##### MANO enabler
 - Validation service: Validate VNFD or NSD as a standalone service
-- Onboard VNFD
-- List VNFDs
-- Retrieve single VNFD
-- Delete VNFD
-- Update VNFD
-- Onboard NSD
-- List NSDs
-- Retrieve single NSD
-- Delete NSD
-- Update NSD
 - Retrieve registered VIMs
 - Upload VIM images
+- List VNFDs
+- Update VNFD with a new version
+- List NSDs
+- Update NSD with a new version
 
-##### ELCM enabler
+##### Repository
+- Expose the directory of the NS and VNF artifacts.
+- Integration with ETSI OSM
+##### ELCM (Future Distributor)
 
 - Validation of Experiment descriptor
 - Retrieve stored experiments from the database
@@ -104,12 +101,6 @@ The file should contain information of all the modules the Dispatcher forwards i
     PORT=xxxx -> Port where the app API is available
     PATH=/ -> Base path of the application ("/" by default)
 
-    [validator]
-    PROTOCOL=http
-    HOST=validator
-    PORT=5100
-    PATH=/
-
     [mano]
     PROTOCOL=http
     HOST=mano
@@ -126,22 +117,12 @@ Once edited properly, the configuration will be applied and the containers built
 
 #### Example
 
-    [validator]
-    PROTOCOL=http
-    HOST=validator
-    port=5100
-    path=/
     [mano]
     PROTOCOL=http
     HOST=mano
     PROTOCOL=5001
     PATH=/
     
-    [elcm]
-    PROTOCOL=http
-    HOST=192.168.33.102
-    PORT=5000
-    PATH=/api
 
 With the sample config file above, using the ELCM API as an **example**, the dispatcher will translate the original request to a new one. For example, the original URL would be the following one:
 > Original URL: <http://192.168.33.102:5000/api/v0/run>
@@ -180,6 +161,34 @@ To stop the Dispatcher service just run the following:
 A swagger testing framework is deployed on port 5002 with the following API specifications:
 ![Dispatcher Swagger](./images/swagger.PNG)
 
+## Repository
+The repository is embedded in the Dispatcher component. The dispatcher, exports the filesystem created in the Mano component.
+The repository allows the version control of VNFs and NSDs. In the main route (https://<IP<IP>>:8082/repository) we can found the following: 
+![Repository_root](./images/repository_root.PNG)
+
+There are 2 directories and one index. 'ns' directory is for hosting the network services and 'vnf' directory is for hosting the virtual network functions.
+Also, we can found an index that will have the minimum information of each artifact:
+
+![Repository_index](./images/repository_index.PNG)
+
+We can observe 1 nsd_package and 2 vnf_package.
+With the index metadata we can compose the path for looking every artifact. For instance, we can check one of them:
+
+![Repository_vnf](./images/repository_vnfd.PNG)
+
+In the directory we can observe 2 files. The VNF package and the metadata.yaml that will have the detailed information of the file.
+The metadata.yaml looks like:
+
+![Repository_vnf_metadata](./images/repository_vnf_metadata.PNG)
+
+The data composed with the VNFD specification and some parameters provided by the open APIs.
+
+## Mano onboarding flow 
+The mano microservice is in charge of validating all the artifacts for the NS onboarding (Images, VNFDs & NSDs). 
+The following flow explains how this component analyze the current resources available and validate the new ingestion of each artifact.
+![Mano Flow](./images/mano-flow.png)
+
+
 ## Logging
 
 *Dispatcher* logs containing all access attemtps to the application are available in the `log` folder of the application.
@@ -197,7 +206,10 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Versioning
-- 2.5.0 - Swagger updated with new requests, and HTTPS
+- 2.6.2 - New validation based on Image dependency for VNFs
+- 2.6.1 - NSDs and VNFs More metadata added
+- 2.6.0 - NSDs and VNFs Repository added with updated validation filter
+- 2.5.1 - Swagger updated with new requests, and HTTPS
 - 2.5.0 - SSL added (Self-sign certification )
 - 2.4.1 - Auth Registration of Platforms With Token Service
 - 2.4.0 - Auth Registration of Platforms
@@ -216,7 +228,7 @@ In case of needing any help, contact the [authors](#authors) for support.
 
 ## Next steps
 
-- Add cross-platform features.
+- Introduce the Distributor microservice that will be in charge of validate experiments, distribute them, and obtain the results through the result catalog.
 
 ## Authors
 

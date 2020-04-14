@@ -16,13 +16,14 @@ services:
       - 8082:8082
       - 443:443
     depends_on:
-      - validator
       - mano
   database:
     image: mongo:latest
     container_name: database
     environment:
       - MONGO_INITDB_DATABASE=experimentsdb
+      - MONGODB_DATABASE=PlatformsDB
+      - MONGODB_DATABASE=images
       #- MONGO_INITDB_ROOT_USERNAME=5genesis
       #- MONGO_INITDB_ROOT_PASSWORD=5genesisPASS
     volumes:
@@ -30,20 +31,6 @@ services:
       - ./database/mongo-volume:/data/db
     ports:
       - '27017-27019:27017-27019'
-  validator:
-    build: ./validator
-    image: validator
-    container_name: validator
-    env_file:
-      - ./validator/config.env
-    command: python validator.py
-    volumes:
-      - "./validator:/validator"
-    ports:
-      - '5100:5100'
-    restart: always
-    depends_on:
-      - database
   mano:
     build: ./mano
     image: mano
@@ -51,7 +38,8 @@ services:
     command: python mano.py
     volumes:
       - "./mano:/mano"
-      - data-volume:/tmp/onboarding
+      - data-volume:/repository
+
     ports:
       - '5101:5101'
     restart: always
@@ -66,14 +54,4 @@ services:
       - './swagger:/my_swagger'
     depends_on:
       - mano
-      - validator
-
-  clean_cache:
-    build: ./clean_cache
-    image: clean_cache
-    command: python clean_cache.py
-    container_name: clean_cache
-    volumes:
-      - data-volume:/tmp/onboarding
-    restart: always
 

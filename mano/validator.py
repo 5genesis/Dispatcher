@@ -5,6 +5,7 @@ import yaml
 import jsonschema
 from flask import jsonify
 import logging
+import hashlib
 
 logger = logging.getLogger("VALIDATOR")
 stream_handler = logging.StreamHandler()
@@ -18,9 +19,67 @@ logger.addHandler(fh)
 logger.addHandler(stream_handler)
 
 
-def validate_zip(file, schema):
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+
+def fields_building(descriptor_json, file, type):
+    fields = {}
+    base_path = '/' + type + '/'
+    if type == "vnf":
+        if descriptor_json.get('vnfd-catalog', False):
+            aux_dict = descriptor_json.get('vnfd-catalog', {}).get('vnfd', [{}])[0]
+        else:
+            aux_dict = descriptor_json.get('vnfd:vnfd-catalog', {}).get('vnfd', [{}])[0]
+
+        fields['name'] = aux_dict.get('name')
+        fields['id'] = aux_dict.get('id')
+        fields['description'] = aux_dict.get('description')
+        fields['vendor'] = aux_dict.get('vendor')
+        fields['version'] = aux_dict.get('version')
+        images = []
+        for vdu in aux_dict.get('vdu'):
+            images.append(vdu.get('image'))
+        fields['images'] = images
+    if type == "ns":
+        if descriptor_json.get('nsd-catalog', False):
+            aux_dict = descriptor_json.get('nsd-catalog', {}).get('nsd', [{}])[0]
+        else:
+            aux_dict = descriptor_json.get('nsd:nsd-catalog', {}).get('nsd', [{}])[0]
+        fields['name'] = aux_dict.get('name')
+        fields['id'] = aux_dict.get('id')
+        fields['description'] = aux_dict.get('description')
+        fields['vendor'] = aux_dict.get('vendor')
+        fields['version'] = aux_dict.get('version')
+        vnfs = []
+
+        for vnf in aux_dict.get('constituent-vnfd'):
+            vnfs.append(vnf.get('vnfd-id-ref'))
+        logger.debug('Used VNFS in the NSD: ' + str(vnfs))
+        check_existing_vnfs(vnfs)
+        fields['vnfd-id-ref'] = vnfs
+    fields['path'] = base_path + fields['id'] + '/' + fields['version'] + '/' + fields.get('id') + "-" + \
+                     fields.get('version') + '.tar.gz'
+    fields['checksum'] = md5(file)
+    return fields
+
+
+def check_existing_vnfs(vnfs):
+    index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader).get('vnf_packages', {})
+
+    for vnf in vnfs:
+        if vnf not in index:
+            raise Exception(
+                str("VNFD '" + str(vnf) + "' has not found in the repository, please upload it first, and then try "
+                                          "to upload the NSD"))
+
+
+def validate_zip(file, schema, type):
     try:
-        # TODO: Switch from jsonschema to fastjsonschema
         logger.debug("Decompressing package file")
         # unzip the package
         tar = tarfile.open(file, "r:gz")
@@ -34,23 +93,24 @@ def validate_zip(file, schema):
             descriptor_data = f.read()
         # load the data inside the file in the 'descriptor_json' variable
         descriptor_json = yaml.safe_load(descriptor_data)
+
         logger.debug("Descriptor: {}".format(descriptor_json))
         # compare the json with the proper schema
         jsonschema.validate(descriptor_json, schema)
         # Delete the folder we just created
+        fields = fields_building(descriptor_json, file, type)
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
-        return jsonify({"detail": "VNFD successfully validated", "code": "OK", "status": 200}), 200
+        return jsonify({"detail": "{}D successfully validated".format(type.upper()), "code": "OK"}), 200, fields
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
-        logger.warning("Problem while validating VNFD: {}".format(ve.message))
-        return jsonify({"detail": "Problem while validating VNFD: {}".format(ve.message), "code": "BAD_REQUEST",
-                        "status": 400}), 400
+        path = ''.join('["' + str(bit) + '"]' for bit in ve.path)
+        logger.warning("Problem validating the {}D: {} in the path {}".format(type.upper(), ve.message, path))
+        return {"detail": "Problem validating the {}D: {}".format(type.upper(), ve.message), "path": path}, 400, {}
     except Exception as e:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, e.args)
-        logger.warning("Problem while validating VNFD: {}".format(str(e)))
-        return jsonify({"detail": message, "code": "BAD_REQUEST", "status": 400}), 400
+
+        logger.warning("Problem while validating {}D: {}".format(type.upper(), str(e)))
+        return {"detail": str(e)}, 400, {}
