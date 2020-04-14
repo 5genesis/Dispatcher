@@ -64,7 +64,8 @@ def vnfds():
                 fields['user'] = user
                 fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
                 existing_image_test(fields.get('images', []))
-                data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor']}
+                data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor'],
+                            'path': fields['path']}
 
                 final_path = '/repository/vnf/' + fields.get('id') + '/' + fields.get('version')
                 if os.path.isdir('/repository/vnf/' + fields.get('id')):

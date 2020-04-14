@@ -29,7 +29,7 @@ def md5(fname):
 
 def fields_building(descriptor_json, file, type):
     fields = {}
-    base_path ='/' + type + '/'
+    base_path = '/' + type + '/'
     if type == "vnf":
         if descriptor_json.get('vnfd-catalog', False):
             aux_dict = descriptor_json.get('vnfd-catalog', {}).get('vnfd', [{}])[0]
@@ -45,7 +45,6 @@ def fields_building(descriptor_json, file, type):
         for vdu in aux_dict.get('vdu'):
             images.append(vdu.get('image'))
         fields['images'] = images
-        fields['checksum'] = md5(file)
     if type == "ns":
         if descriptor_json.get('nsd-catalog', False):
             aux_dict = descriptor_json.get('nsd-catalog', {}).get('nsd', [{}])[0]
@@ -63,9 +62,9 @@ def fields_building(descriptor_json, file, type):
         logger.debug('Used VNFS in the NSD: ' + str(vnfs))
         check_existing_vnfs(vnfs)
         fields['vnfd-id-ref'] = vnfs
-        fields['path'] = base_path + fields['id'] + '/' + fields['version'] + '/' + fields.get('id') + "-" + \
-                         fields.get('version') + '.tar.gz'
-        fields['checksum'] = md5(file)
+    fields['path'] = base_path + fields['id'] + '/' + fields['version'] + '/' + fields.get('id') + "-" + \
+                     fields.get('version') + '.tar.gz'
+    fields['checksum'] = md5(file)
     return fields
 
 
@@ -106,7 +105,7 @@ def validate_zip(file, schema, type):
     except jsonschema.exceptions.ValidationError as ve:
         # Delete the folder we just created
         shutil.rmtree(folder, ignore_errors=True)
-        path = ''.join('["'+str(bit) + '"]' for bit in ve.path)
+        path = ''.join('["' + str(bit) + '"]' for bit in ve.path)
         logger.warning("Problem validating the {}D: {} in the path {}".format(type.upper(), ve.message, path))
         return {"detail": "Problem validating the {}D: {}".format(type.upper(), ve.message), "path": path}, 400, {}
     except Exception as e:
