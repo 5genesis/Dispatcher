@@ -6,6 +6,7 @@ from utils import init_directory, str_to_bool
 import requests
 from pymongo import MongoClient
 from libs.openstack_util import OSUtils as osUtils
+from libs.opennebula_util import Opennebula as oneUtils
 import os
 from gevent.pywsgi import WSGIServer
 import logging
@@ -208,8 +209,12 @@ def onboard_vim_image():
             file.save(file.filename)
             # Write package file to static directory and validate it
             logger.debug("Saving temporary VIM")
-            if conf["VIM"][vim_id]['TYPE']:
+            if str(conf["VIM"][vim_id]['TYPE']) == "openstack":
                 r = openstack_upload_image(vim_id, file, container_format)
+            elif str(conf["VIM"][vim_id]['TYPE']) == "opennebula":
+                r = opennebula_upload_image(vim_id, file, container_format)
+            else:
+                raise Exception('VIM not supported: {}'.format(conf["VIM"][vim_id]['TYPE']))
 
             os.remove(file.filename)
 
@@ -243,6 +248,23 @@ def openstack_upload_image(vim_id, file, container_format):
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
     return r
 
+
+def opennebula_upload_image(vim_id, file, container_format):
+    vim_conf = conf["VIM"][vim_id]
+    filename_without_extension, file_extension = os.path.splitext(file.filename)
+    traductor = {
+        '.qcow2': 'qcow2',
+        '.img': 'qcow2',
+        '.iso': 'iso',
+        '.ova': 'ova',
+        '.vhd': 'vhd'
+    }
+    disk_format = traductor[file_extension]
+
+    r = oneUtils.upload_image(auth_url=vim_conf["AUTH_URL"], one_username=vim_conf["USER"], one_password=vim_conf["PASSWORD"], \
+                              f=file, server_ip="192.168.33.112", server_username="test", server_password="test", \
+                              image_dir="/home/test/")
+    return r
 
 @app.route('/vims', methods=['GET'])
 def get_vims():
