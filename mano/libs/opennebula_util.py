@@ -59,7 +59,7 @@ def timeout(func):
 
 def ssh_scp_files(ssh_host, ssh_user, ssh_password, source_volume, destination_volume, ssh_port=22):
     """
-    SSH/SCP Directory Recursively     
+
     """
     logger.info("Transfering file {} to the server".format(source_volume))
     try:
@@ -71,8 +71,26 @@ def ssh_scp_files(ssh_host, ssh_user, ssh_password, source_volume, destination_v
             scp.put(source_volume, recursive=True, remote_path=destination_volume)
         logger.info("File transfered")
     except Exception as e:
-        logger.exception("Failure while trasnfering the file to the server: {}".format(str(e)))
+        logger.exception("Failure while transfering the file to the server: {}".format(str(e)))
+    ssh.close()
 
+def delete_remote_file(ssh_host, ssh_user, ssh_password, path, ssh_port=22):
+    """
+
+    """
+    logger.info("Deleting cached file")
+    try:
+        ssh = SSHClient()
+        ssh.load_system_host_keys()
+        ssh.set_missing_host_key_policy(AutoAddPolicy())
+        ssh.connect(ssh_host, username=ssh_user, password=ssh_password, look_for_keys=False)
+        sftp = ssh.open_sftp()
+        logger.debug("path: {}".format(path))
+        sftp.remove(path)
+        logger.info("File deleted")
+    except Exception as e:
+        logger.exception("Failure while cached file: {}".format(str(e)))
+    ssh.close()
 
 class Opennebula():
     """
@@ -96,7 +114,7 @@ class Opennebula():
             session="{0}:{1}".format(username, password)
             )
 
-    def create_project(self, conn, name, description="Katana Slice Project"):
+    def create_project(self, conn, name, description=""):
         """
         Creates a new OpenNebula group
         """
@@ -116,7 +134,7 @@ class Opennebula():
         Creates the security group to be assigned to the new tenant
         """
         sec_group = conn.create_security_group(
-            name=name, description="Katana Security Group",
+            name=name, description="Security Group",
             project_id=project.id)
         conn.create_security_group_rule(sec_group)
         return sec_group
@@ -260,8 +278,9 @@ class Opennebula():
             # creation of the image template and registration
             template='''\nNAME="%s"\nSOURCE="%s"\nTYPE="%s"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
                      (name, source, image_type, description, size*3)
-            logger.info("template: ", template)
+            logger.debug("template: {}".format(template))
             r = conn.image.allocate(template,dsid)
+            delete_remote_file(server_ip, server_username, server_password, str(image_dir + f.filename), ssh_port)
         except Exception as e:
             logger.exception("Failed uploading image: {}".format(str(e)))
 

@@ -201,7 +201,8 @@ def onboard_vim_image():
 
         checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
         if len(list(vim.find({'checksum': checksum}))) > 0:
-            return jsonify({'status': 'Image already exists in ' + vim_id + ' With image name "'
+            logger.info("Image '{}' already exists in {}".format(list(vim.find({'checksum': checksum}))[0].get('name'), vim_id))
+            return jsonify({'status': 'Image already exists in ' + vim_id + ' with image name "'
                                       + list(vim.find({'checksum': checksum}))[0].get('name') + '"'}), 400
         else:
 
@@ -216,14 +217,17 @@ def onboard_vim_image():
             else:
                 raise Exception('VIM not supported: {}'.format(conf["VIM"][vim_id]['TYPE']))
 
+            logger.debug("Deleting temporary image")
             os.remove(file.filename)
 
     except AttributeError as ve:
         logger.error("Problem while getting the image file: {}".format(str(ve)))
         return jsonify({"detail": str(ve), "code": "UNPROCESSABLE_ENTITY", "status": 422}), 422
     except Exception as e:
+        logger.error("Problem while uploading the image file: {}".format(str(e)))
         return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400
     try:
+        logger.info("Image uploaded successfully")
         return jsonify({"status": "updated"}), 201
     finally:
         filename_without_extension, file_extension = os.path.splitext(file.filename)
@@ -250,20 +254,12 @@ def openstack_upload_image(vim_id, file, container_format):
 
 
 def opennebula_upload_image(vim_id, file, container_format):
+    #one_conf = ConfigObj('ONE.conf')
     vim_conf = conf["VIM"][vim_id]
-    filename_without_extension, file_extension = os.path.splitext(file.filename)
-    traductor = {
-        '.qcow2': 'qcow2',
-        '.img': 'qcow2',
-        '.iso': 'iso',
-        '.ova': 'ova',
-        '.vhd': 'vhd'
-    }
-    disk_format = traductor[file_extension]
 
     r = oneUtils.upload_image(auth_url=vim_conf["AUTH_URL"], one_username=vim_conf["USER"], one_password=vim_conf["PASSWORD"], \
-                              f=file, server_ip="192.168.33.112", server_username="test", server_password="test", \
-                              image_dir="/home/test/")
+                              f=file, server_ip=vim_conf["IP"], server_username=vim_conf["SERVER_USER"], \
+                              server_password=vim_conf["SERVER_PASS"], image_dir=vim_conf["FOLDER"])
     return r
 
 @app.route('/vims', methods=['GET'])
