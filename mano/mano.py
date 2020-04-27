@@ -6,6 +6,7 @@ from utils import init_directory, str_to_bool
 import requests
 from pymongo import MongoClient
 from libs.openstack_util import OSUtils as osUtils
+from libs.opennebula_util import Opennebula as oneUtils
 import os
 from gevent.pywsgi import WSGIServer
 import logging
@@ -200,7 +201,8 @@ def onboard_vim_image():
 
         checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
         if len(list(vim.find({'checksum': checksum}))) > 0:
-            return jsonify({'status': 'Image already exists in ' + vim_id + ' With image name "'
+            logger.info("Image '{}' already exists in {}".format(list(vim.find({'checksum': checksum}))[0].get('name'), vim_id))
+            return jsonify({'status': 'Image already exists in ' + vim_id + ' with image name "'
                                       + list(vim.find({'checksum': checksum}))[0].get('name') + '"'}), 400
         else:
 
@@ -208,17 +210,24 @@ def onboard_vim_image():
             file.save(file.filename)
             # Write package file to static directory and validate it
             logger.debug("Saving temporary VIM")
-            if conf["VIM"][vim_id]['TYPE']:
+            if str(conf["VIM"][vim_id]['TYPE']) == "openstack":
                 r = openstack_upload_image(vim_id, file, container_format)
+            elif str(conf["VIM"][vim_id]['TYPE']) == "opennebula":
+                r = opennebula_upload_image(vim_id, file, container_format)
+            else:
+                raise Exception('VIM not supported: {}'.format(conf["VIM"][vim_id]['TYPE']))
 
+            logger.debug("Deleting temporary image")
             os.remove(file.filename)
 
     except AttributeError as ve:
         logger.error("Problem while getting the image file: {}".format(str(ve)))
         return jsonify({"detail": str(ve), "code": "UNPROCESSABLE_ENTITY", "status": 422}), 422
     except Exception as e:
+        logger.error("Problem while uploading the image file: {}".format(str(e)))
         return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400
     try:
+        logger.info("Image uploaded successfully")
         return jsonify({"status": "updated"}), 201
     finally:
         filename_without_extension, file_extension = os.path.splitext(file.filename)
@@ -243,6 +252,15 @@ def openstack_upload_image(vim_id, file, container_format):
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
     return r
 
+
+def opennebula_upload_image(vim_id, file, container_format):
+    #one_conf = ConfigObj('ONE.conf')
+    vim_conf = conf["VIM"][vim_id]
+
+    r = oneUtils.upload_image(auth_url=vim_conf["AUTH_URL"], one_username=vim_conf["USER"], one_password=vim_conf["PASSWORD"], \
+                              f=file, server_ip=vim_conf["IP"], server_username=vim_conf["SERVER_USER"], \
+                              server_password=vim_conf["SERVER_PASS"], image_dir=vim_conf["FOLDER"])
+    return r
 
 @app.route('/vims', methods=['GET'])
 def get_vims():
