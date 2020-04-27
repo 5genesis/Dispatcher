@@ -206,6 +206,7 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Versioning
+- 2.6.3 - Support for OpenNebula VIM to upload images
 - 2.6.2 - New validation based on Image dependency for VNFs
 - 2.6.1 - NSDs and VNFs More metadata added
 - 2.6.0 - NSDs and VNFs Repository added with updated validation filter
