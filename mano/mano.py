@@ -6,6 +6,7 @@ from utils import init_directory, str_to_bool
 import requests
 from pymongo import MongoClient
 from libs.openstack_util import OSUtils as osUtils
+from libs.osm_nbi_util import NbiUtil as osmUtils
 import os
 from gevent.pywsgi import WSGIServer
 import logging
@@ -159,9 +160,9 @@ def nsd():
                                  final_path + '/' + fields.get('id') + "-" + fields.get('version') + '.tar.gz')  # VNF
                         yaml.dump(fields, open(final_path + '/' + 'metadata.yaml', 'w'))  # metadata
                         index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-                        index['nsd_packages'][fields.get('id')][fields.get('version')] = data_ind
-                        if version.parse(index['nsd_packages'][fields.get('id')]['latest'])< version.parse(fields.get('version')):
-                            index['nsd_packages'][fields.get('id')]['latest'] = fields.get('version')
+                        index['ns_packages'][fields.get('id')][fields.get('version')] = data_ind
+                        if version.parse(index['ns_packages'][fields.get('id')]['latest'])< version.parse(fields.get('version')):
+                            index['ns_packages'][fields.get('id')]['latest'] = fields.get('version')
                         yaml.dump(index, open('/repository/index.yaml', 'w'))  # metadata
                         files_uploaded[filename] = 'NSD version added'
                 else:
@@ -171,8 +172,8 @@ def nsd():
                              final_path + '/' + fields.get('id') + "-" + fields.get('version') + '.tar.gz')  # VNF
                     yaml.dump(fields, open(final_path + '/' + 'metadata.yaml', 'w'))  # metadata
                     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-                    index['nsd_packages'][fields.get('id')] = {fields.get('version'): data_ind}
-                    index['nsd_packages'][fields.get('id')]['latest'] = fields.get('version')
+                    index['ns_packages'][fields.get('id')] = {fields.get('version'): data_ind}
+                    index['ns_packages'][fields.get('id')]['latest'] = fields.get('version')
                     yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))  # metadata
                     files_uploaded[filename] = 'NSD added'
             os.remove(filename)
@@ -184,6 +185,7 @@ def nsd():
     except Exception as e:
         return jsonify({'error': str(e), 'NSs': files_uploaded}), 400
 
+def upload_ns(new_version):
 
 @app.route('/image', methods=['POST'])
 def onboard_vim_image():
@@ -229,7 +231,7 @@ def openstack_upload_image(vim_id, file, container_format):
     vim_conf = conf["VIM"][vim_id]
     filename_without_extension, file_extension = os.path.splitext(file.filename)
     traductor = {
-        '.qcow2': 'qcow2',
+         '.qcow2': 'qcow2',
         '.img': 'qcow2',
         '.iso': 'iso',
         '.ova': 'ova',
@@ -266,16 +268,53 @@ def get_vims():
 @app.route('/nsd', methods=['GET'])
 def list_nsd():
     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-    return jsonify(index['nsd_packages']), 200
+    return jsonify(list(index['ns_packages'].keys())), 200
 
 
 @app.route('/vnfd', methods=['GET'])
 def list_vnf():
     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-    return jsonify(index['vnf_packages']), 200
+    return jsonify(list(index['vnf_packages'].keys())), 200
+
+
+@app.route('/onboard_ns', methods=['POST'])
+def onboard_ns():
+    try:
+        r = {'detail': 'no detail'}
+        ns = request.form.get('ns')
+        if not ns:
+            return jsonify({'result' : 'argument ns in form is required'}), 404
+        index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
+        if ns not in index['ns_packages'].keys():
+            return jsonify({'result': '{} Network Service not found'.format(ns)}), 404
+        latest = index['ns_packages'][ns]['latest']
+        ns_metadata = yaml.load(open(os.path.join('/repository', 'ns', ns, latest, 'metadata.yaml')), Loader=yaml.FullLoader)
+        vnf_dependencies = ns_metadata['vnfd-id-ref']
+        for vnf_dependency in vnf_dependencies:
+            vnf = index['vnf_packages'][vnf_dependency]
+            vnf_path = '/repository/' + vnf[vnf['latest']]['path']
+            r, status_code = nbiUtil.upload_vnfd_package(vnf_path)
+            if status_code >= 300:
+                if not 'exists' in str(r):
+                    raise Exception("VNF '{}' can not be onboarded".format(vnf_dependency))
+        ns_package = '/repository/' + index['ns_packages'][ns][index['ns_packages'][ns]['latest']]['path']
+        r, status_code = nbiUtil.upload_nsd_package(ns_package)
+        if status_code >= 300:
+
+            raise Exception("NS '{}' can not be onboarded".format(vnf_dependency))
+    except Exception as e:
+        return jsonify({'result': str(e), 'detail': str(e), 'detail': r['detail'], 'status': 400}), 400
+    return jsonify(r), status_code
 
 if __name__ == '__main__':
     init_directory()
     conf = ConfigObj('mano.conf')
+    if conf["NFVO"]["TYPE"] == "OSM":
+        nbiUtil = osmUtils(osm_ip=conf["NFVO"]["IP"], username=conf["NFVO"]["USER"], password=conf["NFVO"]["PASSWORD"],
+                           vim_account_id=None)
+    else:
+        logger.error("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
+        raise KeyError("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
+    # app.run(host='0.0.0.0', debug=True)
     http_server = WSGIServer(('', 5101), app)
     http_server.serve_forever()

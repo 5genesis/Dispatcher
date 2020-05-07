@@ -326,9 +326,9 @@ class NbiUtil():
         """
 
         #print("INFO - Uploading VNFD: ", file.filename)
-        if not os.path.exists(file.filename):
-            return {"detail": "File '{}' does not exist".format(file.filename), "status": 404, "code": "NOT_FOUND"}, 404 
-        data = open(file.filename, 'rb').read()
+        if not os.path.exists(file):
+            return {"detail": "File '{}' does not exist".format(file), "status": 404, "code": "NOT_FOUND"}, 404
+        data = open(file, 'rb').read()
 
         vnfd_url = "{0}/vnfpkgm/v1/vnf_packages_content".format(self.osm_nbi_url)
 
@@ -437,9 +437,9 @@ class NbiUtil():
         """
 
         #print("INFO - Uploading NSD: ", file.filename)
-        if not os.path.exists(file.filename):
-            return "File '{}' does not exist".format(file.filename), 404
-        data = open(file.filename, 'rb').read()
+        if not os.path.exists(file):
+            return "File '{}' does not exist".format(file), 404
+        data = open(file, 'rb').read()
 
         nsd_url = "{0}/nsd/v1/ns_descriptors_content".format(self.osm_nbi_url)
 
