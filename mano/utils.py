@@ -17,7 +17,7 @@ def current_datatime():
 
 
 def str_to_bool(string):
-    if str(string).lower() in ['true', '1', 't', 'y', 'yes', 'public']:
+    if str(string).lower() in [1, 'true', '1', 't', 'y', 'yes', 'public']:
         return True
     return False
 
