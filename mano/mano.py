@@ -325,8 +325,11 @@ def delete_nsd(nsdId):
         if user != ns_metadata['user']:
             raise Exception('User {} have not uploaded this Network Service. This user has not permissions for deleting'
                             ' this'.format(user))
-        ns_id = dbclient['onboarded']['ns'].find_one({'ns': nsdId}).get('nsid')
-        nbiUtil.delete_nsd(ns_id)
+
+        ns_id = dbclient['onboarded']['ns'].find_one({'ns': nsdId})
+        if ns_id:
+            nbiUtil.delete_nsd(ns_id.get('nsid'))
+
         logger.info('NS {} deleted in OSM'.format(nsdId))
         if all or len(ns) == 2:
             del index['ns_packages'][nsdId]
