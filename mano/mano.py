@@ -266,7 +266,7 @@ def list_vnf():
     return jsonify(list(index['vnf_packages'].keys())), 200
 
 
-@app.route('/onboard_ns', methods=['POST'])
+@app.route('/onboard', methods=['POST'])
 def onboard_ns():
     try:
         r = {'detail': 'no detail'}

@@ -183,10 +183,10 @@ The metadata.yaml looks like:
 
 The data composed with the VNFD specification and some parameters provided by the open APIs.
 
-## Mano onboarding flow 
+## Mano Indexing flow 
 The mano microservice is in charge of validating all the artifacts for the NS onboarding (Images, VNFDs & NSDs). 
 The following flow explains how this component analyze the current resources available and validate the new ingestion of each artifact.
-![Mano Flow](./images/mano-flow.png)
+![Mano Flow](./mano/images/mano-flow.png)
 
 
 ## Logging
