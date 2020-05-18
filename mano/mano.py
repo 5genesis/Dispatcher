@@ -375,5 +375,12 @@ def delete_nsd(nsdId):
 if __name__ == '__main__':
     init_directory()
     conf = ConfigObj('mano.conf')
+    if conf["NFVO"]["TYPE"] == "OSM":
+        nbiUtil = osmUtils(osm_ip=conf["NFVO"]["IP"], username=conf["NFVO"]["USER"], password=conf["NFVO"]["PASSWORD"],
+                           vim_account_id=None)
+    else:
+        logger.error("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
+        raise KeyError("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
+    # app.run(host='0.0.0.0', debug=True)
     http_server = WSGIServer(('', 5101), app)
     http_server.serve_forever()

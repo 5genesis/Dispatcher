@@ -50,6 +50,10 @@ openstacksdk==0.38.0
 configobj==5.0.6
 jsonschema==2.6.0
 packaging==20.3
+pyone==5.10.4
+paramiko==2.6.0
+scp==0.13.2
+
 ``` 
 ## File Structure
 ``` 
@@ -81,20 +85,23 @@ Modify the file `mano.conf` to adapt it to your testbed needs, with **one** NFVO
 
     [VIM]
     [[vim-1-name]]
-        TYPE=<type of VIM. Currently only 'openstack' is supported>
-        LOCATION=<Location of the VIM: [core|edge]>
-        AUTH_URL=<VIM 1 auth URL>
-        USER=<VIM username>
-        PASSWORD=<VIM username password>
-        PROJECT=<VIM project>
+      TYPE=<Type of VIM: [openstack|opennebula]>
+      LOCATION=<Location of the VIM: [core|edge]>
+      AUTH_URL=<VIM 1 auth URL>
+      USER=<VIM username>
+      PASSWORD=<VIM username password>
+      PROJECT=<VIM project>
     [[vim-2-name]]
-        TYPE=<type of VIM. Currently only 'openstack' is supported>
-        LOCATION=<Location of the VIM: [core|edge]>
-        AUTH_URL=<VIM 2 auth URL>
-        USER=<VIM 2 username>
-        PASSWORD=<VIM 2 username password>
-        PROJECT=<VIM 2 project>
-    ...
+      TYPE=<Type of VIM: [openstack|opennebula]>
+      LOCATION=<Location of the VIM: [core|edge]>
+      AUTH_URL=<VIM 2 auth URL>
+      USER=<VIM 2 username>
+      PASSWORD=<VIM 2 username password>
+      #Note: if the VIM type is opennebula, the following fields are required
+      IP=<IP of the images server>
+      SERVER_USER=<SSH user with write permissions in the images folder>
+      SERVER_PASS=<Password matching the SSH user>
+      FOLDER=<Folder where the images must be uploaded ending with "/">
 
 #### Example
 
