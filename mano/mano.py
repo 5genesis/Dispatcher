@@ -7,6 +7,7 @@ import requests
 from pymongo import MongoClient
 from libs.openstack_util import OSUtils as osUtils
 from libs.osm_nbi_util import NbiUtil as osmUtils
+from libs.opennebula_util import Opennebula as oneUtils
 import os
 from gevent.pywsgi import WSGIServer
 import logging
@@ -52,6 +53,7 @@ def vnfds():
             logger.debug('Saving temporary VNFD')
             upload.save(filename)
             res, code, fields = validate_zip(filename, vnfd_schema, type='vnf')
+
             if code != 200:
                 global_code = 400
                 files_uploaded[filename] = res
@@ -64,6 +66,7 @@ def vnfds():
                     else:
                         os.mkdir(final_path)
                         index_vnf(fields, filename, final_path, new_version=True)
+
                         files_uploaded[filename] = 'VNF version added'
                 else:
                     os.mkdir("/repository/vnf/" + fields.get('id'))
@@ -76,6 +79,7 @@ def vnfds():
         return jsonify({'VNFs': files_uploaded}), 200
     except Exception as e:
         return jsonify({'error': str(e), 'VNFs': files_uploaded}), 400
+
 
 
 def index_vnf(fields, filename, final_path, new_version):
@@ -191,24 +195,37 @@ def onboard_vim_image():
         vim_id = request.form.get('vim_id')
         container_format = request.form.get('container_format', 'bare')
         vim = dbclient["images"][vim_id]
+        # Save file to static directory and validate it
+
         checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
         if len(list(vim.find({'checksum': checksum}))) > 0:
-            return jsonify({'status': 'Image already exists in ' + vim_id + ' With image name "'
+            logger.info("Image '{}' already exists in {}".format(list(vim.find({'checksum': checksum}))[0].get('name'), vim_id))
+            return jsonify({'status': 'Image already exists in ' + vim_id + ' with image name "'
                                       + list(vim.find({'checksum': checksum}))[0].get('name') + '"'}), 400
         else:
+
             file = request.files.get("file")
             file.save(file.filename)
+            # Write package file to static directory and validate it
             logger.debug("Saving temporary VIM")
-            if conf["VIM"][vim_id]['TYPE']:
+            if str(conf["VIM"][vim_id]['TYPE']) == "openstack":
                 r = openstack_upload_image(vim_id, file, container_format)
+            elif str(conf["VIM"][vim_id]['TYPE']) == "opennebula":
+                r = opennebula_upload_image(vim_id, file, container_format)
+            else:
+                raise Exception('VIM not supported: {}'.format(conf["VIM"][vim_id]['TYPE']))
+
+            logger.debug("Deleting temporary image")
             os.remove(file.filename)
 
     except AttributeError as ve:
         logger.error("Problem while getting the image file: {}".format(str(ve)))
         return jsonify({"detail": str(ve), "code": "UNPROCESSABLE_ENTITY", "status": 422}), 422
     except Exception as e:
+        logger.error("Problem while uploading the image file: {}".format(str(e)))
         return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400
     try:
+        logger.info("Image uploaded successfully")
         return jsonify({"status": "updated"}), 201
     finally:
         filename_without_extension, file_extension = os.path.splitext(file.filename)
@@ -233,6 +250,15 @@ def openstack_upload_image(vim_id, file, container_format):
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
     return r
 
+
+def opennebula_upload_image(vim_id, file, container_format):
+    #one_conf = ConfigObj('ONE.conf')
+    vim_conf = conf["VIM"][vim_id]
+
+    r = oneUtils.upload_image(auth_url=vim_conf["AUTH_URL"], one_username=vim_conf["USER"], one_password=vim_conf["PASSWORD"], \
+                              f=file, server_ip=vim_conf["IP"], server_username=vim_conf["SERVER_USER"], \
+                              server_password=vim_conf["SERVER_PASS"], image_dir=vim_conf["FOLDER"])
+    return r
 
 @app.route('/vims', methods=['GET'])
 def get_vims():
@@ -349,11 +375,5 @@ def delete_nsd(nsdId):
 if __name__ == '__main__':
     init_directory()
     conf = ConfigObj('mano.conf')
-    if conf["NFVO"]["TYPE"] == "OSM":
-        nbiUtil = osmUtils(osm_ip=conf["NFVO"]["IP"], username=conf["NFVO"]["USER"], password=conf["NFVO"]["PASSWORD"],
-                           vim_account_id=None)
-    else:
-        logger.error("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
-        raise KeyError("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
     http_server = WSGIServer(('', 5101), app)
     http_server.serve_forever()

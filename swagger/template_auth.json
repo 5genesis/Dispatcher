@@ -289,6 +289,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
+                "type": "object",
                 "required": [
                   "file",
                   "vim_id"
@@ -296,22 +297,18 @@
                 "properties": {
                   "file": {
                     "type": "string",
-                    "description": "Image file",
                     "format": "binary"
                   },
                   "vim_id": {
-                    "type": "string",
-                    "description": "VIM where do you want to onboard the image"
+                    "type": "string"
                   },
                   "container_format": {
-                    "type": "string",
-                    "description": "Container format: bare"
+                    "type": "string"
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -445,6 +442,9 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "ns"
+                ],
                 "properties": {
                   "ns": {
                     "type": "string",
@@ -621,21 +621,21 @@
         "operationId": "ChangePassword",
         "requestBody": {
           "content": {
-            "application/x-www-form-urlencoded": {
+            "multipart/form-data": {
               "schema": {
+                "type": "object",
                 "required": [
                   "password"
                 ],
                 "properties": {
                   "password": {
                     "type": "string",
-                    "description": ""
+                    "example": "user-pass"
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -681,31 +681,31 @@
         "operationId": "RegisterUser",
         "requestBody": {
           "content": {
-            "application/x-www-form-urlencoded": {
+            "multipart/form-data": {
               "schema": {
+                "type": "object",
                 "required": [
-                  "email",
                   "password",
-                  "username"
+                  "username",
+                  "email"
                 ],
                 "properties": {
-                  "password": {
-                    "type": "string",
-                    "description": ""
-                  },
                   "username": {
                     "type": "string",
-                    "description": ""
+                    "example": "user"
                   },
                   "email": {
                     "type": "string",
-                    "description": ""
+                    "example": "user-email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "user-pass"
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -742,21 +742,21 @@
         "operationId": "RecoverPassword",
         "requestBody": {
           "content": {
-            "application/x-www-form-urlencoded": {
+            "multipart/form-data": {
               "schema": {
+                "type": "object",
                 "required": [
                   "email"
                 ],
                 "properties": {
                   "email": {
                     "type": "string",
-                    "description": ""
+                    "example": "user-email"
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -1023,21 +1023,20 @@
         "operationId": "RegisterPlatform",
         "requestBody": {
           "content": {
-            "application/x-www-form-urlencoded": {
+            "multipart/form-data": {
               "schema": {
+                "type": "object",
                 "required": [
                   "ip"
                 ],
                 "properties": {
                   "ip": {
-                    "type": "string",
-                    "description": "IP of the platform allowed to use the "
+                    "type": "string"
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {

@@ -25,6 +25,7 @@ services:
       - MONGODB_DATABASE=PlatformsDB
       - MONGODB_DATABASE=images
       - MONGODB_DATABASE=onboarded
+
       #- MONGO_INITDB_ROOT_USERNAME=5genesis
       #- MONGO_INITDB_ROOT_PASSWORD=5genesisPASS
     volumes:

@@ -106,7 +106,6 @@ Modify the file `mano.conf` to adapt it to your testbed needs, with **one** NFVO
     
     [VIM]
     [[malaga-core]]
-        NAME=malaga-core
         TYPE=openstack
         LOCATION=core
         AUTH_URL=http://192.168.33.11:5000/v3
