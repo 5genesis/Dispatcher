@@ -1,31 +1,1440 @@
 {
-  "openapi": "3.0.1",
+  "swagger": "2.0",
   "info": {
+    "version": "2.6.3",
     "title": "5GENESIS Dispatcher Swagger",
     "description": "Swagger 5GENESIS Dispatcher",
-    "termsOfService": "http://swagger.io/terms/",
     "contact": {
       "email": "luis.gomez.external@atos.net"
-    },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    },
-    "version": "2.6.3"
+    }
   },
-  "externalDocs": {
-    "description": "Find out more about Swagger",
-    "url": "http://swagger.io"
+  "host": "10.0.2.15:8082",
+  "basePath": "/",
+  "securityDefinitions": {
+    "auth": {
+      "type": "basic"
+    }
   },
-  "servers": [
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/mano/vnfd": {
+      "post": {
+        "description": "This request accepts 1 to many VNFs files. The file first is validated with the images dependencies and syntactic analysis.",
+        "summary": "addVNFD",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "addVNFD",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "visibility",
+            "in": "formData",
+            "required": false,
+            "type": "boolean",
+            "description": ""
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "required": false,
+            "type": "file",
+            "format": "file",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "VNFs Added",
+            "schema": {
+              "$ref": "#/definitions/ManoVnfdResponse"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "VNFs not uploaded",
+            "schema": {
+              "$ref": "#/definitions/ManoVnfdResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      },
+      "get": {
+        "description": "This request list all the VNFDs located in the repository.",
+        "summary": "ListVNFDs",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "ListVNFDs",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of VNFDs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/mano/nsd": {
+      "post": {
+        "description": "This request accepts 1 NS file. The file first is validated with the VNFDs dependencies and syntactic analysis.",
+        "summary": "addNSD",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "addNSD",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "visibility",
+            "in": "formData",
+            "required": false,
+            "type": "boolean",
+            "description": ""
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "required": false,
+            "type": "file",
+            "format": "file",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "NSs uploaded",
+            "schema": {
+              "$ref": "#/definitions/ManoNsdResponse"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "NSs not uploaded",
+            "schema": {
+              "$ref": "#/definitions/ManoNsdResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      },
+      "get": {
+        "description": "This request list all the NSDs located in the repository.",
+        "summary": "ListNSD",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "ListNSD",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of NSDs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/mano/image": {
+      "post": {
+        "description": "Upload an image file in the VIM",
+        "summary": "addImage",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "addImage",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "format": "file",
+            "description": ""
+          },
+          {
+            "name": "vim_id",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "container_format",
+            "in": "formData",
+            "required": false,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image uploaded. Image status: active",
+            "schema": {
+              "$ref": "#/definitions/ManoImageResponse"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Invalid permission",
+            "schema": {
+              "$ref": "#/definitions/ManoVims400Error"
+            }
+          },
+          "422": {
+            "description": "Image file not in the request or request badly formed",
+            "schema": {
+              "$ref": "#/definitions/ManoVims400Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Service is not accessible",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/mano/vims": {
+      "get": {
+        "description": "Retrieves the list of registered VIMs in the mano.conf file",
+        "summary": "getVIMs",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "getVIMs",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of VIMs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Vim"
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/ManoVims400Error"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          }
+        }
+      }
+    },
+    "/mano/onboard": {
+      "post": {
+        "description": "Onboard one NS and their dependencies (VNFs) from the repository to OSM",
+        "summary": "OnboardNS",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "OnboardNS",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ns Onboarded",
+            "schema": {
+              "$ref": "#/definitions/ManoOnboardResponse"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Ns not Onboarded",
+            "schema": {
+              "$ref": "#/definitions/ManoOnboard400Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/mano/nsd/{nsdId}": {
+      "delete": {
+        "description": "Deletes an NSD by _ID",
+        "summary": "deleteNSD",
+        "tags": [
+          "MANO"
+        ],
+        "operationId": "deleteNSD",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "nsdId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "NSD id to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "NSD successfully deleted",
+            "headers": {}
+          },
+          "400": {
+            "description": "Invalid NS _ID supplied",
+            "schema": {
+              "$ref": "#/definitions/ManoNsd400Error1"
+            }
+          }
+        }
+      }
+    },
+    "/auth/get_token": {
+      "get": {
+        "description": "Proccess for obtain the user token from a Basic Auth",
+        "summary": "Gettoken",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Gettoken",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Access token",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/auth/change_password": {
+      "put": {
+        "description": "Process for changing the password",
+        "summary": "ChangePassword",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "ChangePassword",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password change message",
+            "schema": {
+              "$ref": "#/definitions/AuthMsg"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "Register user in the platform",
+        "summary": "RegisterUser",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RegisterUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful registration",
+            "schema": {
+              "$ref": "#/definitions/AuthMsg"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          }
+        }
+      }
+    },
+    "/auth/recover_password": {
+      "put": {
+        "description": "Process for recovering the password by email",
+        "summary": "RecoverPassword",
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "RecoverPassword",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New password has been sent to your email",
+            "schema": {
+              "$ref": "#/definitions/AuthMsg"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/auth/show_users": {
+      "get": {
+        "description": "Show all the current users in the platform",
+        "summary": "ShowUsers",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ShowUsers",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of registered users - traces on verbose mode",
+            "schema": {
+              "$ref": "#/definitions/AuthUsers"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "500": {
+            "description": "Internal server error - Network problems or Auth not included",
+            "schema": {}
+          }
+        }
+      }
+    },
+    "/auth/validate_user/{username}": {
+      "put": {
+        "description": "Manual validation of a user after the resgistration form",
+        "summary": "ValidateUser",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ValidateUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Changes applied - user validated",
+            "schema": {
+              "$ref": "#/definitions/AuthMsg"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          }
+        }
+      }
+    },
+    "/auth/drop_db": {
+      "delete": {
+        "description": "Drop operation for users DB",
+        "summary": "DropDB",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DropDB",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User database dropped",
+            "schema": {
+              "$ref": "#/definitions/AuthMsg"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          }
+        }
+      }
+    },
+    "/auth/delete_user/{username}": {
+      "delete": {
+        "description": "Deletes a user from the DB",
+        "summary": "DeleteUser",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DeleteUser",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User removed",
+            "schema": {
+              "$ref": "#/definitions/AuthMsg"
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "Auth error",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          }
+        }
+      }
+    },
+    "/auth/register_platform_in_platform": {
+      "post": {
+        "description": "Registrer this current platform in another platfom for allowing distribute experiments",
+        "summary": "RegisterPlatform",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "RegisterPlatform",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/show_platforms": {
+      "get": {
+        "description": "Show all the current platforms in the System",
+        "summary": "ShowPlatforms",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ShowPlatforms",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "activated",
+            "in": "query",
+            "required": true,
+            "type": "boolean",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/auth/validate_platform/{platform_name}": {
+      "put": {
+        "description": "Validate a specific platform in this current platform",
+        "summary": "ValidatePlatform",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "ValidatePlatform",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "platform_name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/delete_platform/{platformName}": {
+      "delete": {
+        "description": "Delete a specific Platform",
+        "summary": "DeletePlatform",
+        "tags": [
+          "Auth: Admin Functions"
+        ],
+        "operationId": "DeletePlatform",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "platformName",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/distributor/ed": {
+      "get": {
+        "tags": [
+          "Distributor"
+        ],
+        "summary": "List registered Experiment descriptors",
+        "description": "",
+        "operationId": "listED",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/distributor/ed/{exp_id}": {
+      "get": {
+        "tags": [
+          "Distributor"
+        ],
+        "summary": "List a specific Experiment descriptor",
+        "description": "",
+        "operationId": "getED",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "exp_id",
+            "in": "path",
+            "description": "_id of the experiment descriptor",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/Mongo_experiment_descriptor"
+            }
+          },
+          "400": {
+            "description": "Problem while retrieving the experiment",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "404": {
+            "description": "Descriptor not found in the database",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/distributor/validate/ed": {
+      "post": {
+        "tags": [
+          "Distributor"
+        ],
+        "summary": "Validate Experiment descriptor",
+        "description": "",
+        "operationId": "validateED",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Experiment descriptor in JSON format",
+            "schema": {
+              "$ref": "#/definitions/Experiment_descriptor"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful validation",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "400": {
+            "description": "Entry badly formed",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/distributor/create/ed": {
+      "post": {
+        "tags": [
+          "Distributor"
+        ],
+        "summary": "Validate Experiment descriptor, send it to the ELCM and store is in the internal database",
+        "description": "",
+        "operationId": "onboardED",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Experiment descriptor in JSON format",
+            "schema": {
+              "$ref": "#/definitions/Experiment_descriptor"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful validation. Returns the _id of the inserted experiment",
+            "schema": {
+              "$ref": "#/definitions/Object_id"
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Vim": {
+      "title": "Vim",
+      "type": "object",
+      "properties": {
+        "name": {
+          "example": "malagacore",
+          "type": "string"
+        },
+        "type": {
+          "example": "openstack",
+          "type": "string"
+        },
+        "location": {
+          "example": "core",
+          "type": "string"
+        }
+      }
+    },
+    "Token": {
+      "title": "Token",
+      "type": "object",
+      "properties": {
+        "result": {
+          "example": "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.oqf4Xejq32YuFxu6FoYyv-ZQnEe0Wxt-VW2yqt-Db2PlX44CZN_H-_2Ku40OHq0000ATo2SPWlbT5g6moNiDgO",
+          "type": "string"
+        }
+      }
+    },
+    "AuthMsg": {
+      "title": "AuthMsg",
+      "type": "object",
+      "properties": {
+        "result": {
+          "example": "Not valid token given",
+          "type": "string"
+        }
+      }
+    },
+    "AuthUsers": {
+      "title": "AuthUsers",
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/Result"
+        }
+      }
+    },
+    "ManoImageResponse": {
+      "title": "ManoImageResponse",
+      "type": "object",
+      "properties": {
+        "status": {
+          "example": "updated",
+          "type": "string"
+        }
+      }
+    },
+    "ManoNsd400Error1": {
+      "title": "ManoNsd400Error1",
+      "type": "object",
+      "properties": {
+        "detail": {
+          "example": "<SPECIFIC_ERROR_MESAGE>",
+          "type": "string"
+        },
+        "code": {
+          "example": "<Error Type>",
+          "type": "string"
+        },
+        "status": {
+          "example": 400,
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "ManoNsdResponse": {
+      "title": "ManoNsdResponse",
+      "type": "object",
+      "properties": {
+        "NSs": {
+          "$ref": "#/definitions/NSs"
+        }
+      }
+    },
+    "ManoOnboard400Error": {
+      "title": "ManoOnboard400Error",
+      "type": "object",
+      "properties": {
+        "detail": {
+          "example": "<Error>",
+          "type": "string"
+        },
+        "status": {
+          "example": 400,
+          "type": "integer",
+          "format": "int32"
+        },
+        "result": {
+          "example": "NS hackfest-ns can not be onboarded",
+          "type": "string"
+        }
+      }
+    },
+    "ManoOnboardResponse": {
+      "title": "ManoOnboardResponse",
+      "type": "object",
+      "properties": {
+        "id": {
+          "example": "193n4h-2j3i2n2-k1jndi2-i2o3n3u2",
+          "type": "string"
+        }
+      }
+    },
+    "ManoVims400Error": {
+      "title": "ManoVims400Error",
+      "type": "object",
+      "properties": {
+        "detail": {
+          "example": "<SPECIFIC_ERROR_MESAGE>",
+          "type": "string"
+        }
+      }
+    },
+    "ManoVnfdResponse": {
+      "title": "ManoVnfdResponse",
+      "type": "object",
+      "properties": {
+        "VNFs": {
+          "$ref": "#/definitions/VNFs"
+        }
+      }
+    },
+    "NSs": {
+      "title": "NSs",
+      "type": "object",
+      "properties": {
+        "hackfest_1_nsd_fixed.tar.gz": {
+          "example": "NSD added",
+          "type": "string"
+        }
+      }
+    },
+    "Result": {
+      "title": "Result",
+      "type": "object",
+      "properties": {
+        "usename": {
+          "$ref": "#/definitions/Usename"
+        }
+      }
+    },
+    "Trace": {
+      "title": "Trace",
+      "type": "object",
+      "properties": {
+        "action": {
+          "example": "GetToken",
+          "type": "string"
+        },
+        "date": {
+          "example": "2020-01-09T11:22:32.772Z",
+          "type": "string"
+        }
+      }
+    },
+    "Usename": {
+      "title": "Usename",
+      "type": "object",
+      "properties": {
+        "active": {
+          "type": "boolean"
+        },
+        "deleted": {
+          "example": false,
+          "type": "boolean"
+        },
+        "email": {
+          "example": "5genesismanagement@gmail.com",
+          "type": "string"
+        },
+        "traces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Trace"
+          }
+        }
+      }
+    },
+    "Experiment_descriptor": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "integer",
+          "format": "int64",
+          "example": 123
+        },
+        "Name": {
+          "type": "string",
+          "example": "sfafd"
+        },
+        "User": {
+          "type": "integer",
+          "format": "int64",
+          "example": 12345
+        },
+        "Platform": {
+          "type": "string",
+          "example": "malaga"
+        },
+        "TestCases": {
+          "type": "array",
+          "example": [
+            "TC1",
+            "TC2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "UEs": {
+          "type": "array",
+          "example": [
+            "UE1",
+            "UE2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Slice": {
+          "type": "string",
+          "example": "slice_id"
+        },
+        "NS": {
+          "type": "string",
+          "example": "ns_id"
+        },
+        "NS_Placement": {
+          "type": "string",
+          "example": "Edge"
+        },
+        "Limited": {
+          "type": "boolean",
+          "example": true
+        },
+        "Type_experiment": {
+          "type": "boolean",
+          "example": false
+        },
+        "Scenario": {
+          "type": "array",
+          "example": [
+            "scenario1",
+            "scemarop2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Application": {
+          "type": "array",
+          "example": [
+            "app1"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Attended": {
+          "type": "boolean",
+          "example": true
+        },
+        "Reservation_time": {
+          "type": "integer",
+          "format": "int64",
+          "example": 60
+        }
+      }
+    },
+    "ArrayOfExperiments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Mongo_experiment_descriptor"
+      }
+    },
+    "Mongo_experiment_descriptor": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "5e22e33fc72cffeca34f72a3"
+        },
+        "Id": {
+          "type": "integer",
+          "format": "int64",
+          "example": 123
+        },
+        "Name": {
+          "type": "string",
+          "example": "sfafd"
+        },
+        "User": {
+          "type": "integer",
+          "format": "int64",
+          "example": 12345
+        },
+        "Platform": {
+          "type": "string",
+          "example": "malaga"
+        },
+        "TestCases": {
+          "type": "array",
+          "example": [
+            "TC1",
+            "TC2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "UEs": {
+          "type": "array",
+          "example": [
+            "UE1",
+            "UE2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Slice": {
+          "type": "string",
+          "example": "slice_id"
+        },
+        "NS": {
+          "type": "string",
+          "example": "ns_id"
+        },
+        "NS_Placement": {
+          "type": "string",
+          "example": "Edge"
+        },
+        "Limited": {
+          "type": "boolean",
+          "example": true
+        },
+        "Type_experiment": {
+          "type": "boolean",
+          "example": false
+        },
+        "Scenario": {
+          "type": "array",
+          "example": [
+            "scenario1",
+            "scemarop2"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Application": {
+          "type": "array",
+          "example": [
+            "app1"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "Attended": {
+          "type": "boolean",
+          "example": true
+        },
+        "Reservation_time": {
+          "type": "integer",
+          "format": "int64",
+          "example": 60
+        }
+      }
+    },
+    "ResponseDetails": {
+      "type": "object",
+      "properties": {
+        "detail": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer"
+        },
+        "code": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "detail"
+      ]
+    },
+    "VNFs": {
+      "title": "VNFs",
+      "type": "object",
+      "properties": {
+        "hackfest_1_vnfd_fixed.tar.gz": {
+          "example": "VNF added",
+          "type": "string"
+        }
+      }
+    },
+    "Object_id": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "5e23602463013ef934bff6e5"
+        }
+      }
+    }
+  },
+  "security": [
     {
-      "url": "https://10.0.2.15:8082/"
+      "auth": []
     }
   ],
   "tags": [
     {
       "name": "MANO",
       "description": "MANO OSM Repository and VIM operations"
+    },
+    {
+      "name": "Distributor",
+      "description": "Experiment Descriptor Validator, Creator & Distributor"
     },
     {
       "name": "Auth",
@@ -36,1224 +1445,8 @@
       "description": "Operations for Admin for managing the user Auth"
     }
   ],
-  "paths": {
-    "/mano/vnfd": {
-      "post": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Add a VNFD or new VNFD version to the repository",
-        "description": "This request accepts 1 to many VNFs files. The file first is validated with the images dependencies and syntactic analysis.",
-        "operationId": "addVNFD",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "visibility": {
-                    "type": "boolean"
-                  },
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "VNFs Added",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "VNFs": {
-                      "type": "object",
-                      "properties": {
-                        "hackfest_1_vnfd_fixed.tar.gz": {
-                          "type": "string",
-                          "example": "VNF added"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "VNFs not uploaded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "VNFs": {
-                      "type": "object",
-                      "properties": {
-                        "hackfest_1_vnfd_fixed.tar.gz": {
-                          "type": "string",
-                          "example": "VNFD with this version already exists"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      },
-      "get": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "List VNFDs located in the repository",
-        "description": "This request list all the VNFDs located in the repository.",
-        "operationId": "ListVNFDs",
-        "responses": {
-          "200": {
-            "description": "List of VNFDs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "example": "hackfest-vnf"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      }
-    },
-    "/mano/nsd": {
-      "post": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Add a NSD or new NSD version to the repository",
-        "description": "This request accepts 1 NS file. The file first is validated with the VNFDs dependencies and syntactic analysis.",
-        "operationId": "addNSD",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "visibility": {
-                    "type": "boolean"
-                  },
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "NSs uploaded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "NSs": {
-                      "type": "object",
-                      "properties": {
-                        "hackfest_1_nsd_fixed.tar.gz": {
-                          "type": "string",
-                          "example": "NSD added"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "NSs not uploaded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "NSs": {
-                      "type": "object",
-                      "properties": {
-                        "hackfest_1_nsd_fixed.tar.gz": {
-                          "type": "string",
-                          "example": "NSD with this version already exists"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      },
-      "get": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "List NSDs located in the repository",
-        "description": "This request list all the NSDs located in the repository.",
-        "operationId": "ListNSD",
-        "responses": {
-          "200": {
-            "description": "List of NSDs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "example": "hackfest-ns"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      }
-    },
-    "/mano/image": {
-      "post": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Upload an image file in the VIM",
-        "operationId": "addImage",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "file",
-                  "vim_id"
-                ],
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  },
-                  "vim_id": {
-                    "type": "string"
-                  },
-                  "container_format": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Image uploaded. Image status: active",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "updated"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid permission",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "detail": {
-                      "type": "string",
-                      "example": "<SPECIFIC_ERROR_MESAGE>"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Image file not in the request or request badly formed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "detail": {
-                      "type": "string",
-                      "example": "<SPECIFIC_ERROR_MESAGE>"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Service is not accessible",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      }
-    },
-    "/mano/vims": {
-      "get": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Retrieves the list of registered VIMs in the mano.conf file",
-        "operationId": "getVIMs",
-        "responses": {
-          "200": {
-            "description": "List of VIMs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VimList"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "detail": {
-                      "type": "string",
-                      "example": "<SPECIFIC_ERROR_MESAGE>"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permission",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      }
-    },
-    "/mano/onboard": {
-      "post": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Onboard a NS into OSM",
-        "description": "Onboard one NS and their dependencies (VNFs) from the repository to OSM",
-        "operationId": "OnboardNS",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "ns"
-                ],
-                "properties": {
-                  "ns": {
-                    "type": "string",
-                    "example": "hackfest-ns"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Ns Onboarded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "example": "193n4h-2j3i2n2-k1jndi2-i2o3n3u2"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Ns not Onboarded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "detail": {
-                      "type": "string",
-                      "example": "<Error>"
-                    },
-                    "status": {
-                      "type": "integer",
-                      "example": 400
-                    },
-                    "result": {
-                      "type": "string",
-                      "example": "NS hackfest-ns can not be onboarded"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      }
-    },
-    "/mano/nsd/{nsdId}": {
-      "delete": {
-        "tags": [
-          "MANO"
-        ],
-        "summary": "Deletes an NSD by _ID",
-        "operationId": "deleteNSD",
-        "parameters": [
-          {
-            "name": "nsdId",
-            "in": "path",
-            "description": "NSD id to delete",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "NSD successfully deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "Invalid NS _ID supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "detail": {
-                      "type": "string",
-                      "example": "<SPECIFIC_ERROR_MESAGE>"
-                    },
-                    "code": {
-                      "type": "string",
-                      "example": "<Error Type>"
-                    },
-                    "status": {
-                      "type": "integer",
-                      "example": 400
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ]
-      }
-    },
-    "/auth/get_token": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Get token by Basic Auth",
-        "description": "Proccess for obtain the user token from a Basic Auth",
-        "operationId": "Gettoken",
-        "responses": {
-          "200": {
-            "description": "Access token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Token"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/change_password": {
-      "put": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Change Password",
-        "description": "Process for changing the password",
-        "operationId": "ChangePassword",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "password"
-                ],
-                "properties": {
-                  "password": {
-                    "type": "string",
-                    "example": "user-pass"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Password change message",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/register": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Register User in the platform (But not activated)",
-        "description": "Register user in the platform",
-        "operationId": "RegisterUser",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "password",
-                  "username",
-                  "email"
-                ],
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "user"
-                  },
-                  "email": {
-                    "type": "string",
-                    "example": "user-email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "user-pass"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful registration",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          }
-        },
-        "deprecated": false
-      }
-    },
-    "/auth/recover_password": {
-      "put": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Recover Password by email",
-        "description": "Process for recovering the password by email",
-        "operationId": "RecoverPassword",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "example": "user-email"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "New password has been sent to your email",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems",
-            "content": {}
-          }
-        },
-        "deprecated": false
-      }
-    },
-    "/auth/show_users": {
-      "get": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Show all the users in the platform",
-        "description": "Show all the current users in the platform",
-        "operationId": "ShowUsers",
-        "parameters": [
-          {
-            "name": "verbose",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of registered users - traces on verbose mode",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthUsers"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permission",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthError"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - Network problems or Auth not included",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/validate_user/{username}": {
-      "put": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Validate registered users",
-        "description": "Manual validation of a user after the resgistration form",
-        "operationId": "ValidateUser",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Changes applied - user validated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permission",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthError"
-                }
-              }
-            }
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/drop_db": {
-      "delete": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Drop Users DB",
-        "description": "Drop operation for users DB",
-        "operationId": "DropDB",
-        "responses": {
-          "200": {
-            "description": "User database dropped",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permission",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthError"
-                }
-              }
-            }
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/delete_user/{username}": {
-      "delete": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Delete a specific User",
-        "description": "Deletes a user from the DB",
-        "operationId": "DeleteUser",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User removed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Auth error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthMsg"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid permission",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthError"
-                }
-              }
-            }
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/register_platform_in_platform": {
-      "post": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Register this current Platform in another platform",
-        "description": "Registrer this current platform in another platfom for allowing distribute experiments",
-        "operationId": "RegisterPlatform",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "ip"
-                ],
-                "properties": {
-                  "ip": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/show_platforms": {
-      "get": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Show all the current platforms",
-        "description": "Show all the current platforms in the System",
-        "operationId": "ShowPlatforms",
-        "parameters": [
-          {
-            "name": "activated",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/auth/validate_platform/{platform_name}": {
-      "put": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Validate Platform for distributing experiments",
-        "description": "Validate a specific platform in this current platform",
-        "operationId": "ValidatePlatform",
-        "parameters": [
-          {
-            "name": "platform_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    },
-    "/delete_platform/{platformName}": {
-      "delete": {
-        "tags": [
-          "Auth: Admin Functions"
-        ],
-        "summary": "Delete Platform",
-        "description": "Delete a specific Platform",
-        "operationId": "DeletePlatform",
-        "parameters": [
-          {
-            "name": "platformName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {}
-          }
-        },
-        "deprecated": false,
-        "security": [
-          {
-            "basicAuth": []
-          }
-        ]
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Vim": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "malagacore"
-          },
-          "type": {
-            "type": "string",
-            "example": "openstack"
-          },
-          "location": {
-            "type": "string",
-            "example": "core"
-          }
-        }
-      },
-      "VimList": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/Vim"
-        }
-      },
-      "Token": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "string",
-            "example": "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.oqf4Xejq32YuFxu6FoYyv-ZQnEe0Wxt-VW2yqt-Db2PlX44CZN_H-_2Ku40OHq0000ATo2SPWlbT5g6moNiDgO"
-          }
-        }
-      },
-      "AuthMsg": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "string",
-            "example": "Not valid token given"
-          }
-        }
-      },
-      "AuthError": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "string",
-            "example": "Invalid Permission"
-          }
-        }
-      },
-      "AuthUsers": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "type": "object",
-            "properties": {
-              "usename": {
-                "type": "object",
-                "properties": {
-                  "active": {
-                    "type": "boolean"
-                  },
-                  "deleted": {
-                    "type": "boolean",
-                    "example": false
-                  },
-                  "email": {
-                    "type": "string",
-                    "example": "5genesismanagement@gmail.com"
-                  },
-                  "traces": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "action": {
-                          "type": "string",
-                          "example": "GetToken"
-                        },
-                        "date": {
-                          "type": "string",
-                          "example": "2020-01-09T11:22:32.772Z"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "basicAuth": {
-        "type": "http",
-        "scheme": "basic"
-      },
-      "BearerToken": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header"
-      }
-    }
+  "externalDocs": {
+    "url": "http://swagger.io",
+    "description": "Find out more about Swagger"
   }
 }

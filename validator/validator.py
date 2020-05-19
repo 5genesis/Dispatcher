@@ -157,6 +157,11 @@ def onboard_ed():
         validate = fastjsonschema.compile(ed_schema)
         j = validate(data)
         headers = {'Content-type': 'application/json'}
+        payload = {'ns': data['NS']}
+        r = requests.post('http://mano:5101/onboard', data=payload, headers=headers)
+        if r.status_code > 300:
+            if r.text.find('exists') < 0:
+                raise Exception(r.text)
         r = requests.post(ELCM_ED_POST, data=data, headers=headers)
         _id_json = store_descriptor(data)
     except jsonschema.exceptions.ValidationError as ve:
