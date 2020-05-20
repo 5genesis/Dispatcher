@@ -209,6 +209,7 @@ In case of needing any help, contact the [authors](#authors) for support.
 
 ## Versioning
 
+- 2.7.0 - Introduction of the Distributor/Validator for closing the loop with the Experiment execution
 - 2.6.3 - Support for OpenNebula VIM to upload images
 - 2.6.2 - New validation based on Image dependency for VNFs
 - 2.6.1 - NSDs and VNFs More metadata added
