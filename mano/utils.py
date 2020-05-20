@@ -17,7 +17,7 @@ def current_datatime():
 
 
 def str_to_bool(string):
-    if str(string).lower() in ['true', '1', 't', 'y', 'yes', 'public']:
+    if str(string).lower() in [1, 'true', '1', 't', 'y', 'yes', 'public']:
         return True
     return False
 
@@ -26,6 +26,6 @@ def init_directory():
     if not os.path.isfile('/repository/index.yaml'):
         os.mkdir('/repository/vnf')
         os.mkdir('/repository/ns')
-        index_data = {'apiVersion': 'v1', 'generated': current_datatime(), 'vnf_packages': {}, 'nsd_packages': {}}
+        index_data = {'apiVersion': 'v1', 'generated': current_datatime(), 'vnf_packages': {}, 'ns_packages': {}}
         with open('/repository/index.yaml', 'w') as outfile:
             yaml.dump(index_data, outfile, default_flow_style=False)

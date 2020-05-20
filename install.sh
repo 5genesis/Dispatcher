@@ -186,6 +186,17 @@ while true; do
     esac
 done
 
+# Check the user has configured the validator env file
+while true; do
+    read -p "Have you prepared the Validator environment file in the 'validator' folder? " yn
+    case $yn in
+        [Yy]* ) echo "Let's continue"; break;;
+        [Nn]* ) echo "Please, fill in Validator 'config.env' in the proper way"; exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
 # Allow authentication or not when installin the Dispatcher
 while true; do
     read -p "Do you wish to allow Authentication? " yn

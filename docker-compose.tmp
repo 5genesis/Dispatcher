@@ -24,6 +24,8 @@ services:
       - MONGO_INITDB_DATABASE=experimentsdb
       - MONGODB_DATABASE=PlatformsDB
       - MONGODB_DATABASE=images
+      - MONGODB_DATABASE=onboarded
+
       #- MONGO_INITDB_ROOT_USERNAME=5genesis
       #- MONGO_INITDB_ROOT_PASSWORD=5genesisPASS
     volumes:
@@ -31,6 +33,20 @@ services:
       - ./database/mongo-volume:/data/db
     ports:
       - '27017-27019:27017-27019'
+
+  distributor:
+    build: ./validator
+    image: distributor
+    container_name: distributor
+    env_file:
+      - ./validator/config.env
+    command: python validator.py
+    volumes:
+      - "./validator:/validator"
+    ports:
+      - '5100:5100'
+    restart: always
+
   mano:
     build: ./mano
     image: mano

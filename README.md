@@ -183,10 +183,12 @@ The metadata.yaml looks like:
 
 The data composed with the VNFD specification and some parameters provided by the open APIs.
 
-## Mano onboarding flow 
+
+## Mano Indexing flow 
 The mano microservice is in charge of validating all the artifacts for the NS onboarding (Images, VNFDs & NSDs). 
 The following flow explains how this component analyze the current resources available and validate the new ingestion of each artifact.
-![Mano Flow](./images/mano-flow.png)
+![Mano Flow](./mano/images/mano-flow.png)
+
 
 
 ## Logging
@@ -206,6 +208,7 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Versioning
+
 - 2.6.3 - Support for OpenNebula VIM to upload images
 - 2.6.2 - New validation based on Image dependency for VNFs
 - 2.6.1 - NSDs and VNFs More metadata added
