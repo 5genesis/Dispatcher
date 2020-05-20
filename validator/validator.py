@@ -156,9 +156,11 @@ def onboard_ed():
         #jsonschema.validate(data, ed_schema)
         validate = fastjsonschema.compile(ed_schema)
         j = validate(data)
-        headers = {'Content-type': 'application/json'}
+
         payload = {'ns': data['NS']}
-        r = requests.post('http://mano:5101/onboard', data=payload, headers=headers)
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        session = requests.Session()
+        r = session.post('http://mano:5101/onboard', headers=headers, data=payload)
         if r.status_code > 300:
             if r.text.find('exists') < 0:
                 raise Exception(r.text)
