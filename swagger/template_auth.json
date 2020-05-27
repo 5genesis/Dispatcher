@@ -402,6 +402,14 @@
     },
     "/mano/onboard": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "description": "Onboard one NS and their dependencies (VNFs) from the repository to OSM",
         "summary": "Onboard one NS in OSM",
         "tags": [
@@ -447,6 +455,14 @@
     },
     "/mano/nsd/{nsdId}": {
       "delete": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "description": "Deletes a NSD by it id",
         "summary": "Deletes a NS",
         "tags": [
@@ -454,6 +470,9 @@
         ],
         "operationId": "deleteNSD",
         "deprecated": false,
+        "consumes": [
+          "multipart/form-data"
+        ],
         "produces": [
           "application/json"
         ],
@@ -464,6 +483,12 @@
             "required": true,
             "type": "string",
             "description": "NSD id to delete"
+          },
+          {
+            "name": "all",
+            "in": "formData",
+            "description": "Delete all the nsd versions or just the latest",
+            "type": "boolean"
           }
         ],
         "responses": {
@@ -482,6 +507,14 @@
     },
     "/distributor/ed": {
       "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Distributor"
         ],
@@ -512,6 +545,14 @@
     },
     "/distributor/ed/{exp_id}": {
       "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Distributor"
         ],
@@ -557,6 +598,14 @@
     },
     "/distributor/validate/ed": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Distributor"
         ],
@@ -598,6 +647,14 @@
     },
     "/distributor/create/ed": {
       "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
         "tags": [
           "Distributor"
         ],
