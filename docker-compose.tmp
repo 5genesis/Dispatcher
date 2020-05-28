@@ -71,3 +71,12 @@ services:
     depends_on:
       - mano
 
+  auth:
+    build: ./auth
+    image: auth
+    container_name: auth
+    command: python auth.py
+    ports:
+      - '2000:2000'
+    restart: always
+
