@@ -52,6 +52,8 @@ def vnfds():
             filename = upload.filename.rsplit("/")[0]
             logger.debug('Saving temporary VNFD')
             upload.save(filename)
+
+            logger.debug("VNFD: {}".format(str(filename)))
             res, code, fields = validate_zip(filename, vnfd_schema, type='vnf')
 
             if code != 200:
@@ -195,6 +197,7 @@ def onboard_vim_image():
         vim_id = request.form.get('vim_id')
         container_format = request.form.get('container_format', 'bare')
         vim = dbclient["images"][vim_id]
+        logger.debug("Uploading image: Container format:{} - vim_id:{}".format(container_format, vim_id))
         # Save file to static directory and validate it
 
         checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
@@ -205,18 +208,24 @@ def onboard_vim_image():
         else:
 
             file = request.files.get("file")
-            file.save(file.filename)
+            filename = file.filename
+            if filename == "file":
+                logger.debug("Robot Test fake image uploading")
+                filename = "test_image.img"
+            file.save(filename)
             # Write package file to static directory and validate it
             logger.debug("Saving temporary VIM")
             if str(conf["VIM"][vim_id]['TYPE']) == "openstack":
-                r = openstack_upload_image(vim_id, file, container_format)
+                logger.debug("Openstack VIM used")
+                r = openstack_upload_image(vim_id, filename, container_format)
             elif str(conf["VIM"][vim_id]['TYPE']) == "opennebula":
-                r = opennebula_upload_image(vim_id, file, container_format)
+                logger.debug("OpenNebula VIM used")
+                r = opennebula_upload_image(vim_id, filename, container_format)
             else:
                 raise Exception('VIM not supported: {}'.format(conf["VIM"][vim_id]['TYPE']))
 
             logger.debug("Deleting temporary image")
-            os.remove(file.filename)
+            os.remove(filename)
 
     except AttributeError as ve:
         logger.error("Problem while getting the image file: {}".format(str(ve)))
@@ -228,13 +237,13 @@ def onboard_vim_image():
         logger.info("Image uploaded successfully")
         return jsonify({"status": "updated"}), 201
     finally:
-        filename_without_extension, file_extension = os.path.splitext(file.filename)
+        filename_without_extension, file_extension = os.path.splitext(filename)
         vim.insert_one({'checksum': checksum, 'name': filename_without_extension})
 
 
 def openstack_upload_image(vim_id, file, container_format):
     vim_conf = conf["VIM"][vim_id]
-    filename_without_extension, file_extension = os.path.splitext(file.filename)
+    filename_without_extension, file_extension = os.path.splitext(file)
     traductor = {
         '.qcow2': 'qcow2',
         '.img': 'qcow2',
@@ -248,6 +257,7 @@ def openstack_upload_image(vim_id, file, container_format):
                                   username=vim_conf["USER"], password=vim_conf["PASSWORD"])
 
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
+    logger.debug("resultado: {}".format(str(r)))
     return r
 
 
@@ -259,6 +269,7 @@ def opennebula_upload_image(vim_id, file, container_format):
                               f=file, server_ip=vim_conf["IP"], server_username=vim_conf["SERVER_USER"], \
                               server_password=vim_conf["SERVER_PASS"], image_dir=vim_conf["FOLDER"])
     return r
+
 
 @app.route('/vims', methods=['GET'])
 def get_vims():

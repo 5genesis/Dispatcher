@@ -84,6 +84,7 @@ def validate_zip(file, schema, type):
         # unzip the package
         tar = tarfile.open(file, "r:gz")
         folder = tar.getnames()[0]
+        logger.debug("Folder: {}".format(folder))
         tar.extractall()
         tar.close()
         # pick the file that contains the main descriptor
