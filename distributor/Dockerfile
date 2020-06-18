@@ -6,14 +6,14 @@ RUN apt-get update && apt-get install -qq -y \
 #ENV INSTALL_PATH /OSM
 #RUN mkdir -p $INSTALL_PATH
 
-WORKDIR /validator
+WORKDIR /distributor
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY . /validator
+COPY . /distributor
 
 EXPOSE 5100
-CMD [ "python", "validator.py" ]
+CMD [ "python", "distributor.py" ]
 

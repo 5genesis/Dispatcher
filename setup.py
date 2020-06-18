@@ -106,9 +106,28 @@ conf = configparser.ConfigParser()
 configFilePath = r'dispatcher.conf'
 conf.read(configFilePath)
 enablers = ""
+elcm = ""
 for sect in conf.sections():
-    url = conf[sect]['protocol'] + '://' + conf[sect]['host'] + ':' + conf[sect]['port'] + conf[sect]['path']
+    url = url = conf[sect]['protocol'] + '://' + conf[sect]['host']
+    if conf[sect].get('port'):
+        url += ':' + conf[sect]['port']
+    if conf[sect].get('path'):
+        url += conf[sect]['path']
+
     enablers += add_enabler.replace("{0}", sect).replace("{1}", url)
+    if sect == 'elcm':
+        with open('distributor/config.env', 'w') as file:
+            file.write('ELCM={}'.format(url))
+        url = 'http://distributor:5100/execution'
+        exec_sect = sect + '/execution'
+        enablers += add_enabler.replace("{0}", exec_sect).replace("{1}", url)
+        url = 'http://distributor:5100/api/v0/run'
+        run_sect = sect + '/api/v0/run'
+        enablers += add_enabler.replace("{0}", run_sect).replace("{1}", url)
+        url = 'http://distributor:5100/validate/ed'
+        validate_sect = sect + '/validate/ed'
+        enablers += add_enabler.replace("{0}", validate_sect).replace("{1}", url)
+
 
 with open('nginx.conf', 'w') as file:
     file.write(header+enablers+auth)

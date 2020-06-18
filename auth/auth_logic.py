@@ -382,15 +382,16 @@ def validate_user_manually(data):
         user = data
         action = "create"
         email = User.query.filter_by(username=user).first().email
-
+        logger.info("The user {}, with mail {} is going to be validated".format(str(data), email))
         data = User.query.filter_by(username=user).first()
         data.active = True
         data.deleted = False
         new_action = Registry(username=data.username, action='Activated')
         db.session.add(new_action)
-
         db.session.commit()
+        logger.info("The user {}, with mail {} is validated".format(str(data), email))
         notify_user(email, action)
+        logger.info("A notification email is send to {}".format(email))
         return jsonify(result='Changes applied')
 
     except Exception as e:

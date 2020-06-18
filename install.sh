@@ -16,13 +16,7 @@
 # HOST=192.168.33.101
 # PORT=5001
 # PATH=/
-# 
-# [validator]
-# PROTOCOL=http
-# HOST=validator
-# PORT=5100
-# PATH=/
-#
+
 
 config_file="dispatcher.conf"
 output_file="nginx.conf"
@@ -39,16 +33,6 @@ while true; do
     case $yn in
         [Yy]* ) echo "Let's proceed"; break;;
         [Nn]* ) echo "Please, fill in '$config_file' in the proper way"; exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
-# Check the user has configured the validator env file
-while true; do
-    read -p "Have you prepared the Validator environment file in the 'validator' folder? " yn
-    case $yn in
-        [Yy]* ) echo "Let's continue"; break;;
-        [Nn]* ) echo "Please, fill in Validator 'config.env' in the proper way"; exit;;
         * ) echo "Please answer yes or no.";;
     esac
 done

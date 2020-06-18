@@ -1,6 +1,8 @@
 version: '3'
 
 volumes:
+  mongodb_data:
+    driver: local
   data-volume:
 
 services:
@@ -30,19 +32,19 @@ services:
       #- MONGO_INITDB_ROOT_PASSWORD=5genesisPASS
     volumes:
       #- ./database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./database/mongo-volume:/data/db
+      - mongodb_data:/data/db
     ports:
       - '27017-27019:27017-27019'
 
   distributor:
-    build: ./validator
+    build: ./distributor
     image: distributor
     container_name: distributor
     env_file:
-      - ./validator/config.env
-    command: python validator.py
+      - ./distributor/config.env
+    command: python distributor.py
     volumes:
-      - "./validator:/validator"
+      - "./distributor:/distributor"
     ports:
       - '5100:5100'
     restart: always

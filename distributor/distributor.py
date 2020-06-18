@@ -7,6 +7,7 @@ import logging
 from flask_cors import CORS
 import fastjsonschema
 from gevent.pywsgi import WSGIServer
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -29,7 +30,7 @@ logger.addHandler(stream_handler)
 
 dbclient = MongoClient("mongodb://database:27017/")
 app = Flask(__name__)
-SITE_NAME = 'http://0f4ca4d4a69c.ngrok.io/'
+
 
 
 def authorization_requests(path):
@@ -39,6 +40,7 @@ def authorization_requests(path):
     experiments = db["experiments"]
 
     if path_split[0] == 'execution':
+        logger.info("User is going being checked")
         if path_split[-1] in ('cancel', 'delete', 'json', 'logs', 'results', 'descriptor'):
             executionId = path_split[-2]
         elif path_split[-1] != 'nextExecutionId':
@@ -46,7 +48,10 @@ def authorization_requests(path):
 
         if executionId:
             user = get_user()
-            if len(experiments.find({'executionId': executionId, 'user': user})) == 0:
+            if user =='Admin':
+                return
+            logger.info("{} is going to be checked".format(user))
+            if len(list(experiments.find({'executionId': executionId, 'user': user}))) == 0:
                 error = 'Not enough permissions: user {} has not launch the executionID {}'.format(user, executionId)
                 logger.error(error)
                 raise Exception(error)
@@ -64,7 +69,7 @@ def get_user():
 
 @app.route('/<path:path>', methods=['GET', 'POST', 'DELETE'])
 def proxy(path):
-    global SITE_NAME
+    logger.info(str(request))
     try:
         authorization_requests(path)
 
@@ -123,6 +128,7 @@ def onboard_ed(site, path):
     # TODO: include in the response data returned on the POST to the ELCM
     return r
 
+
 @app.route('/validate/ed', methods=['POST'])
 def validate_ed():
     try:
@@ -145,7 +151,8 @@ def validate_ed():
 if __name__ == '__main__':
     with open('schemas/experiment_schema.json', 'r') as f:
         ed_schema_data = f.read()
+    SITE_NAME = os.environ['ELCM']
     ed_schema = json.loads(ed_schema_data)
     validate = fastjsonschema.compile(ed_schema)
-    http_server = WSGIServer(('', 5101), app)
+    http_server = WSGIServer(('', 5100), app)
     http_server.serve_forever()
