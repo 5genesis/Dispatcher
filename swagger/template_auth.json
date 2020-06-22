@@ -767,14 +767,14 @@
             "description": "Password change message",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/ChangePass"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "500": {
@@ -826,14 +826,14 @@
             "description": "Successful registration",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/register"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           }
         }
@@ -868,14 +868,14 @@
             "description": "New password has been sent to your email",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/NewPass"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "500": {
@@ -922,7 +922,7 @@
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -972,14 +972,14 @@
             "description": "Changes applied - user validated",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/activate"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -1015,14 +1015,14 @@
             "description": "User database dropped",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/activate"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -1069,14 +1069,14 @@
             "description": "User removed",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/userDelete"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -1115,8 +1115,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform Registered",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/platformReg"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         },
         "security": [
@@ -1154,8 +1171,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform show",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/showPlatforms"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1191,8 +1225,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform Validation",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/activate"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1228,8 +1279,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform Remove",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/platformDelete"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1268,12 +1336,106 @@
         }
       }
     },
+    "activate": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Changes applied"
+        }
+      }
+    },
+    "showPlatforms": {
+      "type": "object",
+      "properties": {
+        "<platform_name>": {
+          "type": "object",
+          "properties": {
+            "platform_id": {
+              "type": "string",
+              "example": "6ff41f14-b463-11ea-b3de-0242ac130004"
+            },
+            "ip": {
+              "type": "string",
+              "example": "127.0.0.1"
+            },
+            "active": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        }
+      }
+    },
+    "platformReg": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Platform registration Sucessfull"
+        }
+      }
+    },
     "AuthMsg": {
       "type": "object",
       "properties": {
         "result": {
           "type": "string",
           "example": "Not valid token given"
+        }
+      }
+    },
+    "NewPass": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "New password for test@test.com Look your email for getting it"
+        }
+      }
+    },
+    "register": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "User registered. Keep an eye with your email for knowing when your account is activated"
+        }
+      }
+    },
+    "userDelete": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Test user is removed"
+        }
+      }
+    },
+    "platformDelete": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Test platform is removed"
+        }
+      }
+    },
+    "ChangePass": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "New password for testuser"
+        }
+      }
+    },
+    "SpecificError": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "<Specific Error>"
         }
       }
     },
