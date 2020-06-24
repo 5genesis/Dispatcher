@@ -21,8 +21,12 @@
       "description": "MANO OSM Repository and VIM operations"
     },
     {
-      "name": "Distributor",
-      "description": "Experiment Descriptor Validator, Creator & Distributor"
+      "name": "ELCM",
+      "description": "ELCM interfaces, Experiment Descriptor Validator, Creator & Distributor"
+    },
+    {
+      "name": "Result Catalog",
+      "description": "Operations to retrieve the results data from experiments execution"
     },
     {
       "name": "Auth",
@@ -30,7 +34,7 @@
     },
     {
       "name": "Auth: Admin Functions",
-      "description": "Operations for Admin for managing the user Auth"
+      "description": "Operations for Admin to manage the user Auth"
     }
   ],
   "schemes": [
@@ -505,98 +509,7 @@
         }
       }
     },
-    "/distributor/ed": {
-      "get": {
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ],
-        "tags": [
-          "Distributor"
-        ],
-        "summary": "List registered Experiment descriptors",
-        "description": "",
-        "operationId": "listED",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
-          },
-          "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
-          }
-        }
-      }
-    },
-    "/distributor/ed/{exp_id}": {
-      "get": {
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ],
-        "tags": [
-          "Distributor"
-        ],
-        "summary": "List a specific Experiment descriptor",
-        "description": "",
-        "operationId": "getED",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "exp_id",
-            "in": "path",
-            "description": "_id of the experiment descriptor",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/Mongo_experiment_descriptor"
-            }
-          },
-          "400": {
-            "description": "Problem while retrieving the experiment",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
-          },
-          "404": {
-            "description": "Descriptor not found in the database",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
-          }
-        }
-      }
-    },
-    "/distributor/validate/ed": {
+    "/elcm/validate/ed": {
       "post": {
         "security": [
           {
@@ -607,7 +520,7 @@
           }
         ],
         "tags": [
-          "Distributor"
+          "ELCM"
         ],
         "summary": "Validate Experiment descriptor",
         "description": "",
@@ -645,7 +558,7 @@
         }
       }
     },
-    "/distributor/create/ed": {
+    "/elcm/api/v0/run": {
       "post": {
         "security": [
           {
@@ -656,11 +569,11 @@
           }
         ],
         "tags": [
-          "Distributor"
+          "ELCM"
         ],
-        "summary": "Validate Experiment descriptor, send it to the ELCM and store is in the internal database",
+        "summary": "Run an Experiment Descriptor",
         "description": "",
-        "operationId": "onboardED",
+        "operationId": "RUNED",
         "consumes": [
           "application/json"
         ],
@@ -680,13 +593,541 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful validation. Returns the _id of the inserted experiment",
+            "description": "List of experiments",
             "schema": {
-              "$ref": "#/definitions/Object_id"
+              "$ref": "#/definitions/ArrayOfExperiments"
             }
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Execution information",
+        "description": "",
+        "operationId": "infoED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/cancel": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Cancel execution",
+        "description": "",
+        "operationId": "cancelED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/delete": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Delete execution",
+        "description": "",
+        "operationId": "DeleteED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/json": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Retrieve JSON data from a experiment",
+        "description": "",
+        "operationId": "JSONED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/logs": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Logs of the experiment execution",
+        "description": "",
+        "operationId": "LogsED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/results": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Execution results",
+        "description": "",
+        "operationId": "ResultsED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/descriptor": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Retrieve the Execution Experiment Descriptor",
+        "description": "",
+        "operationId": "DescriptorED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/facility/testcases": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Available testcases",
+        "description": "",
+        "operationId": "testcases",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/facility/ues": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Available UEs",
+        "description": "",
+        "operationId": "ues",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/facility/resource_status": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Current resource status",
+        "description": "",
+        "operationId": "resourceStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          }
+        }
+      }
+    },
+    "/result_catalog/statistical_analysis/{datasource}": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "Result Catalog"
+        ],
+        "summary": "Validate Experiment descriptor",
+        "description": "",
+        "operationId": "ExpResult",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "datasource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "InfluxDB Database to querry"
+          },
+          {
+            "name": "experimentid",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Indicate the execution id of the experiment"
+          },
+          {
+            "name": "measurement",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate a simple measurement to obtain"
+          },
+          {
+            "name": "it",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate a iteration to obtain"
+          },
+          {
+            "name": "kpi",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate a kpi to obtain"
+          },
+          {
+            "name": "unit",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate an unit to obtain"
+          },
+          {
+            "name": "exptype",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate an exptype to obtain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Experiment results",
+            "schema": {
+              "type": "string",
+              "example": "{\"experimentid\":{\"520\":{\"Delay(ms)\":{\"IterationStatistics\":{\"0\":{\"25%Percentile\":54.800000000000004,\"5%Percentile\":24.259999999999998,},\"1\":{\"25%Percentile\":54.550000000000004,\"5%Percentile\":25.61,},},\"TestCaseStatistics\":{\"25%Percentile\":{\"ConfidenceInterval\":1.0124404204175417,\"Value\":57.058},\"5%Percentile\":{\"ConfidenceInterval\":1.1079808517791605,\"Value\":24.4246},}},\"SNR-(dB)\":{\"IterationStatistics\":{\"0\":{\"25%Percentile\":30,\"5%Percentile\":30,},\"1\":{\"25%Percentile\":30,\"5%Percentile\":30,}},\"TestCaseStatistics\":{\"25%Percentile\":{\"ConfidenceInterval\":0,\"Value\":30},\"5%Percentile\":{\"ConfidenceInterval\":0,\"Value\":30},}}}}}"
+            }
+          },
+          "400": {
+            "description": "Entry badly formed",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
