@@ -74,7 +74,7 @@
           {
             "name": "visibility",
             "in": "formData",
-            "description": "visibility of the NSD",
+            "description": "visibility of the VNFD",
             "required": true,
             "type": "boolean"
           }
@@ -1063,7 +1063,7 @@
         "tags": [
           "Result Catalog"
         ],
-        "summary": "Validate Experiment descriptor",
+        "summary": "Retrieve the experiments result",
         "description": "",
         "operationId": "ExpResult",
         "consumes": [
@@ -1120,17 +1120,63 @@
         ],
         "responses": {
           "200": {
-            "description": "Experiment results",
-            "schema": {
-              "type": "string",
-              "example": "{\"experimentid\":{\"520\":{\"Delay(ms)\":{\"IterationStatistics\":{\"0\":{\"25%Percentile\":54.800000000000004,\"5%Percentile\":24.259999999999998,},\"1\":{\"25%Percentile\":54.550000000000004,\"5%Percentile\":25.61,},},\"TestCaseStatistics\":{\"25%Percentile\":{\"ConfidenceInterval\":1.0124404204175417,\"Value\":57.058},\"5%Percentile\":{\"ConfidenceInterval\":1.1079808517791605,\"Value\":24.4246},}},\"SNR-(dB)\":{\"IterationStatistics\":{\"0\":{\"25%Percentile\":30,\"5%Percentile\":30,},\"1\":{\"25%Percentile\":30,\"5%Percentile\":30,}},\"TestCaseStatistics\":{\"25%Percentile\":{\"ConfidenceInterval\":0,\"Value\":30},\"5%Percentile\":{\"ConfidenceInterval\":0,\"Value\":30},}}}}}"
-            }
+            "description": "Experimentation ",
+            "examples": {
+              "application/json": {
+                "experimentid": {
+                  "520": {
+                    "Delay(ms)": {
+                      "IterationStatistics": {
+                        "0": {
+                          "25%Percentile": 54.800000000000004,
+                          "5%Percentile": 24.259999999999998
+                        },
+                        "1": {
+                          "25%Percentile": 54.550000000000004,
+                          "5%Percentile": 25.61
+                        }
+                      },
+                      "TestCaseStatistics": {
+                        "25%Percentile": {
+                          "ConfidenceInterval": 1.0124404204175417,
+                          "Value": 57.058
+                        },
+                        "5%Percentile": {
+                          "ConfidenceInterval": 1.1079808517791605,
+                          "Value": 24.4246
+                        }
+                      }
+                    },
+                    "SNR-(dB)": {
+                      "IterationStatistics": {
+                        "0": {
+                          "25%Percentile": 30,
+                          "5%Percentile": 30
+                        },
+                        "1": {
+                          "25%Percentile": 30,
+                          "5%Percentile": 30
+                        }
+                      },
+                      "TestCaseStatistics": {
+                        "25%Percentile": {
+                          "ConfidenceInterval": 0,
+                          "Value": 30
+                        },
+                        "5%Percentile": {
+                          "ConfidenceInterval": 0,
+                          "Value": 30
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
           },
-          "400": {
-            "description": "Entry badly formed",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+          "404": {
+            "description": "Experiment results not found"
           }
         }
       }
