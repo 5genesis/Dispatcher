@@ -58,30 +58,29 @@ def vnfds():
 
             if code != 200:
                 global_code = 400
-                files_uploaded[filename] = res
+                files_uploaded[fields.get('id', filename)] = res
             if code == 200:
                 existing_image_test(fields.get('images', []))
                 final_path = '/repository/vnf/' + fields.get('id') + '/' + fields.get('version')
                 if os.path.isdir('/repository/vnf/' + fields.get('id')):
                     if os.path.isdir(final_path):
-                        files_uploaded[filename] = 'VNF with this version already exists'
+                        files_uploaded[fields.get('id')] = 'VNF with this version already exists'
                     else:
                         os.mkdir(final_path)
                         index_vnf(fields, filename, final_path, new_version=True)
 
-                        files_uploaded[filename] = 'VNF version added'
+                        files_uploaded[fields.get('id')] = 'VNF version added'
                 else:
                     os.mkdir("/repository/vnf/" + fields.get('id'))
                     os.mkdir(final_path)
                     index_vnf(fields, filename, final_path, new_version=False)
-                    files_uploaded[filename] = 'VNF added'
+                    files_uploaded[fields.get('id')] = 'VNF added'
             os.remove(filename)
         if global_code != 200:
             raise Exception('Some VNFs have invalid descriptors')
         return jsonify({'VNFs': files_uploaded}), 200
     except Exception as e:
         return jsonify({'error': str(e), 'VNFs': files_uploaded}), 400
-
 
 
 def index_vnf(fields, filename, final_path, new_version):
@@ -107,6 +106,9 @@ def index_vnf(fields, filename, final_path, new_version):
     else:
         index['vnf_packages'][fields.get('id')] = {fields.get('version'): data_ind}
         index['vnf_packages'][fields.get('id')]['latest'] = fields.get('version')
+        if not fields['visibility']:
+            private_packages = dbclient['private_packages']['vnf']
+            private_packages.insert_one({'id': fields.get('id'), 'user':user})
     yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))
 
 
@@ -136,25 +138,27 @@ def nsd():
             filename = upload.filename.rsplit("/")[0]
             logger.debug('Saving temporary NSD')
             upload.save(filename)
-            res, code, fields = validate_zip(filename, nsd_schema, type='ns')
+            private_vnfs = list(dbclient['private_packages']['vnf'].find())
+            user = get_user()
+            res, code, fields = validate_zip(filename, nsd_schema, type='ns', private_vnfs=private_vnfs, user=user)
             if code != 200:
                 global_code = 400
-                files_uploaded[filename] = res
+                files_uploaded[fields.get('id', filename)] = res
             if code == 200:
                 nsd_path = '/repository/ns'
                 final_path = nsd_path + '/' + fields.get('id') + '/' + fields.get('version')
                 if os.path.isdir(nsd_path + '/' + fields.get('id')):
                     if os.path.isdir(final_path):
-                        files_uploaded[filename] = 'NSD with this version already exists'
+                        files_uploaded[fields.get('id')] = 'NSD with this version already exists'
                     else:
                         os.mkdir(final_path)
-                        index_ns(fields, filename, final_path, new_version=True)
-                        files_uploaded[filename] = 'NSD version added'
+                        index_ns(fields, filename, final_path, new_version=True, user=user)
+                        files_uploaded[fields.get('id')] = 'NSD version added'
                 else:
                     os.mkdir(nsd_path + '/' + fields.get('id'))
                     os.mkdir(final_path)
-                    index_ns(fields, filename, final_path, new_version=False)
-                    files_uploaded[filename] = 'NSD added'
+                    index_ns(fields, filename, final_path, new_version=False, user=user)
+                    files_uploaded[fields.get('id')] = 'NSD added'
             os.remove(filename)
         if global_code != 200:
             raise Exception('Some NSD have invalid descriptors')
@@ -163,11 +167,12 @@ def nsd():
         return jsonify({'error': str(e), 'NSs': files_uploaded}), 400
 
 
-def index_ns(fields, filename, final_path, new_version):
+def index_ns(fields, filename, final_path, new_version, user=None):
     """
     indexing function for network services
     """
-    user = get_user()
+    if not user:
+        user = get_user()
     fields['visibility'] = str_to_bool(request.form.get('visibility', 1))
     fields['user'] = user
     data_ind = {'name': fields['name'], 'description': fields['description'], 'vendor': fields['vendor'],
@@ -183,6 +188,9 @@ def index_ns(fields, filename, final_path, new_version):
     else:
         index['ns_packages'][fields.get('id')] = {fields.get('version'): data_ind}
         index['ns_packages'][fields.get('id')]['latest'] = fields.get('version')
+        if not fields['visibility']:
+            private_packages = dbclient['private_packages']['ns']
+            private_packages.insert_one({'id': fields.get('id'), 'user': user})
     yaml.dump(index, open('/repository/index.yaml', 'w'))
 
 
@@ -193,10 +201,20 @@ def onboard_vim_image():
     Output: 200 code
     """
     try:
-        logger.info("Uploading image")
+        logger.info(request)
+        save = False
         vim_id = request.form.get('vim_id')
-        container_format = request.form.get('container_format', 'bare')
         vim = dbclient["images"][vim_id]
+        image_name = request.form.get('image_name')
+        if image_name:
+            if get_user() != 'Admin':
+                raise Exception('Only Admin User is able to register images pre-uploaded in the VIM')
+            checksum = None
+            save = True
+            return jsonify({"status": "updated"}), 201
+
+        container_format = request.form.get('container_format', 'bare')
+
         logger.debug("Uploading image: Container format:{} - vim_id:{}".format(container_format, vim_id))
         # Save file to static directory and validate it
 
@@ -235,10 +253,32 @@ def onboard_vim_image():
         return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400
     try:
         logger.info("Image uploaded successfully")
+        save = True
         return jsonify({"status": "updated"}), 201
     finally:
-        filename_without_extension, file_extension = os.path.splitext(filename)
-        vim.insert_one({'checksum': checksum, 'name': filename_without_extension})
+        if save:
+            if not image_name:
+                name, file_extension = os.path.splitext(filename)
+            else:
+                name = image_name
+            vim.insert_one({'checksum': checksum, 'name': name})
+
+
+@app.route('/image', methods=['GET'])
+def get_images():
+    status = 200
+    try:
+        result = {}
+        for vim in dbclient['images'].collection_names():
+            images = []
+            for image in list(dbclient['images']['malagacore'].find()):
+                images.append(image['name'])
+            result[vim] = images
+    except Exception as e:
+        logger.error(e)
+        result = {'detail': e}
+        status = 400
+    return jsonify(result), status
 
 
 def openstack_upload_image(vim_id, file, container_format):
@@ -291,16 +331,57 @@ def get_vims():
     return jsonify(aux_list), 200
 
 
+def private_packages(package_type):
+    aux_list= []
+    ns_private_list = list(dbclient['private_packages'][package_type].find({"user": {"$not": {"$regex": get_user()}}}))
+    for item in ns_private_list:
+        aux_list.append(item['id'])
+    return aux_list
+
+
+def prune_private_artefacts(results, private):
+    if isinstance(results, dict):
+        for item in private:
+            if item in results:
+                results.pop(item)
+    else:
+        for item in private:
+            if item in results:
+                results.remove(item)
+
+    return results
+
+
 @app.route('/nsd', methods=['GET'])
 def list_nsd():
+    verbose = request.args.get('verbose', False)
     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-    return jsonify(list(index['ns_packages'].keys())), 200
+    private_ns = private_packages('ns')
+
+    if verbose:
+        results = index['ns_packages']
+    else:
+        results = list(index['ns_packages'].keys())
+
+    results = prune_private_artefacts(results, private_ns)
+
+    return jsonify(results), 200
 
 
 @app.route('/vnfd', methods=['GET'])
 def list_vnf():
+    verbose = request.args.get('verbose', False)
     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
-    return jsonify(list(index['vnf_packages'].keys())), 200
+    private_vnf = private_packages('vnf')
+
+    if verbose:
+        results = index['vnf_packages']
+    else:
+        results = list(index['vnf_packages'].keys())
+
+    results = prune_private_artefacts(results, private_vnf)
+
+    return jsonify(results), 200
 
 
 @app.route('/onboard', methods=['POST'])
@@ -308,6 +389,11 @@ def onboard_ns():
     try:
         r = {'detail': 'no detail'}
         ns = request.form.get('ns')
+        private = list(dbclient['private_packages']['ns'].find({'id', ns}))
+        if len(private) > 0:
+            if private[0].get('user') == get_user():
+                raise Exception( str("NSD '" + str(ns) + "' is private , please upload your own NSD."))
+
         if not ns:
             return jsonify({'result': 'argument ns in form is required'}), 404
         index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
@@ -337,10 +423,13 @@ def onboard_ns():
 
 
 def get_user():
-    token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
-    return ast.literal_eval(
-        requests.get('http://auth:2000/get_user_from_token', headers={'Authorization': str(token)}).text)[
-        'result']
+    user = request.authorization.get('username')
+    if not user:
+        token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+        user = ast.literal_eval(
+            requests.get('http://auth:2000/get_user_from_token', headers={'Authorization': str(token)}).text)[
+            'result']
+    return user
 
 
 @app.route('/nsd/<nsdId>', methods=['DELETE'])
@@ -349,7 +438,7 @@ def delete_nsd(nsdId):
     Network Service Delete on OSM and repository
     """
     try:
-        logger.info("VNFD successfully modified")
+        logger.info(request)
         all = str_to_bool(request.form.get('all', 0))
         user = get_user()
         index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
@@ -378,6 +467,7 @@ def delete_nsd(nsdId):
 
         yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))
         dbclient['onboarded']['ns'].delete_one({'ns': nsdId})
+        dbclient['private_packages']['nsd'].delete_one({'id': nsdId})
         return jsonify({}), 204
     except Exception as e:
         return jsonify({"detail": str(e), "code": type(e).__name__, "status": 400}), 400

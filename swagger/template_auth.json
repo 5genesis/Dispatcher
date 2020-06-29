@@ -114,6 +114,13 @@
               }
             }
           },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
           "500": {
             "description": "Internal server error - Network problems"
           }
@@ -136,6 +143,14 @@
         "operationId": "ListVNFDs",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
         ],
         "responses": {
           "200": {
@@ -228,6 +243,13 @@
               }
             }
           },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
           "500": {
             "description": "Internal server error - Network problems"
           }
@@ -250,6 +272,14 @@
         "operationId": "ListNSD",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
         ],
         "responses": {
           "200": {
@@ -282,8 +312,8 @@
         "tags": [
           "MANO"
         ],
-        "summary": "Upload an image file in the VIM",
-        "description": "",
+        "summary": "Upload and register an image file in the VIM",
+        "description": "With this request it is posible to upload images directly in the VIM & the Admin can also register the pre-uploaded images in the VIM",
         "operationId": "addImage",
         "consumes": [
           "multipart/form-data"
@@ -293,23 +323,30 @@
         ],
         "parameters": [
           {
-            "name": "file",
-            "in": "formData",
-            "description": "Image file",
-            "required": true,
-            "type": "file"
-          },
-          {
             "name": "vim_id",
             "in": "formData",
-            "description": "VIM where do you want to onboard the image",
+            "description": "VIM where the image is going to be registered.",
             "required": true,
             "type": "string"
           },
           {
+            "name": "image_name",
+            "in": "formData",
+            "description": "[Admin Function - Required to upload images that need to be registered] Image name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "[Required in image Upload process] Image file if the image is not uploaded in the VIM",
+            "required": false,
+            "type": "file"
+          },
+          {
             "name": "container_format",
             "in": "formData",
-            "description": "Container format: bare",
+            "description": "[Optional in image Upload process] Container format: bare",
             "required": false,
             "type": "string"
           }
@@ -339,6 +376,13 @@
               }
             }
           },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
           "422": {
             "description": "Image file not in the request or request badly formed",
             "schema": {
@@ -349,6 +393,66 @@
                   "example": "<SPECIFIC_ERROR_MESAGE>"
                 }
               }
+            }
+          },
+          "500": {
+            "description": "Internal server error - Service is not accessible"
+          }
+        }
+      },
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "MANO"
+        ],
+        "summary": "Get the list of the images in the VIMs",
+        "description": "",
+        "operationId": "getImages",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Images requested",
+            "examples": {
+              "application/json": {
+                "core": [
+                  "ubuntu18"
+                ],
+                "edge": [
+                  "cirros",
+                  "ubuntu16"
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid permission",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "detail": {
+                  "type": "string",
+                  "example": "<SPECIFIC_ERROR_MESAGE>"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           },
           "500": {
@@ -400,6 +504,10 @@
             "schema": {
               "$ref": "#/definitions/AuthError"
             }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
           }
         }
       }
@@ -448,6 +556,13 @@
             "description": "Ns not Onboarded",
             "schema": {
               "$ref": "#/definitions/ManoOnboard400Error"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           },
           "500": {
@@ -505,6 +620,13 @@
             "schema": {
               "$ref": "#/definitions/ManoNsd400Error1"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -553,6 +675,13 @@
             "description": "Entry badly formed",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
@@ -603,6 +732,13 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -649,6 +785,13 @@
             "description": "Problem while obtaining the list of experiments",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
@@ -697,6 +840,13 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -743,6 +893,13 @@
             "description": "Problem while obtaining the list of experiments",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
@@ -791,6 +948,13 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -837,6 +1001,13 @@
             "description": "Problem while obtaining the list of experiments",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
@@ -885,6 +1056,13 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -932,6 +1110,13 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -969,6 +1154,13 @@
             "description": "Problem while obtaining the list of experiments",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
@@ -1008,6 +1200,13 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1045,6 +1244,13 @@
             "description": "Problem while obtaining the list of experiments",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
@@ -1174,6 +1380,13 @@
               }
             },
             "headers": {}
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           },
           "404": {
             "description": "Experiment results not found"

@@ -27,7 +27,7 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 
-def fields_building(descriptor_json, file, type):
+def fields_building(descriptor_json, file, type, private_vnfs=None, user=None):
     fields = {}
     base_path = '/' + type + '/'
     if type == "vnf":
@@ -60,7 +60,7 @@ def fields_building(descriptor_json, file, type):
         for vnf in aux_dict.get('constituent-vnfd'):
             vnfs.append(vnf.get('vnfd-id-ref'))
         logger.debug('Used VNFS in the NSD: ' + str(vnfs))
-        check_existing_vnfs(vnfs)
+        check_existing_vnfs(vnfs, private_vnfs, user)
         fields['vnfd-id-ref'] = vnfs
     fields['path'] = base_path + fields['id'] + '/' + fields['version'] + '/' + fields.get('id') + "-" + \
                      fields.get('version') + '.tar.gz'
@@ -68,8 +68,13 @@ def fields_building(descriptor_json, file, type):
     return fields
 
 
-def check_existing_vnfs(vnfs):
+def check_existing_vnfs(vnfs, private_vnfs, user):
     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader).get('vnf_packages', {})
+
+    for vnf in private_vnfs:
+        if (vnf.get('id') in vnfs) and (vnf.get('user') != user):
+            raise Exception(
+                str("VNFD '" + str(vnf) + "' is private , please upload your own VNFD."))
 
     for vnf in vnfs:
         if vnf not in index:
@@ -78,11 +83,14 @@ def check_existing_vnfs(vnfs):
                                           "to upload the NSD"))
 
 
-def validate_zip(file, schema, type):
+def validate_zip(file, schema, type, private_vnfs=None, user=None):
     try:
+        folder = ''
         logger.debug("Decompressing package file")
         # unzip the package
-        tar = tarfile.open(file, "r:gz")
+        if file.split('.')[-1] != 'gz':
+            raise Exception('Not valid file, .tar.gz is required')
+        tar = tarfile.open(file)
         folder = tar.getnames()[0]
         logger.debug("Folder: {}".format(folder))
         tar.extractall()
@@ -99,7 +107,7 @@ def validate_zip(file, schema, type):
         # compare the json with the proper schema
         jsonschema.validate(descriptor_json, schema)
         # Delete the folder we just created
-        fields = fields_building(descriptor_json, file, type)
+        fields = fields_building(descriptor_json, file, type, private_vnfs=private_vnfs, user=user)
         shutil.rmtree(folder, ignore_errors=True)
         logger.debug("Descriptor sucessfully validated")
         return jsonify({"detail": "{}D successfully validated".format(type.upper()), "code": "OK"}), 200, fields
