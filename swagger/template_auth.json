@@ -2154,7 +2154,7 @@
         "result": {
           "type": "object",
           "properties": {
-            "usename": {
+            "test_user1": {
               "type": "object",
               "properties": {
                 "active": {
@@ -2166,23 +2166,24 @@
                 },
                 "email": {
                   "type": "string",
-                  "example": "5genesismanagement@gmail.com"
+                  "example": "test1@gmail.com"
+                }
+              }
+            },
+            "test_user2": {
+              "type": "object",
+              "properties": {
+                "active": {
+                  "type": "boolean",
+                  "example": false
                 },
-                "traces": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "action": {
-                        "type": "string",
-                        "example": "GetToken"
-                      },
-                      "date": {
-                        "type": "string",
-                        "example": "2020-01-09 11:22:32.772248"
-                      }
-                    }
-                  }
+                "deleted": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "email": {
+                  "type": "string",
+                  "example": "test2@gmail.com"
                 }
               }
             }
