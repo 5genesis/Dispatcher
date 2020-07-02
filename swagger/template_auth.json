@@ -1,9 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Swagger 5GENESIS Dispatcher",
+    "description": "5GENESIS Dispatcher REST API Specification",
     "version": "2.7.",
-    "title": "5GENESIS Dispatcher Swagger",
+    "title": "5GENESIS Dispatcher Open APIs",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
       "email": "luis.gomez.external@atos.net"
