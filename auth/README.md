@@ -155,7 +155,7 @@ The service will be exposed in port 2000.
 
 ## Authors
 
-Luis Gómez (luis.gomez.external@atos.net)
+Luis Gómez (luis.gomez.external at atos.net)
 
 ## License
 

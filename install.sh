@@ -1,8 +1,5 @@
 #! /bin/bash
 
-# Usage:
-# ./dispatcher.sh
-#
 # Example of entry config file:
 # 
 # [mano]

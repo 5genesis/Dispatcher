@@ -237,9 +237,9 @@ In case of needing any help, contact the [authors](#authors) for support.
 
 ## Authors
 
-Javier Melian (javier.melian@atos.net)
+Javier Melian (javier.melian at atos.net)
 
-Luis Gómez (luis.gomez.external@atos.net)
+Luis Gómez (luis.gomez.external at atos.net)
 
 ## License
 

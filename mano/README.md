@@ -245,8 +245,8 @@ Application logs are available in the application directory as `mano.log`
 
 ## Authors
 
-- Javier Melian (javier.melian@atos.net)
-- Luis Gómez (luis.gomez.external@atos.net)
+- Javier Melian (javier.melian at atos.net)
+- Luis Gómez (luis.gomez.external at atos.net)
 
 ## License
 

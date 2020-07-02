@@ -149,7 +149,7 @@ Application logs are available in the application directory as `validator.log`
 
 ## Authors
 
-Javier Melian (javier.melian@atos.net)
+Javier Melian (javier.melian at atos.net)
 
 ## License
 
