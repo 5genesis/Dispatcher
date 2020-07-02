@@ -210,7 +210,7 @@ def onboard_vim_image():
             if get_user() != 'Admin':
                 raise Exception('Only Admin User is able to register images pre-uploaded in the VIM')
             checksum = None
-            save = True
+            vim.insert_one({'checksum': checksum, 'name': image_name})
             return jsonify({"status": "updated"}), 201
 
         container_format = request.form.get('container_format', 'bare')
@@ -389,7 +389,7 @@ def onboard_ns():
     try:
         r = {'detail': 'no detail'}
         ns = request.form.get('ns')
-        private = list(dbclient['private_packages']['ns'].find({'id', ns}))
+        private = list(dbclient['private_packages']['ns'].find({'id': ns}))
         if len(private) > 0:
             if private[0].get('user') == get_user():
                 raise Exception( str("NSD '" + str(ns) + "' is private , please upload your own NSD."))
