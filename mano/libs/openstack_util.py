@@ -16,10 +16,10 @@ class OSUtils():
 
     def upload_image(conn, f, disk_format="raw", container_format="bare"):
         # Build the image attributes and upload the image.
-        filename_without_extension, file_extension = os.path.splitext(f.filename)
+        filename_without_extension, file_extension = os.path.splitext(f)
         image_attrs = {
             'name': filename_without_extension,
-            'filename': f.filename,
+            'filename': f,
             'disk_format': disk_format,
             'container_format': container_format,
             'visibility': 'public',

@@ -524,4 +524,77 @@ class NbiUtil():
             return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
         return r.json(), r.status_code
 
+    @check_authorization
+    def get_vdu_ips(self, id):
+        """
+        Gets the list of NDSs in the OSM catalogue or a single one if specified
 
+        Parameters
+        ----------
+        id: str
+            Id of a specific NSD(default is None)
+
+        Raises
+        ------
+        Exception
+            If there has been any errors in the request
+
+        Returns
+        ------
+        NSDs list in json format : str
+        token : str
+        """
+
+        url = self.base_url + '/nslcm/v1/vnfrs' + "?nsr-id-ref=" + str(id)
+        headers = dict(self.headers)
+        headers["Content-type"] = "application/yaml"
+        try:
+            r = requests.get(url, params=None, verify=False, stream=True, headers=headers)
+            data = json.loads(r.text)
+            ip_list = []
+            for vdu in data:
+                ip_list.append(vdu.get('ip-address'))
+
+        except Exception as e:
+            print("ERROR - get_nsd: ", e)
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400
+        return json.dumps(ip_list), r.status_code
+
+    @check_authorization
+    def get_nsi_name(self, id):
+        """
+        Gets the list of NDSs in the OSM catalogue or a single one if specified
+
+        Parameters
+        ----------
+        id: str
+            Id of a specific NSD(default is None)
+
+        Raises
+        ------
+        Exception
+            If there has been any errors in the request
+
+        Returns
+        ------
+        NSDs list in json format : str
+        token : str
+        """
+
+        url = self.base_url + '/nslcm/v1/ns_instances_content'
+        headers = dict(self.headers)
+        headers["Content-type"] = "application/yaml"
+        try:
+            r = requests.get(url, params=None, verify=False, stream=True, headers=headers)
+            data = json.loads(r.text)
+            name = ''
+            status_code = 404
+            for instance in data:
+                if instance.get('_id') == id:
+                    status_code = 200
+                    name = instance.get('name')
+
+        except Exception as e:
+            print("ERROR - get_nsd: ", e)
+            return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400
+        return name, status_code

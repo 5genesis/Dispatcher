@@ -1,9 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Swagger 5GENESIS Dispatcher",
+    "description": "5GENESIS Dispatcher REST API Specification",
     "version": "2.7.",
-    "title": "5GENESIS Dispatcher Swagger",
+    "title": "5GENESIS Dispatcher Open APIs",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
       "email": "luis.gomez.external@atos.net"
@@ -21,8 +21,12 @@
       "description": "MANO OSM Repository and VIM operations"
     },
     {
-      "name": "Distributor",
-      "description": "Experiment Descriptor Validator, Creator & Distributor"
+      "name": "ELCM",
+      "description": "ELCM interfaces, Experiment Descriptor Validator, Creator & Distributor"
+    },
+    {
+      "name": "Result Catalog",
+      "description": "Operations to retrieve the results data from experiments execution"
     },
     {
       "name": "Auth",
@@ -30,7 +34,7 @@
     },
     {
       "name": "Auth: Admin Functions",
-      "description": "Operations for Admin for managing the user Auth"
+      "description": "Operations for Admin to manage the user Auth"
     }
   ],
   "schemes": [
@@ -70,7 +74,7 @@
           {
             "name": "visibility",
             "in": "formData",
-            "description": "visibility of the NSD",
+            "description": "visibility of the VNFD",
             "required": true,
             "type": "boolean"
           }
@@ -110,6 +114,13 @@
               }
             }
           },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
           "500": {
             "description": "Internal server error - Network problems"
           }
@@ -132,6 +143,14 @@
         "operationId": "ListVNFDs",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
         ],
         "responses": {
           "200": {
@@ -224,6 +243,13 @@
               }
             }
           },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
           "500": {
             "description": "Internal server error - Network problems"
           }
@@ -246,6 +272,14 @@
         "operationId": "ListNSD",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "verbose",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
         ],
         "responses": {
           "200": {
@@ -278,8 +312,8 @@
         "tags": [
           "MANO"
         ],
-        "summary": "Upload an image file in the VIM",
-        "description": "",
+        "summary": "Upload and register an image file in the VIM",
+        "description": "With this request it is posible to upload images directly in the VIM & the Admin can also register the pre-uploaded images in the VIM",
         "operationId": "addImage",
         "consumes": [
           "multipart/form-data"
@@ -289,23 +323,30 @@
         ],
         "parameters": [
           {
-            "name": "file",
-            "in": "formData",
-            "description": "Image file",
-            "required": true,
-            "type": "file"
-          },
-          {
             "name": "vim_id",
             "in": "formData",
-            "description": "VIM where do you want to onboard the image",
+            "description": "VIM where the image is going to be registered.",
             "required": true,
             "type": "string"
           },
           {
+            "name": "image_name",
+            "in": "formData",
+            "description": "[Admin Function - Required to upload images that need to be registered] Image name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "[Required in image Upload process] Image file if the image is not uploaded in the VIM",
+            "required": false,
+            "type": "file"
+          },
+          {
             "name": "container_format",
             "in": "formData",
-            "description": "Container format: bare",
+            "description": "[Optional in image Upload process] Container format: bare",
             "required": false,
             "type": "string"
           }
@@ -335,6 +376,13 @@
               }
             }
           },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
           "422": {
             "description": "Image file not in the request or request badly formed",
             "schema": {
@@ -345,6 +393,66 @@
                   "example": "<SPECIFIC_ERROR_MESAGE>"
                 }
               }
+            }
+          },
+          "500": {
+            "description": "Internal server error - Service is not accessible"
+          }
+        }
+      },
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "MANO"
+        ],
+        "summary": "Get the list of the images in the VIMs",
+        "description": "",
+        "operationId": "getImages",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Images requested",
+            "examples": {
+              "application/json": {
+                "core": [
+                  "ubuntu18"
+                ],
+                "edge": [
+                  "cirros",
+                  "ubuntu16"
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid permission",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "detail": {
+                  "type": "string",
+                  "example": "<SPECIFIC_ERROR_MESAGE>"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           },
           "500": {
@@ -396,6 +504,10 @@
             "schema": {
               "$ref": "#/definitions/AuthError"
             }
+          },
+          "500": {
+            "description": "Internal server error - Network problems",
+            "schema": {}
           }
         }
       }
@@ -444,6 +556,13 @@
             "description": "Ns not Onboarded",
             "schema": {
               "$ref": "#/definitions/ManoOnboard400Error"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
             }
           },
           "500": {
@@ -501,102 +620,18 @@
             "schema": {
               "$ref": "#/definitions/ManoNsd400Error1"
             }
-          }
-        }
-      }
-    },
-    "/distributor/ed": {
-      "get": {
-        "security": [
-          {
-            "basicAuth": []
           },
-          {
-            "BearerToken": []
-          }
-        ],
-        "tags": [
-          "Distributor"
-        ],
-        "summary": "List registered Experiment descriptors",
-        "description": "",
-        "operationId": "listED",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "List of experiments",
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
             "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
-          },
-          "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
+              "$ref": "#/definitions/AuthError"
             }
           }
         }
       }
     },
-    "/distributor/ed/{exp_id}": {
-      "get": {
-        "security": [
-          {
-            "basicAuth": []
-          },
-          {
-            "BearerToken": []
-          }
-        ],
-        "tags": [
-          "Distributor"
-        ],
-        "summary": "List a specific Experiment descriptor",
-        "description": "",
-        "operationId": "getED",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "exp_id",
-            "in": "path",
-            "description": "_id of the experiment descriptor",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/Mongo_experiment_descriptor"
-            }
-          },
-          "400": {
-            "description": "Problem while retrieving the experiment",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
-          },
-          "404": {
-            "description": "Descriptor not found in the database",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
-          }
-        }
-      }
-    },
-    "/distributor/validate/ed": {
+    "/elcm/validate/ed": {
       "post": {
         "security": [
           {
@@ -607,7 +642,7 @@
           }
         ],
         "tags": [
-          "Distributor"
+          "ELCM"
         ],
         "summary": "Validate Experiment descriptor",
         "description": "",
@@ -641,11 +676,18 @@
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
     },
-    "/distributor/create/ed": {
+    "/elcm/api/v0/run": {
       "post": {
         "security": [
           {
@@ -656,11 +698,11 @@
           }
         ],
         "tags": [
-          "Distributor"
+          "ELCM"
         ],
-        "summary": "Validate Experiment descriptor, send it to the ELCM and store is in the internal database",
+        "summary": "Run an Experiment Descriptor",
         "description": "",
-        "operationId": "onboardED",
+        "operationId": "RUNED",
         "consumes": [
           "application/json"
         ],
@@ -680,16 +722,674 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful validation. Returns the _id of the inserted experiment",
+            "description": "List of experiments",
             "schema": {
-              "$ref": "#/definitions/Object_id"
+              "$ref": "#/definitions/ArrayOfExperiments"
             }
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Problem while obtaining the list of experiments",
             "schema": {
               "$ref": "#/definitions/ResponseDetails"
             }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Execution information",
+        "description": "",
+        "operationId": "infoED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/cancel": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Cancel execution",
+        "description": "",
+        "operationId": "cancelED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/delete": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Delete execution",
+        "description": "",
+        "operationId": "DeleteED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/json": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Retrieve JSON data from a experiment",
+        "description": "",
+        "operationId": "JSONED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/logs": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Logs of the experiment execution",
+        "description": "",
+        "operationId": "LogsED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/results": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Execution results",
+        "description": "",
+        "operationId": "ResultsED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/execution{id}/descriptor": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Retrieve the Execution Experiment Descriptor",
+        "description": "",
+        "operationId": "DescriptorED",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": ""
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/facility/testcases": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Available testcases",
+        "description": "",
+        "operationId": "testcases",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/facility/ues": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Available UEs",
+        "description": "",
+        "operationId": "ues",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/elcm/facility/resource_status": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Current resource status",
+        "description": "",
+        "operationId": "resourceStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of experiments",
+            "schema": {
+              "$ref": "#/definitions/ArrayOfExperiments"
+            }
+          },
+          "400": {
+            "description": "Problem while obtaining the list of experiments",
+            "schema": {
+              "$ref": "#/definitions/ResponseDetails"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          }
+        }
+      }
+    },
+    "/result_catalog/statistical_analysis/{datasource}": {
+      "post": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "Result Catalog"
+        ],
+        "summary": "Retrieve the experiments result",
+        "description": "",
+        "operationId": "ExpResult",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "datasource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "InfluxDB Database to querry"
+          },
+          {
+            "name": "experimentid",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Indicate the execution id of the experiment"
+          },
+          {
+            "name": "measurement",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate a simple measurement to obtain"
+          },
+          {
+            "name": "it",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate a iteration to obtain"
+          },
+          {
+            "name": "kpi",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate a kpi to obtain"
+          },
+          {
+            "name": "unit",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate an unit to obtain"
+          },
+          {
+            "name": "exptype",
+            "in": "query",
+            "type": "string",
+            "description": "Indicate an exptype to obtain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Experimentation ",
+            "examples": {
+              "application/json": {
+                "experimentid": {
+                  "520": {
+                    "Delay(ms)": {
+                      "IterationStatistics": {
+                        "0": {
+                          "25%Percentile": 54.800000000000004,
+                          "5%Percentile": 24.259999999999998
+                        },
+                        "1": {
+                          "25%Percentile": 54.550000000000004,
+                          "5%Percentile": 25.61
+                        }
+                      },
+                      "TestCaseStatistics": {
+                        "25%Percentile": {
+                          "ConfidenceInterval": 1.0124404204175417,
+                          "Value": 57.058
+                        },
+                        "5%Percentile": {
+                          "ConfidenceInterval": 1.1079808517791605,
+                          "Value": 24.4246
+                        }
+                      }
+                    },
+                    "SNR-(dB)": {
+                      "IterationStatistics": {
+                        "0": {
+                          "25%Percentile": 30,
+                          "5%Percentile": 30
+                        },
+                        "1": {
+                          "25%Percentile": 30,
+                          "5%Percentile": 30
+                        }
+                      },
+                      "TestCaseStatistics": {
+                        "25%Percentile": {
+                          "ConfidenceInterval": 0,
+                          "Value": 30
+                        },
+                        "5%Percentile": {
+                          "ConfidenceInterval": 0,
+                          "Value": 30
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
+          "404": {
+            "description": "Experiment results not found"
           }
         }
       }
@@ -767,14 +1467,14 @@
             "description": "Password change message",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/ChangePass"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "500": {
@@ -826,14 +1526,14 @@
             "description": "Successful registration",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/register"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           }
         }
@@ -868,14 +1568,14 @@
             "description": "New password has been sent to your email",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/NewPass"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "500": {
@@ -922,7 +1622,7 @@
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -972,14 +1672,14 @@
             "description": "Changes applied - user validated",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/activate"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -1015,14 +1715,14 @@
             "description": "User database dropped",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/activate"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -1069,14 +1769,14 @@
             "description": "User removed",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/userDelete"
             }
           },
           "400": {
             "description": "Auth error",
             "headers": {},
             "schema": {
-              "$ref": "#/definitions/AuthMsg"
+              "$ref": "#/definitions/SpecificError"
             }
           },
           "401": {
@@ -1115,8 +1815,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform Registered",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/platformReg"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         },
         "security": [
@@ -1154,8 +1871,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform show",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/showPlatforms"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1191,8 +1925,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform Validation",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/activate"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1228,8 +1979,25 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "headers": {}
+            "description": "Platform Remove",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/platformDelete"
+            }
+          },
+          "400": {
+            "description": "Auth error",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/SpecificError"
+            }
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
           }
         }
       }
@@ -1268,12 +2036,106 @@
         }
       }
     },
+    "activate": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Changes applied"
+        }
+      }
+    },
+    "showPlatforms": {
+      "type": "object",
+      "properties": {
+        "<platform_name>": {
+          "type": "object",
+          "properties": {
+            "platform_id": {
+              "type": "string",
+              "example": "6ff41f14-b463-11ea-b3de-0242ac130004"
+            },
+            "ip": {
+              "type": "string",
+              "example": "127.0.0.1"
+            },
+            "active": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        }
+      }
+    },
+    "platformReg": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Platform registration Sucessfull"
+        }
+      }
+    },
     "AuthMsg": {
       "type": "object",
       "properties": {
         "result": {
           "type": "string",
           "example": "Not valid token given"
+        }
+      }
+    },
+    "NewPass": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "New password for test@test.com Look your email for getting it"
+        }
+      }
+    },
+    "register": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "User registered. Keep an eye with your email for knowing when your account is activated"
+        }
+      }
+    },
+    "userDelete": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Test user is removed"
+        }
+      }
+    },
+    "platformDelete": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "Test platform is removed"
+        }
+      }
+    },
+    "ChangePass": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "New password for testuser"
+        }
+      }
+    },
+    "SpecificError": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string",
+          "example": "<Specific Error>"
         }
       }
     },
@@ -1292,7 +2154,7 @@
         "result": {
           "type": "object",
           "properties": {
-            "usename": {
+            "test_user1": {
               "type": "object",
               "properties": {
                 "active": {
@@ -1304,23 +2166,24 @@
                 },
                 "email": {
                   "type": "string",
-                  "example": "5genesismanagement@gmail.com"
+                  "example": "test1@gmail.com"
+                }
+              }
+            },
+            "test_user2": {
+              "type": "object",
+              "properties": {
+                "active": {
+                  "type": "boolean",
+                  "example": false
                 },
-                "traces": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "action": {
-                        "type": "string",
-                        "example": "GetToken"
-                      },
-                      "date": {
-                        "type": "string",
-                        "example": "2020-01-09 11:22:32.772248"
-                      }
-                    }
-                  }
+                "deleted": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "email": {
+                  "type": "string",
+                  "example": "test2@gmail.com"
                 }
               }
             }
