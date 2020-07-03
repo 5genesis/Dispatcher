@@ -271,7 +271,7 @@ def get_images():
         result = {}
         for vim in dbclient['images'].collection_names():
             images = []
-            for image in list(dbclient['images']['malagacore'].find()):
+            for image in list(dbclient['images'][vim].find()):
                 images.append(image['name'])
             result[vim] = images
     except Exception as e:
@@ -423,7 +423,9 @@ def onboard_ns():
 
 
 def get_user():
-    user = request.authorization.get('username')
+    user = None
+    if request.authorization:
+        user = request.authorization.get('username')
     if not user:
         token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
         user = ast.literal_eval(
