@@ -88,8 +88,8 @@ def validate_zip(file, schema, type, private_vnfs=None, user=None):
         folder = ''
         logger.debug("Decompressing package file")
         # unzip the package
-        if file.split('.')[-1] != 'gz':
-            raise Exception('Not valid file, .tar.gz is required')
+        #if file.split('.')[-1] != 'gz':
+        #    raise Exception('Not valid file, .tar.gz is required')
         tar = tarfile.open(file)
         folder = tar.getnames()[0]
         logger.debug("Folder: {}".format(folder))
