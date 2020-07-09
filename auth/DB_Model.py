@@ -10,7 +10,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///auth.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
+engine = db.create_engine('sqlite:///auth.db', echo=False)
 settings = Settings()
 key = settings.KEY
 
@@ -88,6 +88,17 @@ def init_db():
     admin_rol = Rol(username='Admin', rol_name='Admin')
     db.session.add(admin_rol)
     db.session.commit()
+
+
+def drop_users_db():
+    Rol.__table__.drop(engine)
+    Registry.__table__.drop(engine)
+    User.__table__.drop(engine)
+
+    User.__table__.create(engine)
+    Rol.__table__.create(engine)
+    Registry.__table__.create(engine)
+    init_db()
 
 
 db.create_all()

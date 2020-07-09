@@ -9,7 +9,7 @@ import json
 from auth import app
 from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
     string_to_boolean, get_user_from_token, get_platform_name, get_platform_id
-from DB_Model import init_db, User, Registry, Platform, db
+from DB_Model import init_db, drop_users_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
 from settings import Settings
@@ -195,10 +195,7 @@ def drop_db():
     logger.info(str(request))
     try:
         # Drop DB & create a new instance of DB
-        db.drop_all()
-        db.session.commit()
-        db.create_all()
-        init_db()
+        drop_users_db()
         return jsonify(result='User Database dropped')
     except Exception as e:
         return jsonify(result=('Drop DataBase failed: ' + str(e))), 400
