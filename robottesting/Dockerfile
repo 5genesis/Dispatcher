@@ -1,8 +1,8 @@
 #From robot:melian
 From javimelian/robottesting:latest
 
-ENV ROBOT_WORK_DIR /robotTesting
-ENV PACKAGES_DIR /robotTesting/packages
+ENV ROBOT_WORK_DIR /robottesting
+ENV PACKAGES_DIR /robottesting/packages
 ENV TEST_IMAGE test_image.img
 
 #5MB
@@ -25,4 +25,4 @@ EXPOSE 80
 #ENTRYPOINT sed 's@\/home@'"$ROBOT_RESULTS_DIR"'@g' /etc/lighttpd/lighttpd.conf > /etc/lighttpd/lighttpd.conf2 && mv /etc/lighttpd/lighttpd.conf2 /etc/lighttpd/lighttpd.conf && service lighttpd restart && /bin/bash
 ENTRYPOINT ["sh", "./start.sh"]
 # Execute all robot tests
-#CMD ["run-tests-in-virtual-screen.sh"]
+#CMD ["runtests.sh"]
