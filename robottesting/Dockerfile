@@ -1,8 +1,8 @@
 #From robot:melian
 From javimelian/robottesting:latest
 
-ENV ROBOT_WORK_DIR /robottesting
-ENV PACKAGES_DIR /robottesting/packages
+ENV ROBOT_WORK_DIR /robotTesting
+ENV PACKAGES_DIR /robotTesting/packages
 ENV TEST_IMAGE test_image.img
 
 #5MB

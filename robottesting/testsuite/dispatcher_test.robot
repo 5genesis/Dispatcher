@@ -10,18 +10,16 @@ ${admin_user}=   Admin
 ${admin_pass}=   Admin
 ${test_user}=    %{TEST_USER}
 ${test_pass}=    %{TEST_PASS}
-#${test_user}=    Admin
-#${test_pass}=    Admin
-${test_email}=    %{TEST_EMAIL}
+${test_email}=   %{TEST_EMAIL}
 # Descriptors
-${test_vnfd_pkg_bad}=    %{PACKAGES_DIR}/cirros_vnf.tar.gz
+${test_vnfd_pkg_bad}=   %{PACKAGES_DIR}/cirros_vnf.tar.gz
 ${test_vnfd_pkg_ok}=    %{PACKAGES_DIR}/hackfest_1_vnfd_fixed.tar.gz
 ${test_nsd_pkg_bad}=    %{PACKAGES_DIR}/cirros_2vnf_ns.tar.gz
-${test_nsd_pkg_ok}=    %{PACKAGES_DIR}/hackfest_1_nsd_fixed.tar.gz
+${test_nsd_pkg_ok}=     %{PACKAGES_DIR}/hackfest_1_nsd_fixed.tar.gz
 ${test_nsd_id}=    hackfest1-ns
 
 ${test_experiment_bad}=   %{PACKAGES_DIR}/exp.json
-${test_experiment_ok}=   %{PACKAGES_DIR}/exp_fixed.json
+${test_experiment_ok}=    %{PACKAGES_DIR}/exp_fixed.json
 
 # VIM
 ${test_image_file}=   %{PACKAGES_DIR}/%{TEST_IMAGE}
@@ -63,7 +61,7 @@ Register New User
 
 
 Validate User
-    # Request preparation
+    # Request preparation (Admin Basic Auth)
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${admin_user}  ${admin_pass}
     ${false}=    Convert To Boolean    False
@@ -81,7 +79,7 @@ Validate User
     log   ${resp.json()}
 
 
-Show Users
+Show Users (Admin Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${admin_user}  ${admin_pass}
@@ -98,12 +96,11 @@ Show Users
     log   ${resp.json()}
 
 
-Get User Token
+Get User Token (User Basic Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${test_user}  ${test_pass}
-    #${auth}=  Create List  ${admin_user}  ${admin_pass}
     ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
@@ -121,30 +118,23 @@ Get User Token
     Log   ${token}
 
 
-List VIMs
+List VIMs (Token Auth)
     sleep  5s
     # Request preparation
-    #${headers}=   create dictionary   Content-Type=application/json   Authorization=${token}
-    #${false}=    Convert To Boolean    False
-    #Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}   verify=${false}
-    # Request preparation
-    ${headers}=   create dictionary   Content-Type=application/json   Authorization=Basic ABCDEF==
-    ${auth}=  Create List   ${test_user}   ${test_pass}
+    ${headers}=   create dictionary   Content-Type=application/json   Authorization=${token}
     ${false}=    Convert To Boolean    False
-    Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
-
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}   verify=${false}
 
     # Request
     ${resp}=  Get Request  Dispatcher   /mano/vims
 
     # VALIDATIONS
-    #log   ${resp.json()}
     Log   ${resp.content}
     Should Contain  ${resp.text}   ${vim_name}
     Should Be Equal As Strings  ${resp.status_code}  200
 
 
-Upload Image VIM
+Upload Image VIM (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
@@ -163,7 +153,7 @@ Upload Image VIM
     Should Be Equal As Strings    ${resp.status_code}    201
 
 
-Register VIM Image (Basic Auth)
+Register VIM Image (Admin Basic Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=Basic ABCDEF==
@@ -187,12 +177,6 @@ Get Image List (Token Auth)
     ${headers}=   create dictionary   Authorization=${token}
     ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
-    # Request preparation
-    #${headers}=   create dictionary   Content-Type=application/json   Authorization=Basic ABCDEF==
-    #${auth}=  Create List   ${test_user}   ${test_pass}
-    #${false}=    Convert To Boolean    False
-    #Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
-
 
     ${resp}=    Get Request    Dispatcher   /mano/image
 
@@ -406,33 +390,31 @@ Delete NSD
     Should Be Equal As Strings    ${resp.status_code}    204
 
 
-#Delete User
-#    # Request preparation
-#    ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
-#    ${auth}=  Create List  ${test_user}  ${test_pass}
-#    #${auth}=  Create List  ${admin_user}  ${admin_pass}
-#    ${false}=    Convert To Boolean    False
-#    Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
-#
-#    # Request
-#    ${resp}=   Delete Request  Dispatcher   /auth/delete_user/${test_user}
-#
-#    # VALIDATIONS
-#    Should Be Equal As Strings  ${resp.status_code}  204
-#
-#
-# Drop Database
-#     # Request preparation
-#     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
-#     ${auth}=  Create List  ${test_user}  ${test_pass}
-#     #${auth}=  Create List  ${admin_user}  ${admin_pass}
-#     ${false}=    Convert To Boolean    False
-#     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
+Delete User (Admin Basic Auth)
+    # Request preparation
+    ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
+    ${auth}=  Create List  ${admin_user}  ${admin_pass}
+    ${false}=    Convert To Boolean    False
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
-#     # Request
-#     ${resp}=   Delete Request  Dispatcher   /auth/drop_db
+    # Request
+    ${resp}=   Delete Request  Dispatcher   /auth/delete_user/${test_user}
 
-#     # VALIDATIONS
-#     Should Be Equal As Strings  ${resp.status_code}  200
+    # VALIDATIONS
+    Should Be Equal As Strings  ${resp.status_code}  204
+
+
+Drop Database (Admin Basic Auth)
+    # Request preparation
+    ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
+    ${auth}=  Create List  ${test_user}  ${test_pass}
+    ${false}=    Convert To Boolean    False
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
+
+    # Request
+    ${resp}=   Delete Request  Dispatcher   /auth/drop_db
+
+    # VALIDATIONS
+    Should Be Equal As Strings  ${resp.status_code}  200
 
 
