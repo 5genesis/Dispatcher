@@ -86,7 +86,7 @@ services:
     build: ./robottest
     container_name: robottest
     env_file:
-      - ./robottest/.env
+      - ./robottest/environment.rc
     ports:
       - '8200:80'
 
