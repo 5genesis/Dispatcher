@@ -82,14 +82,11 @@ services:
       - '2000:2000'
     restart: always
 
-  robottesting:
-    build: ./robottesting
-    container_name: robottesting
+  robottest:
+    build: ./robottest
+    container_name: robottest
     env_file:
-      - ./robottesting/.env
-    command: start.sh
+      - ./robottest/.env
     ports:
-      - '8002:80'
-    volumes:
-      - './robottesting:/robottesting'
+      - '8200:80'
 
