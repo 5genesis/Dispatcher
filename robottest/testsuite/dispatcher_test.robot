@@ -29,6 +29,9 @@ ${vim_name}=   %{VIM_NAME}
 
 ${dispatcher_URL}=   %{API_URL}
 
+${true}=    Convert To Boolean    True
+${false}=    Convert To Boolean    False
+
 
 *** Keywords ***
 Create Multi Part
@@ -45,26 +48,27 @@ Register New User
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/x-www-form-urlencoded
     ${params}=   create dictionary   username=${test_user}    email=${test_email}   password=${test_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Request
     ${resp}=   Post Request  Dispatcher   /auth/register   data=${params}
 
+    # Output
+    log   ${resp.json()}
+
     # VALIDATIONS
     #Should Be Equal As Strings  ${resp.json()['transaction']['status']}  success
-    Should Be Equal As Strings  ${resp.status_code}  200
 
-    # Output
-    log to console   ${resp}
-    log   ${resp.json()}
+    # If the user exists, it still should pass the test
+    ${exists}=  Evaluate   "User already exists" in """${resp.text}"""
+    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
+    ...               ELSE   Should Be Equal As Strings    ${resp.status_code}    200
 
 
 Validate User
     # Request preparation (Admin Basic Auth)
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${admin_user}  ${admin_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Request
@@ -75,7 +79,6 @@ Validate User
     should contain   ${resp.text}    Changes applied
 
     # Output
-    log to console   ${resp}
     log   ${resp.json()}
 
 
@@ -83,7 +86,6 @@ Show Users (Admin Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${admin_user}  ${admin_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Request
@@ -101,7 +103,6 @@ Get User Token (User Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${test_user}  ${test_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Request
@@ -122,7 +123,6 @@ List VIMs (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}   verify=${false}
 
     # Request
@@ -138,7 +138,6 @@ Upload Image VIM (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
@@ -149,8 +148,12 @@ Upload Image VIM (Token Auth)
     ${resp}=    Post Request    Dispatcher   /mano/image   files=${files}    data=${data}
 
     # VALIDATIONS
-    log to console   ${resp.content}
-    Should Be Equal As Strings    ${resp.status_code}    201
+    Log   ${resp.content}
+ 
+    # If the image exists, it still should pass the test
+    ${exists}=  Evaluate   "Image already exists" in """${resp.text}"""
+    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
+    ...               ELSE   Should Be Equal As Strings    ${resp.status_code}    201
 
 
 Register VIM Image (Admin Basic Auth)
@@ -158,7 +161,6 @@ Register VIM Image (Admin Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Authorization=Basic ABCDEF==
     ${auth}=  Create List   ${admin_user}   ${admin_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Data
@@ -167,7 +169,7 @@ Register VIM Image (Admin Basic Auth)
     ${resp}=    Post Request    Dispatcher   /mano/image   data=${data}
 
     # VALIDATIONS
-    log to console   ${resp.content}
+    Log   ${resp.content}
     Should Be Equal As Strings    ${resp.status_code}    201
 
 
@@ -189,7 +191,6 @@ Index Faulty VNFD (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
@@ -211,14 +212,7 @@ Index VNFD (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
-
-    # Request preparation
-    #${headers}=   create dictionary   Content-Type=application/json   Authorization=Basic ABCDEF==
-    #${auth}=  Create List   ${test_user}   ${test_pass}
-    #${false}=    Convert To Boolean    False
-    #Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Data
     &{data}=    Create Dictionary    visibility=True
@@ -236,7 +230,6 @@ Get VNFD list (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}   verify=${false}
 
     # Request
@@ -252,7 +245,6 @@ Get VNFD list (Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json   Authorization=Basic ABCDEF==
     ${auth}=  Create List   ${test_user}   ${test_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Request
@@ -267,7 +259,6 @@ Index Faulty NSD (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
@@ -289,7 +280,6 @@ Index NSD (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
@@ -308,7 +298,6 @@ Get NSD list (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}   verify=${false}
 
     # Request
@@ -323,7 +312,6 @@ Validate Bad Experiment Descriptor
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
@@ -340,11 +328,11 @@ Validate Experiment Descriptor
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
     ${file_data}=    Get File    ${test_experiment_ok}
+
     ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
 
     # VALIDATIONS
@@ -357,15 +345,10 @@ Onboard NSD (Token Auth)
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
     #${headers}=   create dictionary   Content-Type=multipart/form-data   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
-    #&{data}=    Create Dictionary    ns=${test_nsd_id}
-    #${data}=    Evaluate    {'ns': '${test_nsd_id}'}    
     ${data}=   Evaluate   [('ns', '${test_nsd_id}')]
-
-
 
     ${resp}=    Post Request    Dispatcher   /mano/onboard   data=${data}
 
@@ -378,7 +361,6 @@ Delete NSD
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Content-Type=multipart/form-data   Authorization=${token}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
     # Data
@@ -394,21 +376,21 @@ Delete User (Admin Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
     ${auth}=  Create List  ${admin_user}  ${admin_pass}
-    ${false}=    Convert To Boolean    False
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Request
     ${resp}=   Delete Request  Dispatcher   /auth/delete_user/${test_user}
 
     # VALIDATIONS
-    Should Be Equal As Strings  ${resp.status_code}  204
+    ${result} =  Get From Dictionary  ${resp.json()}   result
+    Should Contain  ${result}   user is removed
+    Should Be Equal As Strings  ${resp.status_code}  200
 
 
 Drop Database (Admin Basic Auth)
     # Request preparation
     ${headers}=   create dictionary   Content-Type=application/json  Authorization=Basic ABCDEF==
-    ${auth}=  Create List  ${test_user}  ${test_pass}
-    ${false}=    Convert To Boolean    False
+    ${auth}=  Create List  ${admin_user}  ${admin_pass}
     Create Session  alias=Dispatcher  url=${dispatcher_URL}  headers=${headers}  auth=${auth}   verify=${false}
 
     # Request

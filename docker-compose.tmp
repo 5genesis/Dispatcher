@@ -87,6 +87,9 @@ services:
     container_name: robottest
     env_file:
       - ./robottest/environment.rc
+    entrypoint: ["sh", "-c", "sleep infinity"]
+    volumes:
+      - './robottest/testsuite:/robotTesting/testsuite'
     ports:
       - '8200:80'
 
