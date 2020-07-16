@@ -12,9 +12,6 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# DB parameters
-dbclient = MongoClient("mongodb://database:27017/")
-
 # Logging Parameters
 logger = logging.getLogger("-Distributor-")
 fh = logging.FileHandler('distributor.log')
@@ -99,7 +96,11 @@ def onboard_ed(site, path):
         data = json.loads(content)
         logger.debug("Experiment descriptor: {}".format(data))
 
+        # Validation process
         validate(data)
+        # Check artifacts dependencies (nss, vnfs, images)
+        for ns in data['NSs']:
+            check_dependencies(ns[0], ns[1])
 
         logger.debug('Experiment validated')
         payload = {'ns': data['NS']}
@@ -136,7 +137,12 @@ def validate_ed():
         content = request.get_data()
         data = json.loads(content)
         logger.debug("Experiment descriptor: {}".format(data))
+        # Validation process
         validate(data)
+        # Check artifacts dependencies (nss, vnfs, images)
+        for ns in data['NSs']:
+            check_dependencies(ns[0], ns[1])
+
     except fastjsonschema.JsonSchemaDefinitionException as ve:
         logger.warning("Problem while validating Experiment descriptor: {}".format(ve.message))
         return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
@@ -146,6 +152,18 @@ def validate_ed():
     except Exception as e:
         logger.warning("Problem while validating Experiment descriptor: {}".format(str(e)))
     return jsonify({"detail": "Successful validation", "code": "OK", "status": 200}), 200
+
+
+def check_dependencies(ns, vim):
+    images = []
+    dependencies = dbclient['dependencies']
+    ns = dependencies['ns'].find_one({'id':ns})
+    for vnf in ns['vnfs']:
+        vdu_images = dependencies['vnf'].find_one({'id': vnf})['images']
+        images.extend(vdu_images)
+    for image in images:
+        if not dbclient['images'][vim].find_one({'name': image}):
+            raise Exception('Image {} not available in VIM {}'.format(image, vim))
 
 
 if __name__ == '__main__':

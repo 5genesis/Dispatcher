@@ -5,17 +5,15 @@
   "type": "object",
   "title": "The Experiment descriptor Schema",
   "required": [
-    "Name",
-    "User",
-    "Platform",
     "TestCases",
+    "Automated",
     "UEs",
     "Slice",
-    "NS",
-    "Type_experiment",
+    "NSs",
+    "ExperimentType",
     "Scenario",
     "Application",
-    "Attended"
+    "Parameters",
   ],
   "properties": {
     "Id": {
@@ -84,7 +82,7 @@
     },
     "Slice": {
       "$id": "#/properties/Slice",
-      "type": "string",
+      "type": ["string", "null"],
       "title": "Slice ID",
       "examples": [
         "fer9af0gfg0ads"
@@ -130,7 +128,7 @@
     },
     "Scenario": {
       "$id": "#/properties/Scenario",
-      "type": "array",
+      "type": ["array", "null"],
       "title": "The Scenario Schema",
       "items": {
         "$id": "#/properties/Scenario/items",
@@ -145,7 +143,7 @@
     },
     "Application": {
       "$id": "#/properties/Application",
-      "type": "array",
+      "type": ["array", "null"],
       "title": "Application list",
       "items": {
         "$id": "#/properties/Application/items",
