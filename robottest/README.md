@@ -75,6 +75,17 @@ Deletes the test user created at the beginning of the testing.
 ### 21. Drop DB
 Deletes the database that keeps all the user information and restores it to the initial state.
 
+## Configuration
+
+The testing environment needs to be configured before starting the container.
+The `environment.rc`file needs to be edited to adapt it to the local environment:
+
+    # Test variables
+
+    TEST_EMAIL=<user e-mail address>
+    API_URL=<Dispatcher API URL. Example: https://192.168.33.116:8082>
+    VIM_NAME=<VIM name. Example: malagacore>
+
 ## Execution
 
 The previous set of tests can be executed by running a script:
