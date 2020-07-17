@@ -87,7 +87,8 @@ For running the 5Genesis Dispatcher, you will need:
 + docker version >= 18.09.6
 + docker-compose version >= 1.17.1
 + Configuration files correctly filled up:
-    + [MANO Wrapper](mano/README.md#config-file "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder
+    + [MANO Wrapper](mano/README.md#settings "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder.
+    + [Robot Testing](robottest/README.md#configuration "Robot Testing") module config: configuration file (`environment.rc`) inside the *robottest/config* folder.
 + NFVO + VIM
 
 ### Config file and installation
