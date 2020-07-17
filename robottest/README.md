@@ -7,7 +7,7 @@ We have created a set of tests to audit the behaviour of the Dispatcher. These t
 The tests are written using Robot Framework [https://robotframework.org], a generic open source automation framework which can be used for test automation and robotic process automation (RPA). Robot Framework is open and extensible and can be integrated with virtually any other tool to create powerful and flexible automation solutions. Being open source also means that Robot Framework is free to use without licensing costs.
 The testing framework is executed in a separate container which also includes a web server that serves the testing reports after the execution of the set of tests is finalised. 
  
-![Test report](./images/test_report.png)
+![Test report](./images/test_report.PNG)
 
 ## Tests description
 
