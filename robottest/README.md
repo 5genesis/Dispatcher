@@ -78,13 +78,15 @@ Deletes the database that keeps all the user information and restores it to the 
 ## Configuration
 
 The testing environment needs to be configured before starting the container.
-The `environment.rc`file needs to be edited to adapt it to the local environment:
+The `environment.rc`, in the `config` folder, file needs to be edited to adapt it to the local environment:
 
     # Test variables
 
     TEST_EMAIL=<user e-mail address>
     API_URL=<Dispatcher API URL. Example: https://192.168.33.116:8082>
     VIM_NAME=<VIM name. Example: malagacore>
+
+> Alternatively, these environment variables can be modified on runtime by editing the file above and running the `reload_env.sh` script to reload the values.
 
 ## Execution
 
