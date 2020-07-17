@@ -1,4 +1,3 @@
-#From robot:melian
 From javimelian/robottesting:latest
 
 ENV ROBOT_WORK_DIR /robotTesting
@@ -25,8 +24,3 @@ RUN mv /etc/lighttpd/lighttpd.conf2 /etc/lighttpd/lighttpd.conf
 # Port for the web reports
 EXPOSE 80
 
-# Restart the web service for the logs
-#ENTRYPOINT sed 's@\/home@'"$ROBOT_RESULTS_DIR"'@g' /etc/lighttpd/lighttpd.conf > /etc/lighttpd/lighttpd.conf2 && mv /etc/lighttpd/lighttpd.conf2 /etc/lighttpd/lighttpd.conf && service lighttpd restart && /bin/bash
-#ENTRYPOINT ["sh", "./start.sh"]
-# Execute all robot tests
-#CMD ["runtests.sh"]
