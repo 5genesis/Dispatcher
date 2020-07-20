@@ -89,8 +89,10 @@ def delete_remote_file(ssh_host, ssh_user, ssh_password, path, ssh_port=22):
         sftp.remove(path)
         logger.info("File deleted")
     except Exception as e:
-        logger.exception("Failure while cached file: {}".format(str(e)))
+        logger.exception("Failure while deleting cached file: {}".format(str(e)))
+        return "Failure while deleting cached file: {}".format(str(e)), 400
     ssh.close()
+    return "OK", 204
 
 class Opennebula():
     """
@@ -251,10 +253,10 @@ class Opennebula():
         import os
 
         try:
-            ssh_scp_files(server_ip, server_username, server_password, f.filename, image_dir, ssh_port)
+            ssh_scp_files(server_ip, server_username, server_password, f, image_dir, ssh_port)
 
             # sife of the file in bytes
-            size = os.path.getsize(f.filename)
+            size = os.path.getsize(f)
             # convert to MB
             size = int(size/(1024*1024))
 
@@ -263,9 +265,9 @@ class Opennebula():
                 auth_url,
                 session="{0}:{1}".format(one_username, one_password)
                 )
-            name, file_extension = os.path.splitext(f.filename)
-            description = f.filename
-            source = image_dir + f.filename
+            name, file_extension = os.path.splitext(f)
+            description = f
+            source = image_dir + f
     
             # find the default datastore
             dsid = 0
@@ -280,8 +282,11 @@ class Opennebula():
                      (name, source, image_type, description, size*3)
             logger.debug("template: {}".format(template))
             r = conn.image.allocate(template,dsid)
-            delete_remote_file(server_ip, server_username, server_password, str(image_dir + f.filename), ssh_port)
         except Exception as e:
             logger.exception("Failed uploading image: {}".format(str(e)))
+            delete_remote_file(server_ip, server_username, server_password, str(image_dir + f), ssh_port)
+            return "Failed uploading image: {}".format(str(e)), 400
+        delete_remote_file(server_ip, server_username, server_password, str(image_dir + f), ssh_port)
+        return "Image uploaded successfully", 201
 
 
