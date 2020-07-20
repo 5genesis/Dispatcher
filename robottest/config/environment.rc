@@ -1,0 +1,16 @@
+# Test variables
+
+TEST_EMAIL=<user e-mail address>
+API_URL=<Dispatcher API URL. Example: https://192.168.33.116:8082>
+VIM_NAME=<VIM name. Example: malagacore>
+
+## Do not change anything below this line ##
+TEST_USER=testuser
+TEST_PASS=testpass
+TEST_IMAGE=test_image.img
+
+# Robot variables
+
+ROBOT_WORK_DIR=/robotTesting
+ROBOT_RESULTS_DIR=/robotTesting/results
+PACKAGES_DIR=/robotTesting/packages

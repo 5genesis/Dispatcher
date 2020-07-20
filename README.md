@@ -87,7 +87,8 @@ For running the 5Genesis Dispatcher, you will need:
 + docker version >= 18.09.6
 + docker-compose version >= 1.17.1
 + Configuration files correctly filled up:
-    + [MANO Wrapper](mano/README.md#config-file "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder
+    + [MANO Wrapper](mano/README.md#settings "MANO Wrapper") module config: configuration file (`mano.conf`) inside the *mano* folder.
+    + [Robot Testing](robottest/README.md#configuration "Robot Testing") module config: configuration file (`environment.rc`) inside the *robottest/config* folder.
 + NFVO + VIM
 
 ### Config file and installation
@@ -207,8 +208,14 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - Javier [02/Jan/2020:16:08:30 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
+## Testing
+
+The *Dispatcher* includes tests to validate each of its features based in Python Robot Test Framework.
+Consult the [testing documentation](robottest/README.md "robottest") for the available actions and how to use them.
+
 ## Versioning
 
+- 2.8.0 - Dispatcher testing
 - 2.7.0 - Introduction of the Distributor/Validator for closing the loop with the Experiment execution
 - 2.6.3 - Support for OpenNebula VIM to upload images
 - 2.6.2 - New validation based on Image dependency for VNFs
