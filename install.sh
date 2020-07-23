@@ -18,11 +18,14 @@
 config_file="dispatcher.conf"
 output_file="nginx.conf"
 swagger_file="swagger/template_auth.json"
+testing_conf_file="robottest/config/environment.tmp"
 
 echo "Platform Name: "
 read answer
 echo $answer > auth/platform_name
 uuidgen > auth/platformID
+echo "(Any) VIM Name (for testing purposes): "
+read vim_name
 
 # Check the user has configured the dispatcher config file
 while true; do
@@ -41,6 +44,8 @@ cp docker-compose.tmp docker-compose.yml
 # Add the local IP to the swagger file
 my_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
 sed "s/DISPATCHER/$my_ip/g" $swagger_file > swagger/swagger.json
+# and to the testing config
+sed "s/DISPATCHER/$my_ip/g;s/SELECTED_VIM/$vim_name/g" $testing_conf_file > robottest/config/environment.rc
 
 echo "Dispatcher configured using information from '$config_file' file"
 
