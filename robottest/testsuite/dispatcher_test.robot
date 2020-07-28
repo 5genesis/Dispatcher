@@ -151,8 +151,9 @@ Upload Image VIM (Token Auth)
     Log   ${resp.content}
  
     # If the image exists, it still should pass the test
-    ${exists}=  Evaluate   "Image already exists" in """${resp.text}"""
-    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
+    ${exists_in_openstack}=  Evaluate   "Image already exists" in """${resp.text}"""
+    ${exists_in_opennebula}=  Evaluate   "NAME is already taken by IMAGE" in """${resp.text}"""
+    Run Keyword If   '${exists_in_openstack}' == 'True' or '${exists_in_opennebula}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
     ...               ELSE   Should Be Equal As Strings    ${resp.status_code}    201
 
 

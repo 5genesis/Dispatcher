@@ -86,7 +86,7 @@ The `environment.rc`, in the `config` folder, file needs to be edited to adapt i
     API_URL=<Dispatcher API URL. Example: https://192.168.33.116:8082>
     VIM_NAME=<VIM name. Example: malagacore>
 
-> Alternatively, these environment variables can be modified on runtime by editing the file above and running the `reload_env.sh` script to reload the values.
+> This file is created on installation time based on the information provided by the user
 
 ## Execution
 

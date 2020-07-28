@@ -56,11 +56,29 @@ def timeout(func):
             raise (AttributeError)
     return (wrapper)
 
+def ssh_transfer_files(ssh_host, ssh_user, ssh_password, source_volume, destination_volume, ssh_port=22):
+    import plumbum
+    import os.path
+    from os import path
+    
+    try:
+        logger.debug("Source image file exists: "+str(path.exists(source_volume)))
+
+        remote = plumbum.SshMachine(str(ssh_host), user = ssh_user,  password = ssh_password)
+        fro = plumbum.local.path(source_volume)
+        to = remote.path(destination_volume)
+        plumbum.path.utils.copy(fro, to)
+        logger.info("File transfered")
+    except Exception as e:
+        logger.exception("Failure while transfering the file to the server: {}".format(str(e)))
+    #remote.close()
 
 def ssh_scp_files(ssh_host, ssh_user, ssh_password, source_volume, destination_volume, ssh_port=22):
     """
 
     """
+    import os
+
     logger.info("Transfering file {} to the server".format(source_volume))
     try:
         ssh = SSHClient()
@@ -70,6 +88,13 @@ def ssh_scp_files(ssh_host, ssh_user, ssh_password, source_volume, destination_v
         with SCPClient(ssh.get_transport()) as scp:
             scp.put(source_volume, recursive=True, remote_path=destination_volume)
         logger.info("File transfered")
+
+        #once transfered, convert the image from raw to qcow2
+        # Example: qemu-img convert -f raw -O qcow2 ttylinux-vd.qcow2 ttylinux-vd.qcow2
+        command = "qemu-img convert -f raw -O qcow2 {}{} {}{}".format(destination_volume, source_volume, destination_volume, os.path.splitext(source_volume)[0]+'.qcow2')
+        stdin, stdout, stderr = ssh.exec_command(command)
+        logger.info("File converted to qcow2 format")
+
     except Exception as e:
         logger.exception("Failure while transfering the file to the server: {}".format(str(e)))
     ssh.close()
@@ -89,8 +114,10 @@ def delete_remote_file(ssh_host, ssh_user, ssh_password, path, ssh_port=22):
         sftp.remove(path)
         logger.info("File deleted")
     except Exception as e:
-        logger.exception("Failure while cached file: {}".format(str(e)))
+        logger.exception("Failure while deleting cached file: {}".format(str(e)))
+        return "Failure while deleting cached file: {}".format(str(e)), 400
     ssh.close()
+    return "OK", 204
 
 class Opennebula():
     """
@@ -251,10 +278,11 @@ class Opennebula():
         import os
 
         try:
-            ssh_scp_files(server_ip, server_username, server_password, f.filename, image_dir, ssh_port)
+            ssh_scp_files(server_ip, server_username, server_password, f, image_dir, ssh_port)
+            #ssh_transfer_files(server_ip, server_username, server_password, f, image_dir, ssh_port)
 
             # sife of the file in bytes
-            size = os.path.getsize(f.filename)
+            size = os.path.getsize(f)
             # convert to MB
             size = int(size/(1024*1024))
 
@@ -263,9 +291,9 @@ class Opennebula():
                 auth_url,
                 session="{0}:{1}".format(one_username, one_password)
                 )
-            name, file_extension = os.path.splitext(f.filename)
-            description = f.filename
-            source = image_dir + f.filename
+            name, file_extension = os.path.splitext(f)
+            description = f
+            source = image_dir + f
     
             # find the default datastore
             dsid = 0
@@ -276,12 +304,17 @@ class Opennebula():
                     break
 
             # creation of the image template and registration
-            template='''\nNAME="%s"\nSOURCE="%s"\nTYPE="%s"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
+            #template='''\nNAME="%s"\nPATH="%s"\nTYPE="%s"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
+            template='''\nNAME="%s"\nPATH="%s"\nTYPE="%s"\nDRIVER="qcow2"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
                      (name, source, image_type, description, size*3)
             logger.debug("template: {}".format(template))
+            logger.debug("DSID: {}".format(dsid))
             r = conn.image.allocate(template,dsid)
-            delete_remote_file(server_ip, server_username, server_password, str(image_dir + f.filename), ssh_port)
         except Exception as e:
             logger.exception("Failed uploading image: {}".format(str(e)))
+            delete_remote_file(server_ip, server_username, server_password, str(image_dir + f), ssh_port)
+            return "Failed uploading image: {}".format(str(e)), 400
+        delete_remote_file(server_ip, server_username, server_password, str(image_dir + f), ssh_port)
+        return "Image uploaded successfully", 201
 
 

@@ -162,6 +162,8 @@ The following sequence diagram describes the flow of each request showed above.
 ![Upload_image](./images/upload_Image_VIM.png)
 <!-- https://www.planttext.com/?text=TL9DJyCm3BtdLrZTXMdQ7-20rcqIciGG1uOcCGvkwhNHqgGqBen_ZvDLZF6HG-J4xpq_Eva5nexxnYhisRk-AQXJ2ZNx3ZQ1EXXPKzNyNXicfGf_XEp18kzzrsH3hh0zAP2LjbRaZ3OjEePiQKABh6lgCi00o-rlIDvpdPBvzc-HDJgVBajaB30GhBsh_78UIKqCKrPxQqcpyIx0qsfzrZfjv4eGzqgfrDNqHinSmoqnFFe3ERYQm1o3qH3zZDLo6o6vG9uxAaqdoYyNp4rhFPPW6gmeabSfcC2TrnXDI9Y4n-gRLXAGETVafBs4K_bbzWsjAK-PWHZxlwodujKvjK2hUtaJ0XcqFeI-sJdmUv0oF_1fMaA8CA2Z2MnS1JjtwiAuH0aVWQdvuiWi_wa-g1adldcOH7mZvRnuiRJdw2AXO8IlFQhfCAPxR4WEYy6kX585x32wz5PHGyKravDypqy0 -->
 
+The image uploading for OpenNebula supports only raw and qcow2 formats
+
 ### List VIMs
 ![get_VIMs](./images/get_VIMs.png)
 <!-- https://www.planttext.com/?text=RP31IWGn44Jl_HNDU74HVy23xCY022vuK1aG3psPrZHcaY7fg9zlal6mY_QXBrNrA6gVbABcnG5b3Jul4qS0CXeYFYMEUERatUgN5MM0ANnZz-18tq9SkbzjSfa1oxMt5fmOMSahTeEabTHOZXrImc7yQ-cpsYRsu_-G0_a0cyH-nb8105gro-j2lC9RLdmC7-pn_09lA8d12jt1C5PBNomlaMU9RFJr97alIV7vxf1giY5sS9HgrZABPL_Qa4hmq9-gd-HatfGjLziUWQ7UllGk2_y0 -->

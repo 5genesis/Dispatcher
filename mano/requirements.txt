@@ -12,4 +12,5 @@ packaging==20.3
 pyone==5.10.4
 paramiko==2.6.0
 scp==0.13.2
+plumbum==1.6.9
 

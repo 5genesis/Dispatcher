@@ -240,15 +240,17 @@ def onboard_vim_image():
             logger.debug("Saving temporary VIM")
             if str(conf["VIM"][vim_id]['TYPE']) == "openstack":
                 logger.debug("Openstack VIM used")
-                r = openstack_upload_image(vim_id, filename, container_format)
+                r, code = openstack_upload_image(vim_id, filename, container_format)
             elif str(conf["VIM"][vim_id]['TYPE']) == "opennebula":
                 logger.debug("OpenNebula VIM used")
-                r = opennebula_upload_image(vim_id, filename, container_format)
+                r, code = opennebula_upload_image(vim_id, filename, container_format)
             else:
                 raise Exception('VIM not supported: {}'.format(conf["VIM"][vim_id]['TYPE']))
 
             logger.debug("Deleting temporary image")
             os.remove(filename)
+            if code == 400:
+                raise Exception('Image could not be indexed: {}'.format(r))
 
     except AttributeError as ve:
         logger.error("Problem while getting the image file: {}".format(str(ve)))
@@ -302,7 +304,6 @@ def openstack_upload_image(vim_id, file, container_format):
                                   username=vim_conf["USER"], password=vim_conf["PASSWORD"])
 
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
-    logger.debug("resultado: {}".format(str(r)))
     return r
 
 

@@ -1,8 +1,8 @@
 # Test variables
 
-TEST_EMAIL=<user e-mail address>
-API_URL=<Dispatcher API URL. Example: https://192.168.33.116:8082>
-VIM_NAME=<VIM name. Example: malagacore>
+TEST_EMAIL=5genesistest@maildrop.cc
+API_URL=https://DISPATCHER:8082
+VIM_NAME=SELECTED_VIM
 
 ## Do not change anything below this line ##
 TEST_USER=testuser
