@@ -56,11 +56,29 @@ def timeout(func):
             raise (AttributeError)
     return (wrapper)
 
+def ssh_transfer_files(ssh_host, ssh_user, ssh_password, source_volume, destination_volume, ssh_port=22):
+    import plumbum
+    import os.path
+    from os import path
+    
+    try:
+        logger.debug("Source image file exists: "+str(path.exists(source_volume)))
+
+        remote = plumbum.SshMachine(str(ssh_host), user = ssh_user,  password = ssh_password)
+        fro = plumbum.local.path(source_volume)
+        to = remote.path(destination_volume)
+        plumbum.path.utils.copy(fro, to)
+        logger.info("File transfered")
+    except Exception as e:
+        logger.exception("Failure while transfering the file to the server: {}".format(str(e)))
+    #remote.close()
 
 def ssh_scp_files(ssh_host, ssh_user, ssh_password, source_volume, destination_volume, ssh_port=22):
     """
 
     """
+    import os
+
     logger.info("Transfering file {} to the server".format(source_volume))
     try:
         ssh = SSHClient()
@@ -70,6 +88,13 @@ def ssh_scp_files(ssh_host, ssh_user, ssh_password, source_volume, destination_v
         with SCPClient(ssh.get_transport()) as scp:
             scp.put(source_volume, recursive=True, remote_path=destination_volume)
         logger.info("File transfered")
+
+        #once transfered, convert the image from raw to qcow2
+        # Example: qemu-img convert -f raw -O qcow2 ttylinux-vd.qcow2 ttylinux-vd.qcow2
+        command = "qemu-img convert -f raw -O qcow2 {}{} {}{}".format(destination_volume, source_volume, destination_volume, os.path.splitext(source_volume)[0]+'.qcow2')
+        stdin, stdout, stderr = ssh.exec_command(command)
+        logger.info("File converted to qcow2 format")
+
     except Exception as e:
         logger.exception("Failure while transfering the file to the server: {}".format(str(e)))
     ssh.close()
@@ -254,6 +279,7 @@ class Opennebula():
 
         try:
             ssh_scp_files(server_ip, server_username, server_password, f, image_dir, ssh_port)
+            #ssh_transfer_files(server_ip, server_username, server_password, f, image_dir, ssh_port)
 
             # sife of the file in bytes
             size = os.path.getsize(f)
@@ -278,9 +304,11 @@ class Opennebula():
                     break
 
             # creation of the image template and registration
-            template='''\nNAME="%s"\nSOURCE="%s"\nTYPE="%s"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
+            #template='''\nNAME="%s"\nPATH="%s"\nTYPE="%s"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
+            template='''\nNAME="%s"\nPATH="%s"\nTYPE="%s"\nDRIVER="qcow2"\nDESCRIPTION="%s"\nSIZE="%d"''' % \
                      (name, source, image_type, description, size*3)
             logger.debug("template: {}".format(template))
+            logger.debug("DSID: {}".format(dsid))
             r = conn.image.allocate(template,dsid)
         except Exception as e:
             logger.exception("Failed uploading image: {}".format(str(e)))
