@@ -104,16 +104,19 @@ def onboard_ed(site, path):
         # Check artifacts dependencies (nss, vnfs, images)
         for ns in data['NSs']:
             check_dependencies(ns[0], ns[1])
-
+        user = get_user()
         logger.debug('Experiment validated')
 
         data['NSs'] = onboard_ns_process(data['NSs'])
+
+        # Experiment Distribution
+        split_experiment(data)
 
         r = requests.post(f'{site}{path}', json=request.get_json(), headers=headers)
 
         executionId = ast.literal_eval(r.text)['ExecutionId']
         experiments = dbclient["experimentsdb"]["experiments"]
-        user = get_user()
+
         experiments.insert_one({'executionId': executionId, 'user': user})
 
     except fastjsonschema.JsonSchemaDefinitionException as ve:
