@@ -206,7 +206,7 @@ def split_experiment(experiment):
     url = 'https://' + ip + ':8082/elcm/api/v0/run'
 
     logger.info('Request to URL {} with the descriptor{}'.format(url, distributed_experiment))
-    req = requests.post(url, headers=header, verify=False, data=distributed_experiment)
+    req = requests.post(url, headers=header, verify=False, json=distributed_experiment)
 
     if req.status_code >= 300:
         msg = 'Experiment distribution failed. ' \

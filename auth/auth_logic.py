@@ -407,7 +407,7 @@ def register_platform(platform_name):
             if metadata.get('timeout') < datetime.timestamp(now):
                 return jsonify(result='Token expired'), 401
 
-        data = request.json
+        data = request.form
         ip = data['ip']
         if ip.find(':') != -1:
             ip = ip.split(':')[-1]
