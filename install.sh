@@ -23,6 +23,7 @@ testing_conf_file="robottest/config/environment.tmp"
 echo "Platform Name: "
 read answer
 echo $answer > auth/platform_name
+ip -o -4 route show to default | awk '{print $9}' > auth/platform_ip
 uuidgen > auth/platformID
 echo "(Any) VIM Name (for testing purposes): "
 read vim_name

@@ -13,7 +13,7 @@
     "ExperimentType",
     "Scenario",
     "Application",
-    "Parameters",
+    "Parameters"
   ],
   "properties": {
     "Id": {

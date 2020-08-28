@@ -78,9 +78,11 @@ def proxy(path):
         elif request.method == 'DELETE':
             resp = requests.delete(f'{SITE_NAME}{path}')
 
+        logger.info(str(resp.text))
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-        headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
-        response = Response(resp.content, resp.status_code, headers)
+        #headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
+        #response = Response(resp.content, resp.status_code) #, headers)
+        response = (jsonify(resp.json()), resp.status_code)
     except Exception as exc:
         exc = str(exc)
         code = 400
@@ -206,7 +208,7 @@ def split_experiment(experiment):
     logger.info('Request to URL {} with the descriptor{}'.format(url, distributed_experiment))
     req = requests.post(url, headers=header, verify=False, data=distributed_experiment)
 
-    if req >= 300:
+    if req.status_code >= 300:
         msg = 'Experiment distribution failed. ' \
               'The platform {} failed with the code {} and the details {} '.format(distributed_platform,
                                                                                    req.status_code, req.text)

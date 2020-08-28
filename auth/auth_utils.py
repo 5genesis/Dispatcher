@@ -15,7 +15,7 @@ key = Settings().KEY
 
 get_platform_name = lambda: open("platform_name", "r").read().split()[0]
 get_platform_id = lambda: open("platformID", "r").read().split()[0]
-
+get_platform_ip = lambda: open("platform_ip", "r").read().split()[0]
 
 def preValidation(request, functional_part):
     if request.authorization:
