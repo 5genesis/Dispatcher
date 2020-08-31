@@ -166,9 +166,10 @@ def onboard_ns_process(network_services):
     logger.info("Onboarding process for NSs {}".format(network_services))
     for ns in network_services:
         payload = {'ns': ns[0]}
-        result = dict(dbclient['onboarded']['ns'].find_one({'ns': ns[0]}))
+        result = dbclient['onboarded']['ns'].find_one({'ns': ns[0]})
         if result:
             logger.info("NS ({}) already onboarded.".format(ns[0]))
+            result= dict(result)
             ns[0] = result['nsid']
         else:
             r = session.post('http://mano:5101/onboard', headers=headers, data=payload)
