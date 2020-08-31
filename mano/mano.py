@@ -109,6 +109,9 @@ def index_vnf(fields, filename, final_path, new_version):
         if not fields['visibility']:
             private_packages = dbclient['private_packages']['vnf']
             private_packages.insert_one({'id': fields.get('id'), 'user':user})
+        dependencies = dbclient['dependencies']['vnf']
+        dependencies.insert_one({'id': fields.get('id'), 'images': fields.get('images')})
+
     yaml.dump(index, open('/repository/' + 'index.yaml', 'w'))
 
 
@@ -191,6 +194,8 @@ def index_ns(fields, filename, final_path, new_version, user=None):
         if not fields['visibility']:
             private_packages = dbclient['private_packages']['ns']
             private_packages.insert_one({'id': fields.get('id'), 'user': user})
+        dependencies = dbclient['dependencies']['ns']
+        dependencies.insert_one({'id': fields.get('id'), 'vnfs': fields.get('vnfd-id-ref')})
     yaml.dump(index, open('/repository/index.yaml', 'w'))
 
 

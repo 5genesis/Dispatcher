@@ -15,7 +15,7 @@ key = Settings().KEY
 
 get_platform_name = lambda: open("platform_name", "r").read().split()[0]
 get_platform_id = lambda: open("platformID", "r").read().split()[0]
-
+get_platform_ip = lambda: open("platform_ip", "r").read().split()[0]
 
 def preValidation(request, functional_part):
     if request.authorization:
@@ -88,8 +88,11 @@ def get_user_from_token(token):
     try:
         if not token:
             return 'Token access is required', 400
+        name = ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('username')
+        if not name:
+            name = ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('platform')
 
-        return ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('username'), 200
+        return name, 200
 
     except:
         return 'No valid Token given', 400

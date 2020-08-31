@@ -8,7 +8,7 @@ import logging
 import json
 from auth import app
 from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
-    string_to_boolean, get_user_from_token, get_platform_name, get_platform_id
+    string_to_boolean, get_user_from_token, get_platform_name, get_platform_id, get_platform_ip
 from DB_Model import init_db, drop_users_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
@@ -407,7 +407,8 @@ def register_platform(platform_name):
             if metadata.get('timeout') < datetime.timestamp(now):
                 return jsonify(result='Token expired'), 401
 
-        ip = request.remote_addr
+        data = request.form
+        ip = data['ip']
         if ip.find(':') != -1:
             ip = ip.split(':')[-1]
 
@@ -435,9 +436,10 @@ def register_platform(platform_name):
 @auth_logic.route('/register_platform_in_platform', methods=['POST'])
 def register_platform_in_platform():
     logger.info(str(request))
-    # TODO set platform_name
+
     platform_name = get_platform_name()
     platform_id = get_platform_id()
+    platform_ip = get_platform_ip()
     try:
         url = request.form['ip']
 
@@ -452,8 +454,8 @@ def register_platform_in_platform():
         token = Etoken.serialize()
         header = {'Authorization': 'Bearer ' + str(token)}
         url = url + Settings.RequestPrefix + '/register_platform/' + platform_name
-
-        req = requests.post(url, headers=header, verify=False)
+        payload = {'ip': platform_ip}
+        req = requests.post(url, data=payload, headers=header, verify=False)
         if req.status_code != 200:
             raise Exception(req.text)
         return jsonify(result='Platform registration Sucessfull'), 200
