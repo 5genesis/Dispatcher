@@ -214,6 +214,7 @@ Consult the [testing documentation](robottest/README.md "robottest") for the ava
 
 ## Versioning
 
+- 2.8.1 - Experiment authorization, interplatform experiment distribution
 - 2.8.0 - Dispatcher testing
 - 2.7.0 - Introduction of the Distributor/Validator for closing the loop with the Experiment execution
 - 2.6.3 - Support for OpenNebula VIM to upload images
