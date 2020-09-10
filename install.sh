@@ -39,9 +39,6 @@ while true; do
 done
 
 
-#copy the docker-compose template to the final docker-compose file
-cp docker-compose.tmp docker-compose.yml
-
 # Add the local IP to the swagger file
 my_ip=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
 sed "s/DISPATCHER/$my_ip/g" $swagger_file > swagger/swagger.json
