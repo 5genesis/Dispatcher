@@ -304,7 +304,10 @@ def openstack_upload_image(vim_id, file, container_format):
                                   username=vim_conf["USER"], password=vim_conf["PASSWORD"])
 
     r = osUtils.upload_image(vim_conn, file, disk_format, container_format)
-    return r
+    status_code = 200
+    if r.status in ('queued'):
+        status_code = 400
+    return r, status_code
 
 
 def opennebula_upload_image(vim_id, file, container_format):
