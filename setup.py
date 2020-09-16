@@ -12,6 +12,9 @@ http {
     access_log   /var/log/nginx/access.log  main;
     error_log   /var/log/nginx/error.log  debug;
     server_names_hash_bucket_size 128; # this seems to be required for some vhosts
+    # Set timeout for a request in 30mins
+    fastcgi_read_timeout 1800;
+    proxy_read_timeout 1800;
 
     server {
         listen 8082 ssl default_server;
