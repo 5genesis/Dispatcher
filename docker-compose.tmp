@@ -78,6 +78,8 @@ services:
     image: auth
     container_name: auth
     command: python auth.py
+    volumes:
+      - ./auth/auth.db:/auth/auth.db
     ports:
       - '2000:2000'
     restart: always
