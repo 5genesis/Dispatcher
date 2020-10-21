@@ -1,4 +1,4 @@
-# 5GENESIS Dispatcher
+# 5GENESIS Dispatcher & MANO Wrapper
 
 The 5GENESIS Dispatcher is the entry point to the system, offering the functionalities to an Experimenter through a single interface. These functionalites are know as the Open APIs, being able to interact with the key features of the underlying modules (as shown in the architecture diagram below) without actually exposing them
 
@@ -37,45 +37,6 @@ The available features will depend on the features exposed by each dispatched mo
 - Cancel execution
 - Get execution logs
 
-## How the authentication works
-
-![Authentication](./images/auth.png)
-
-It is important to know how the application works to make the most of it knowing why every step is taken.
-
-Authentication is delegated to the *Auth* module. Users are registered into it and provide the ability to an user to claim an access token. This token is a JSON Web Token. It contains user's identity (subject id, name, email) and some meta data relatives to the authorization process (issuer, time to live, etc.). The access token can be claimed using Basic Authentication (username + password). The access token is online, that is, a token used by client apps having a direct user interaction (GUI such as: web site, desktop apps, mobile apps, etc). It's a short-lived token, so it shall be renew before its expiration date using a refresh token. Once claimed, the access token is renewed as well as the refresh token. And the process is repeated during the whole user session life time.
-Instead of requesting an access token, it is also possible to authenticate every request using Basic Auth with a user already registered and validated by the Platform Administrator.
-
-### The process is the following:
-
-#### User registration
-The user that wants to have access to the platform services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
-
-![User registration](./images/user_registration.png)
-
-
-#### Platform registration
-The Admin of one platform that wants to allow another platforms for using their services will have to request the Platform Administrator for permission and the Administrator will grant it or deny it.
-
-![Platform registration](./images/register_platform_in_platform.png)
-
-
-
-#### Sending a request to a service
-The *Dispatcher* allows two different authentication methods: Token authentication (JWT) and Basic authentication.
-
-##### Request to a service using Token Authentication
-Prior to any request to a service, the user needs to obtain an authentication token using valid credentials and Basic Auth. Once received the token, this is valid for the next 5 minutes and can be used to query any service behind the *Dispatcher*.
-
-![Request with token](./images/request_with_token.png)
-
-##### Request to a service using Basic Authentication
-Basic authentication is also available: A registered user, using valid credentials should use them in every query to a service behind the *Dispatcher*. 
-
-![Request with basic authentication](./images/request_with_ba.png)
-
-**NOTE:** To know more about the Auth module, go [here](auth/README.md "Auth docs") 
-
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes after you clone the [repository](https://gitlab.fokus.fraunhofer.de/5genesis/dispatcher.git).
@@ -101,11 +62,6 @@ The file should contain information of all the modules the Dispatcher forwards i
     PORT=xxxx -> Port where the app API is available
     PATH=/ -> Base path of the application ("/" by default)
 
-    [mano]
-    PROTOCOL=http
-    HOST=mano
-    PORT=5001
-    PATH=/
 
 The config file template already includes the *validator* and the *mano* modules as they are included within the *Dispatcher*. They are already configured and **should not be touched**.
 
@@ -161,35 +117,6 @@ To stop the Dispatcher service just run the following:
 A swagger testing framework is deployed on port 5002 with the following API specifications:
 ![Dispatcher Swagger](./images/swagger.PNG)
 
-## Repository
-The repository is embedded in the Dispatcher component. The dispatcher, exports the filesystem created in the Mano component.
-The repository allows the version control of VNFs and NSDs. In the main route (https://<IP<IP>>:8082/repository) we can found the following: 
-![Repository_root](./images/repository_root.PNG)
-
-There are 2 directories and one index. 'ns' directory is for hosting the network services and 'vnf' directory is for hosting the virtual network functions.
-Also, we can found an index that will have the minimum information of each artifact:
-
-![Repository_index](./images/repository_index.PNG)
-
-We can observe 1 nsd_package and 2 vnf_package.
-With the index metadata we can compose the path for looking every artifact. For instance, we can check one of them:
-
-![Repository_vnf](./images/repository_vnfd.PNG)
-
-In the directory we can observe 2 files. The VNF package and the metadata.yaml that will have the detailed information of the file.
-The metadata.yaml looks like:
-
-![Repository_vnf_metadata](./images/repository_vnf_metadata.PNG)
-
-The data composed with the VNFD specification and some parameters provided by the open APIs.
-
-
-## Mano Indexing flow 
-The mano microservice is in charge of validating all the artifacts for the NS onboarding (Images, VNFDs & NSDs). 
-The following flow explains how this component analyze the current resources available and validate the new ingestion of each artifact.
-![Mano Flow](./mano/images/mano-flow.png)
-
-
 
 ## Logging
 
@@ -201,10 +128,10 @@ In case of needing any help, contact the [authors](#authors) for support.
     192.168.33.11 - - [02/Jan/2020:15:31:05 +0000]  401 "POST /validator/validate/ed HTTP/1.1" 179 "-" "curl/7.59.0" "-"
     192.168.33.11 - - [02/Jan/2020:15:31:44 +0000]  200 "OPTIONS /auth/get_token HTTP/1.1" 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36" "-"
     192.168.33.11 - - [02/Jan/2020:15:33:51 +0000]  204 "OPTIONS /mano/vnfd HTTP/1.1" 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36" "-"
-    192.168.33.11 - Javier [02/Jan/2020:16:00:24 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
+    192.168.33.11 - - [02/Jan/2020:16:00:24 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
     192.168.33.11 - - [02/Jan/2020:16:02:10 +0000]  200 "GET /mano/vnfd HTTP/1.1" 9407 "-" "PostmanRuntime/7.21.0" "-"
     192.168.33.11 - - [02/Jan/2020:16:08:22 +0000]  401 "GET /mano/nsd HTTP/1.1" 179 "-" "PostmanRuntime/7.21.0" "-"
-    192.168.33.11 - Javier [02/Jan/2020:16:08:30 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
+    192.168.33.11 - - [02/Jan/2020:16:08:30 +0000]  200 "GET /auth/get_token HTTP/1.1" 363 "-" "PostmanRuntime/7.21.0" "-"
     192.168.33.11 - - [02/Jan/2020:16:08:48 +0000]  200 "GET /mano/nsd HTTP/1.1" 4916 "-" "PostmanRuntime/7.21.0" "-"
 
 ## Testing
