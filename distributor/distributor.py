@@ -74,14 +74,17 @@ def proxy(path):
         if request.method == 'GET':
             resp = requests.get(f'{SITE_NAME}{path}')
         elif request.method == 'POST':
-            resp = onboard_ed(SITE_NAME, path)
+            if path.find('distributed'):
+                resp = requests.post(f'{SITE_NAME}{path}', data=request.get_data())
+            else:
+                resp = onboard_ed(SITE_NAME, path)
         elif request.method == 'DELETE':
             resp = requests.delete(f'{SITE_NAME}{path}')
 
         logger.info(str(resp.text))
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-        #headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
-        #response = Response(resp.content, resp.status_code) #, headers)
+        # headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
+        # response = Response(resp.content, resp.status_code) #, headers)
         response = (jsonify(resp.json()), resp.status_code)
     except Exception as exc:
         exc = str(exc)
@@ -90,6 +93,15 @@ def proxy(path):
             code = 401
         response = (jsonify({'result': exc}), code)
     return response
+
+
+def remote_ack(distributed_platform, executionId, remote_id):
+    ip, token = remote_data_info(distributed_platform)
+    header = {'Authorization': 'Bearer ' + token}
+    url = 'https://' + ip + ':8082/elcm'
+    r = requests.post(f'{url}/distributed/{executionId}/peerDetails', verify=False, json={'execution_id': remote_id},
+                      headers=header)
+    return r
 
 
 def onboard_ed(site, path):
@@ -112,11 +124,17 @@ def onboard_ed(site, path):
         data['NSs'] = onboard_ns_process(data['NSs'])
 
         # Experiment Distribution
-        split_experiment(data)
+        remote_id = split_experiment(data)
 
         r = requests.post(f'{site}{path}', json=request.get_json(), headers=headers)
+        if r.status_code > 300:
+            raise Exception('ELCM reject the experiment: {}'.format(r.text))
 
         executionId = ast.literal_eval(r.text)['ExecutionId']
+        if remote_id:
+            r = requests.post(f'{site}/distributed/{executionId}/peerDetails', json={'execution_id': remote_id},
+                              headers=headers)
+            remote_ack(data.get('Remote'), executionId=remote_id, remote_id=executionId)
         experiments = dbclient["experimentsdb"]["experiments"]
 
         experiments.insert_one({'executionId': executionId, 'user': user})
@@ -169,7 +187,7 @@ def onboard_ns_process(network_services):
         result = dbclient['onboarded']['ns'].find_one({'ns': ns[0]})
         if result:
             logger.info("NS ({}) already onboarded.".format(ns[0]))
-            result= dict(result)
+            result = dict(result)
             ns[0] = result['nsid']
         else:
             r = session.post('http://mano:5101/onboard', headers=headers, data=payload)
@@ -184,14 +202,10 @@ def onboard_ns_process(network_services):
         return ns_by_id
 
 
-def split_experiment(experiment):
-    """Split experiment"""
-    distributed_platform = experiment.get('Remote')
+def remote_data_info(distributed_platform):
     # not distributed experiment
     if not distributed_platform:
-        return
-
-    logger.info('Distribution of the experiment for the platform {} is started'.format(distributed_platform))
+        return None, None
 
     platform = dict(dbclient['PlatformsDB']['platforms'].find_one({'platform': distributed_platform}))
     if not platform:
@@ -201,8 +215,18 @@ def split_experiment(experiment):
 
     ip = platform.get('ip')
     token = platform.get('token')
-    distributed_experiment = experiment.get('RemoteDescriptor')
 
+    return ip, token
+
+
+def split_experiment(experiment):
+    """Split experiment"""
+    distributed_platform = experiment.get('Remote')
+    ip, token = remote_data_info(distributed_platform)
+    if not ip:
+        return None
+    logger.info('Distribution of the experiment for the platform {} is started'.format(distributed_platform))
+    distributed_experiment = experiment.get('RemoteDescriptor')
     header = {'Authorization': 'Bearer ' + token}
     url = 'https://' + ip + ':8082/elcm/api/v0/run'
 
@@ -215,6 +239,7 @@ def split_experiment(experiment):
                                                                                    req.status_code, req.text)
         logger.error(msg)
         raise Exception(msg)
+    return req.json().get('ExecutionId')
 
 
 def check_dependencies(ns, vim):
