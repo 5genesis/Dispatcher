@@ -74,7 +74,7 @@ def proxy(path):
         if request.method == 'GET':
             resp = requests.get(f'{SITE_NAME}{path}')
         elif request.method == 'POST':
-            if path.find('distributed'):
+            if path.find('distributed') >= 0:
                 resp = requests.post(f'{SITE_NAME}{path}', data=request.get_data())
             else:
                 resp = onboard_ed(SITE_NAME, path)
