@@ -1,5 +1,19 @@
 {
-  "definitions": {},
+
+
+  "definitions": {
+
+     "NS_list": {
+      	"type": "array",
+      	"minItems": 2,
+  	  	"maxItems": 2,
+        "contains": {
+     		"type": "string"}
+
+    }
+
+
+  },
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://example.com/root.json",
   "type": "object",
@@ -12,43 +26,38 @@
     "NSs",
     "ExperimentType",
     "Scenario",
-    "Parameters"
+    "Parameters",
+    "Version"
   ],
   "properties": {
-    "Id": {
-      "$id": "#/properties/Id",
-      "type": "integer",
-      "title": "Id of the experiment",
-      "examples": [
-        123
-      ]
-    },
-    "Name": {
-      "$id": "#/properties/Name",
+
+    "ReservationTime": {
+      "$id": "#/properties/ReservationTime",
+      "type": ["integer", "null"],
+      "title": "Reservation time for experiment"
+
+   },
+
+    "Automated": {
+      "$id": "#/properties/Automated",
+      "type": "boolean",
+      "title": "Automated experiment"
+
+   },
+
+   "ExperimentType": {
+      "$id": "#/properties/ExperimentType",
       "type": "string",
-      "title": "Name of the experiment",
-      "examples": [
-        "sfafd"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "User": {
-      "$id": "#/properties/User",
-      "type": "integer",
-      "title": "ID of the user running the experiment",
-      "examples": [
-        123
-      ]
-    },
-    "Platform": {
-      "$id": "#/properties/Platform",
-      "type": "string",
-      "title": "Platform ID where the experiment is going to be executed",
-      "examples": [
-        "malaga"
-      ],
-      "pattern": "^(.*)$"
-    },
+      "title": "Experiment type"
+
+   },
+     "ExclusiveExecution": {
+      "$id": "#/properties/ExclusiveExecution",
+      "type": "boolean",
+      "title": "ExclusiveExecution experiment"
+
+   },
+
     "TestCases": {
       "$id": "#/properties/TestCases",
       "type": "array",
@@ -83,48 +92,18 @@
       "$id": "#/properties/Slice",
       "type": ["string", "null"],
       "title": "Slice ID",
-      "examples": [
-        "fer9af0gfg0ads"
-      ],
+      "examples": "fer9af0gfg0ads",
       "pattern": "^(.*)$"
     },
-    "NS": {
-      "$id": "#/properties/NS",
-      "type": "string",
+    "NSs": {
+      "$id": "#/properties/NSs",
+      "type": "array",
+      "items": { "$ref": "#/definitions/NS_list" },
       "title": "NS Id",
-      "examples": [
-        "cqcqcleerv9e"
-      ],
-      "pattern": "^(.*)$"
+
+
     },
-    "NS_Placement": {
-      "$id": "#/properties/NS_Placement",
-      "type": "string",
-      "title": "Placement options: Edge, Core or Automatic",
-      "default": "Automatic",
-      "examples": [
-        "Edge"
-      ],
-      "pattern": "^(Edge|Core|Automatic)$"
-    },
-    "Limited": {
-      "$id": "#/properties/Limited",
-      "type": "boolean",
-      "title": "Whether the experiment needs to run exclusively or not",
-      "default": false,
-      "examples": [
-        true
-      ]
-    },
-    "Type_experiment": {
-      "$id": "#/properties/Type_experiment",
-      "type": "boolean",
-      "title": "Type of experiment: True: 'Tailored' False: 'Custom'",
-      "default": false,
-      "examples": [
-        false
-      ]
-    },
+
     "Scenario": {
       "$id": "#/properties/Scenario",
       "type": ["string", "null"],
@@ -132,17 +111,14 @@
       "items": {
         "$id": "#/properties/Scenario/items",
         "type": "string",
-        "title": "List of scenarios where the experiment is going to be executed",
-        "examples": [
-          "scenario1",
-          "scenario2"
-        ],
+        "title": "Scenarios where the experiment is going to be executed",
+        "examples": "scenario1",
         "pattern": "^(.*)$"
       }
     },
     "Application": {
       "$id": "#/properties/Application",
-      "type": ["array", "null"],
+      "type": ["string", "null"],
       "title": "Application list",
       "items": {
         "$id": "#/properties/Application/items",
@@ -154,15 +130,7 @@
         "pattern": "^(.*)$"
       }
     },
-    "Attended": {
-      "$id": "#/properties/Attended",
-      "type": "boolean",
-      "title": "Whether the execution is going to be attended or not",
-      "default": false,
-      "examples": [
-        true
-      ]
-    },
+
     "Reservation_time": {
       "$id": "#/properties/Reservation_time",
       "type": "integer",
@@ -172,11 +140,9 @@
       ]
     }
   },
-  "if": {
-    "properties": {
-      "Attended": { "const": true }
-    },
-    "required": ["Attended"]
-  },
-  "then": { "required": ["Reservation_time"] }
+
+  "dependencies": {
+    "RemoteDescriptor": ["Remote"],
+    "Remote": ["RemoteDescriptor"]
+  }
 }
