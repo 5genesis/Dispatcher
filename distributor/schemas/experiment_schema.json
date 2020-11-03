@@ -12,7 +12,6 @@
     "NSs",
     "ExperimentType",
     "Scenario",
-    "Application",
     "Parameters"
   ],
   "properties": {
@@ -128,7 +127,7 @@
     },
     "Scenario": {
       "$id": "#/properties/Scenario",
-      "type": ["array", "null"],
+      "type": ["string", "null"],
       "title": "The Scenario Schema",
       "items": {
         "$id": "#/properties/Scenario/items",
