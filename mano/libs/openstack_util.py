@@ -22,7 +22,7 @@ class OSUtils():
             'filename': f,
             'disk_format': disk_format,
             'container_format': container_format,
-            'visibility': 'public',
+            # 'visibility': 'public',
         }
         return conn.image.create_image(**image_attrs)
 
