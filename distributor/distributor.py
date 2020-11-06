@@ -6,7 +6,7 @@ from pymongo import MongoClient
 import logging
 from flask_cors import CORS
 import fastjsonschema
-from gevent.pywsgi import WSGIServer
+from waitress import serve
 import os
 
 app = Flask(__name__)
@@ -268,5 +268,6 @@ if __name__ == '__main__':
     SITE_NAME = os.environ['ELCM']
     ed_schema = json.loads(ed_schema_data)
     validate = fastjsonschema.compile(ed_schema)
-    http_server = WSGIServer(('', 5100), app)
-    http_server.serve_forever()
+    serve(app, port=5100)
+    # http_server = WSGIServer(('', 5100), app)
+    # http_server.serve_forever()
