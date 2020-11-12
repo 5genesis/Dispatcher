@@ -8,7 +8,7 @@ import logging
 import json
 from auth import app
 from auth_utils import session, admin_auth, validate_token, preValidation, check_mail, randomPassword, \
-    string_to_boolean, get_user_from_token, get_platform_name, get_platform_id, get_platform_ip
+    string_to_boolean, get_user_from_token, get_platform_name, get_platform_id, get_platform_ip, get_mail_from_token
 from DB_Model import init_db, drop_users_db, User, Registry, Platform, db
 from MailConfig import mail
 import requests
@@ -73,6 +73,19 @@ def get_user():
     else:
         token = ''
     result, code = get_user_from_token(token)
+    return jsonify(result=result), code
+
+
+@auth_logic.route('/get_mail', methods=['GET'])
+def get_mail():
+    user = None
+    token = None
+    logger.info(str(request))
+    if request.headers.environ.get('HTTP_AUTHORIZATION', ''):
+        token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+    else:
+        user = request.get_json()['user']
+    result, code = get_mail_from_token(token, user)
     return jsonify(result=result), code
 
 

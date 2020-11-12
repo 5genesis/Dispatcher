@@ -17,6 +17,7 @@ get_platform_name = lambda: open("platform_name", "r").read().split()[0]
 get_platform_id = lambda: open("platformID", "r").read().split()[0]
 get_platform_ip = lambda: open("platform_ip", "r").read().split()[0]
 
+
 def preValidation(request, functional_part):
     if request.authorization:
         username = request.authorization.username
@@ -98,6 +99,21 @@ def get_user_from_token(token):
         return 'No valid Token given', 400
 
 
+def get_mail_from_token(token, user):
+    try:
+        if not token or user:
+            return 'Token access is required', 400
+        if token:
+            user = ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('username')
+
+        email = User.query.filter_by(username=user).first().email
+
+        return email, 200
+
+    except:
+        return 'No valid Token given', 400
+
+
 def validate_token(token, request):
     try:
         if not token:
@@ -108,7 +124,8 @@ def validate_token(token, request):
         now = datetime.now()
         if metadata.get('timeout') >= datetime.timestamp(now):
             if metadata.get('username'):
-                data = User.query.filter_by(username=metadata.get('username'), password=metadata.get('password')).first()
+                data = User.query.filter_by(username=metadata.get('username'),
+                                            password=metadata.get('password')).first()
             else:
                 if metadata.get('platform_id') == get_platform_id():
                     return

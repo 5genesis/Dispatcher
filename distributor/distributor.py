@@ -65,6 +65,21 @@ def get_user():
     return user
 
 
+def get_mail():
+    user = None
+    data = None
+    headers = None
+    if request.authorization:
+        user = request.authorization.get('username')
+        data = {'user': user}
+    if not user:
+        token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+        headers = {'Authorization': str(token)}
+    user = requests.get('http://auth:2000/get_mail', data=data, headers=headers).json()[
+        'result']
+    return user
+
+
 @app.route('/<path:path>', methods=['GET', 'POST', 'DELETE'])
 def proxy(path):
     logger.info(str(request))
@@ -115,6 +130,9 @@ def onboard_ed(site, path):
 
         # Validation process
         validate(data)
+        # ELCM Validation UES, Slices, TestCases and Scenarios
+        check_elcm_dependencies(data)
+
         # Check artifacts dependencies (nss, vnfs, images)
         for ns in data['NSs']:
             check_dependencies(ns[0], ns[1])
@@ -161,6 +179,8 @@ def validate_ed():
         logger.debug("Experiment descriptor: {}".format(data))
         # Validation process
         validate(data)
+        # ELCM Validation UES, Slices, TestCcases and Scenarios
+        check_elcm_dependencies(data)
         # Check artifacts dependencies (nss, vnfs, images)
         for ns in data['NSs']:
             check_dependencies(ns[0], ns[1])
@@ -174,6 +194,78 @@ def validate_ed():
     except Exception as e:
         logger.warning("Problem while validating Experiment descriptor: {}".format(str(e)))
     return jsonify({"detail": "Successful validation", "code": "OK", "status": 200}), 200
+
+
+def check_elcm_dependencies(experiment_descriptor):
+    """
+    GET / facility / baseSliceDescriptors
+    GET / facility / testcases
+    GET / facility / ues
+    GET / facility / scenarios
+    (“TestCases”, “UEs”, “SliceDescriptors” y “Scenarios”).
+
+    {
+        "TestCases": [
+            {
+                "Distributed": true,
+                "Name": "Test",
+                "Parameters": [],
+                "PrivateCustom": [],
+                "PublicCustom": false,
+                "Standard": true
+            }
+        ]
+    }
+{
+  "Application": Optional[str],
+  "Automated": bool,
+  "ExclusiveExecution": bool,
+  "ExperimentType": str,
+  "Extra": Dict[str, str] (may be empty),
+  "NSs": List[Tuple[str, str]] ((nsd id, vim location) may be empty),
+  "Parameters": Dict[str, str] (may be empty),
+  "Remote": Optional[str],
+  "RemoteDescriptor": Optional[<Remote descriptor>],
+  "ReservationTime": Optional[int],
+  "Scenario": Optional[str],
+  "Slice": Optional[str],
+  "TestCases": List[str] (may be empty),
+  "UEs": List[str] (may be empty),
+  "Version": str
+}
+
+    """
+    if experiment_descriptor.get('Slice'):
+        path = "baseSliceDescriptors"
+        resp = requests.get(f'{SITE_NAME}{path}').json()
+        if experiment_descriptor.get('Slice') not in resp.get('SliceDescriptors'):
+            raise Exception('Slice {} not found in ELCM'.format(experiment_descriptor.get('Slice')))
+
+    if experiment_descriptor.get('UEs'):
+        path = 'ues'
+        resp = requests.get(f'{SITE_NAME}{path}').json()
+        ues = resp.get('UEs')
+        for ue in experiment_descriptor.get('UEs'):
+            if ue not in ues:
+                raise Exception('UE {} not found in ELCM'.format(ue))
+
+    if experiment_descriptor.get('Scenario'):
+        path = 'scenarios'
+        resp = requests.get(f'{SITE_NAME}{path}').json()
+        if experiment_descriptor.get('Scenario') not in resp.get('Scenarios'):
+            raise Exception('Scenario {} not found in ELCM'.format(experiment_descriptor.get('Scenario')))
+
+    if experiment_descriptor.get('TestCases'):
+        path = 'testcases'
+        resp = requests.get(f'{SITE_NAME}{path}').json()
+        for test_case in experiment_descriptor.get('TestCases'):
+            item = next((item for item in resp if item["Name"] == test_case), None)
+            if not item:
+                raise Exception('TestCase {} not found in ELCM'.format(test_case))
+            if not (item['PublicCustom'] or item['Standard']):
+                mail = get_mail()
+                if mail not in item['PrivateCustom']:
+                    raise Exception('TestCase {} not found in ELCM'.format(test_case))
 
 
 def onboard_ns_process(network_services):
