@@ -101,7 +101,7 @@ def get_user_from_token(token):
 
 def get_mail_from_token(token, user):
     try:
-        if not token or user:
+        if not (token or user):
             return 'Token access is required', 400
         if token:
             user = ast.literal_eval(jwt.JWT(key=key, jwt=token).claims).get('username')

@@ -84,7 +84,7 @@ def get_mail():
     if request.headers.environ.get('HTTP_AUTHORIZATION', ''):
         token = request.headers.environ.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
     else:
-        user = request.get_json()['user']
+        user = request.form['user']
     result, code = get_mail_from_token(token, user)
     return jsonify(result=result), code
 

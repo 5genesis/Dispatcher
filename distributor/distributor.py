@@ -193,6 +193,7 @@ def validate_ed():
         return jsonify({"detail": ve.message, "code": "BAD_REQUEST", "status": 400}), 400
     except Exception as e:
         logger.warning("Problem while validating Experiment descriptor: {}".format(str(e)))
+        return jsonify({"detail": str(e), "code": "BAD_REQUEST", "status": 400}), 400
     return jsonify({"detail": "Successful validation", "code": "OK", "status": 200}), 200
 
 
@@ -236,13 +237,13 @@ def check_elcm_dependencies(experiment_descriptor):
 
     """
     if experiment_descriptor.get('Slice'):
-        path = "baseSliceDescriptors"
+        path = "facility/baseSliceDescriptors"
         resp = requests.get(f'{SITE_NAME}{path}').json()
         if experiment_descriptor.get('Slice') not in resp.get('SliceDescriptors'):
             raise Exception('Slice {} not found in ELCM'.format(experiment_descriptor.get('Slice')))
 
     if experiment_descriptor.get('UEs'):
-        path = 'ues'
+        path = 'facility/ues'
         resp = requests.get(f'{SITE_NAME}{path}').json()
         ues = resp.get('UEs')
         for ue in experiment_descriptor.get('UEs'):
@@ -250,14 +251,14 @@ def check_elcm_dependencies(experiment_descriptor):
                 raise Exception('UE {} not found in ELCM'.format(ue))
 
     if experiment_descriptor.get('Scenario'):
-        path = 'scenarios'
+        path = 'facility/scenarios'
         resp = requests.get(f'{SITE_NAME}{path}').json()
         if experiment_descriptor.get('Scenario') not in resp.get('Scenarios'):
             raise Exception('Scenario {} not found in ELCM'.format(experiment_descriptor.get('Scenario')))
 
     if experiment_descriptor.get('TestCases'):
-        path = 'testcases'
-        resp = requests.get(f'{SITE_NAME}{path}').json()
+        path = 'facility/testcases'
+        resp = requests.get(f'{SITE_NAME}{path}').json().get('TestCases')
         for test_case in experiment_descriptor.get('TestCases'):
             item = next((item for item in resp if item["Name"] == test_case), None)
             if not item:
