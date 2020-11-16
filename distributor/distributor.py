@@ -100,7 +100,10 @@ def proxy(path):
         excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
         # headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
         # response = Response(resp.content, resp.status_code) #, headers)
-        response = (jsonify(resp.json()), resp.status_code)
+        if not isinstance(resp, tuple):
+            response = (jsonify(resp.json()), resp.status_code)
+        else:
+            response = resp
     except Exception as exc:
         exc = str(exc)
         code = 400
@@ -315,6 +318,8 @@ def remote_data_info(distributed_platform):
 def split_experiment(experiment):
     """Split experiment"""
     distributed_platform = experiment.get('Remote')
+    if not distributed_platform:
+        return None
     ip, token = remote_data_info(distributed_platform)
     if not ip:
         return None
