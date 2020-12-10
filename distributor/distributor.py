@@ -344,8 +344,11 @@ def check_dependencies(ns, vim):
     """Check dependencies (NS, VNF, images in VIM)"""
     logger.info('Validation process started')
     images = []
-    dependencies = dbclient['dependencies']
-    ns = dependencies['ns'].find_one({'id': ns})
+    try:
+        dependencies = dbclient['dependencies']
+        ns = dependencies['ns'].find_one({'id': ns})
+    except Exception:
+        raise Exception('NS {} not indexed yet'.format(ns))
     if not ns:
         msg = 'ns {} not found in the repository'.format(ns)
         logger.error(msg)
@@ -357,7 +360,7 @@ def check_dependencies(ns, vim):
         if not dbclient['images'][vim].find_one({'name': image}):
             msg = 'Image {} not available in VIM {}'.format(image, vim)
             logger.error(msg)
-            raise Exception()
+            raise Exception(msg)
 
 
 if __name__ == '__main__':
