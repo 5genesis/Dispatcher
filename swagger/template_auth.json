@@ -1254,7 +1254,7 @@
       }
     },
     "/result_catalog/statistical_analysis/{datasource}": {
-      "post": {
+      "get": {
         "security": [
           {
             "basicAuth": []
@@ -1293,32 +1293,16 @@
           {
             "name": "measurement",
             "in": "query",
+            "required": true,
             "type": "string",
             "description": "Indicate a simple measurement to obtain"
           },
           {
-            "name": "it",
-            "in": "query",
-            "type": "string",
-            "description": "Indicate a iteration to obtain"
-          },
-          {
             "name": "kpi",
             "in": "query",
+            "required": true,
             "type": "string",
             "description": "Indicate a kpi to obtain"
-          },
-          {
-            "name": "unit",
-            "in": "query",
-            "type": "string",
-            "description": "Indicate an unit to obtain"
-          },
-          {
-            "name": "exptype",
-            "in": "query",
-            "type": "string",
-            "description": "Indicate an exptype to obtain"
           }
         ],
         "responses": {

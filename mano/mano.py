@@ -9,7 +9,7 @@ from libs.openstack_util import OSUtils as osUtils
 from libs.osm_nbi_util import NbiUtil as osmUtils
 from libs.opennebula_util import Opennebula as oneUtils
 import os
-from gevent.pywsgi import WSGIServer
+from waitress import serve
 import logging
 import yaml
 from flask_cors import CORS
@@ -108,7 +108,7 @@ def index_vnf(fields, filename, final_path, new_version):
         index['vnf_packages'][fields.get('id')]['latest'] = fields.get('version')
         if not fields['visibility']:
             private_packages = dbclient['private_packages']['vnf']
-            private_packages.insert_one({'id': fields.get('id'), 'user':user})
+            private_packages.insert_one({'id': fields.get('id'), 'user': user})
         dependencies = dbclient['dependencies']['vnf']
         dependencies.insert_one({'id': fields.get('id'), 'images': fields.get('images')})
 
@@ -225,7 +225,8 @@ def onboard_vim_image():
 
         checksum = hashlib.md5(request.files['file'].read(2 ** 5)).hexdigest()
         if len(list(vim.find({'checksum': checksum}))) > 0:
-            logger.info("Image '{}' already exists in {}".format(list(vim.find({'checksum': checksum}))[0].get('name'), vim_id))
+            logger.info(
+                "Image '{}' already exists in {}".format(list(vim.find({'checksum': checksum}))[0].get('name'), vim_id))
             return jsonify({'status': 'Image already exists in ' + vim_id + ' with image name "'
                                       + list(vim.find({'checksum': checksum}))[0].get('name') + '"'}), 400
         else:
@@ -311,10 +312,11 @@ def openstack_upload_image(vim_id, file, container_format):
 
 
 def opennebula_upload_image(vim_id, file, container_format):
-    #one_conf = ConfigObj('ONE.conf')
+    # one_conf = ConfigObj('ONE.conf')
     vim_conf = conf["VIM"][vim_id]
 
-    r = oneUtils.upload_image(auth_url=vim_conf["AUTH_URL"], one_username=vim_conf["USER"], one_password=vim_conf["PASSWORD"], \
+    r = oneUtils.upload_image(auth_url=vim_conf["AUTH_URL"], one_username=vim_conf["USER"],
+                              one_password=vim_conf["PASSWORD"], \
                               f=file, server_ip=vim_conf["IP"], server_username=vim_conf["SERVER_USER"], \
                               server_password=vim_conf["SERVER_PASS"], image_dir=vim_conf["FOLDER"])
     return r
@@ -341,7 +343,7 @@ def get_vims():
 
 
 def private_packages(package_type):
-    aux_list= []
+    aux_list = []
     ns_private_list = list(dbclient['private_packages'][package_type].find({"user": {"$not": {"$regex": get_user()}}}))
     for item in ns_private_list:
         aux_list.append(item['id'])
@@ -401,7 +403,7 @@ def onboard_ns():
         private = list(dbclient['private_packages']['ns'].find({'id': ns}))
         if len(private) > 0:
             if private[0].get('user') == get_user():
-                raise Exception( str("NSD '" + str(ns) + "' is private , please upload your own NSD."))
+                raise Exception(str("NSD '" + str(ns) + "' is private , please upload your own NSD."))
 
         if not ns:
             return jsonify({'result': 'argument ns in form is required'}), 404
@@ -494,5 +496,6 @@ if __name__ == '__main__':
         logger.error("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
         raise KeyError("NFVO type {} not supported".format(conf["NFVO"]["TYPE"]))
     # app.run(host='0.0.0.0', debug=True)
-    http_server = WSGIServer(('', 5101), app)
-    http_server.serve_forever()
+    serve(app, port=5101)
+    # http_server = WSGIServer(('', 5101), app)
+    # http_server.serve_forever()

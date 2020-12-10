@@ -1,5 +1,14 @@
 {
-  "definitions": {},
+  "definitions": {
+    "NS_list": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "http://example.com/root.json",
   "type": "object",
@@ -12,43 +21,110 @@
     "NSs",
     "ExperimentType",
     "Scenario",
-    "Application",
-    "Parameters"
+    "Parameters",
+    "Version"
   ],
   "properties": {
-    "Id": {
-      "$id": "#/properties/Id",
-      "type": "integer",
-      "title": "Id of the experiment",
-      "examples": [
-        123
-      ]
-    },
-    "Name": {
-      "$id": "#/properties/Name",
-      "type": "string",
-      "title": "Name of the experiment",
-      "examples": [
-        "sfafd"
+    "Application": {
+      "$id": "#/properties/Application",
+      "type": [
+        "string",
+        "null"
       ],
-      "pattern": "^(.*)$"
+      "title": "Application list",
+      "pattern": "^([a-zA-Z0-9-_]+)$"
     },
-    "User": {
-      "$id": "#/properties/User",
-      "type": "integer",
-      "title": "ID of the user running the experiment",
-      "examples": [
-        123
-      ]
+    "Automated": {
+      "$id": "#/properties/Automated",
+      "type": "boolean",
+      "title": "Automated experiment"
     },
-    "Platform": {
-      "$id": "#/properties/Platform",
+    "ExclusiveExecution": {
+      "$id": "#/properties/ExclusiveExecution",
+      "type": "boolean",
+      "title": "ExclusiveExecution experiment"
+    },
+    "ExperimentType": {
+      "$id": "#/properties/ExperimentType",
       "type": "string",
-      "title": "Platform ID where the experiment is going to be executed",
-      "examples": [
-        "malaga"
+      "title": "Experiment type",
+      "pattern":"^([a-zA-Z0-9-_]+)$"
+    },
+    "Extra": {
+      "$id": "#/properties/Extra",
+      "type": [
+        "object"
       ],
-      "pattern": "^(.*)$"
+      "additionalProperties": {
+        "not": {
+          "type": "null"
+        }
+      },
+      "title": "Extra parameters"
+    },
+    "NSs": {
+      "$id": "#/properties/NSs",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/NS_list"
+      },
+      "title": "NS Id"
+    },
+    "Parameters": {
+      "$id": "#/properties/Parameters",
+      "type": [
+        "object"
+      ],
+      "additionalProperties": {
+        "not": {
+          "type": "null"
+        }
+      },
+      "title": "Parameters"
+    },
+    "Remote": {
+      "$id": "#/properties/Remote",
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "Remote Platform",
+      "pattern": "^([a-zA-Z0-9-_]+)$"
+    },
+    "RemoteDescriptor": {
+      "$id": "#/properties/RemoteDescriptor",
+      "type": [
+        "object",
+        "null"
+      ],
+      "title": "RemoteDescriptor"
+    },
+    "ReservationTime": {
+      "$id": "#/properties/ReservationTime",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "title": "Reservation time for experiment"
+    },
+    "Scenario": {
+      "$id": "#/properties/Scenario",
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "Scenario",
+      "pattern": "^([a-zA-Z0-9-_]+)$"
+    },
+    "Slice": {
+      "$id": "#/properties/Slice",
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "Slice ID",
+      "examples": "fer9af0gfg0ads",
+      "pattern": "^([a-zA-Z0-9-_]+)$"
     },
     "TestCases": {
       "$id": "#/properties/TestCases",
@@ -61,8 +137,7 @@
         "examples": [
           "TC1",
           "TC2"
-        ],
-        "pattern": "^(.*)$"
+        ]
       }
     },
     "UEs": {
@@ -80,104 +155,20 @@
         "pattern": "^(.*)$"
       }
     },
-    "Slice": {
-      "$id": "#/properties/Slice",
-      "type": ["string", "null"],
-      "title": "Slice ID",
-      "examples": [
-        "fer9af0gfg0ads"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "NS": {
-      "$id": "#/properties/NS",
+
+    "Version": {
+      "$id": "#/properties/Version",
       "type": "string",
-      "title": "NS Id",
-      "examples": [
-        "cqcqcleerv9e"
-      ],
-      "pattern": "^(.*)$"
-    },
-    "NS_Placement": {
-      "$id": "#/properties/NS_Placement",
-      "type": "string",
-      "title": "Placement options: Edge, Core or Automatic",
-      "default": "Automatic",
-      "examples": [
-        "Edge"
-      ],
-      "pattern": "^(Edge|Core|Automatic)$"
-    },
-    "Limited": {
-      "$id": "#/properties/Limited",
-      "type": "boolean",
-      "title": "Whether the experiment needs to run exclusively or not",
-      "default": false,
-      "examples": [
-        true
-      ]
-    },
-    "Type_experiment": {
-      "$id": "#/properties/Type_experiment",
-      "type": "boolean",
-      "title": "Type of experiment: True: 'Tailored' False: 'Custom'",
-      "default": false,
-      "examples": [
-        false
-      ]
-    },
-    "Scenario": {
-      "$id": "#/properties/Scenario",
-      "type": ["array", "null"],
-      "title": "The Scenario Schema",
-      "items": {
-        "$id": "#/properties/Scenario/items",
-        "type": "string",
-        "title": "List of scenarios where the experiment is going to be executed",
-        "examples": [
-          "scenario1",
-          "scenario2"
-        ],
-        "pattern": "^(.*)$"
-      }
-    },
-    "Application": {
-      "$id": "#/properties/Application",
-      "type": ["array", "null"],
-      "title": "Application list",
-      "items": {
-        "$id": "#/properties/Application/items",
-        "type": "string",
-        "title": "Application",
-        "examples": [
-          "app1"
-        ],
-        "pattern": "^(.*)$"
-      }
-    },
-    "Attended": {
-      "$id": "#/properties/Attended",
-      "type": "boolean",
-      "title": "Whether the execution is going to be attended or not",
-      "default": false,
-      "examples": [
-        true
-      ]
-    },
-    "Reservation_time": {
-      "$id": "#/properties/Reservation_time",
-      "type": "integer",
-      "title": "Reservation time in minutes",
-      "examples": [
-        123
-      ]
+      "title": "Reservation time for experiment",
+      "pattern": "^([a-zA-Z0-9-_]+)$"
     }
   },
-  "if": {
-    "properties": {
-      "Attended": { "const": true }
-    },
-    "required": ["Attended"]
-  },
-  "then": { "required": ["Reservation_time"] }
+  "dependencies": {
+    "RemoteDescriptor": [
+      "Remote"
+    ],
+    "Remote": [
+      "RemoteDescriptor"
+    ]
+  }
 }
