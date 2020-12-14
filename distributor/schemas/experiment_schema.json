@@ -160,7 +160,7 @@
       "$id": "#/properties/Version",
       "type": "string",
       "title": "Reservation time for experiment",
-      "pattern": "^([a-zA-Z0-9-_]+)$"
+      "pattern": "^([a-zA-Z0-9-_.]+)$"
     }
   },
   "dependencies": {

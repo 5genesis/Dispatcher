@@ -347,7 +347,10 @@ def recover_password():
                               recipients=[email],  # replace with your email for testing
                               html=render_template('recover.html',
                                                    user=data.username, password=new_password))
-                mail.send(msg)
+                try:
+                    mail.send(msg)
+                except Exception:
+                    logger.error("Mail does not work properly")
             return jsonify(result='New password for ' + email + ' Look your email for getting it.')
         else:
             return jsonify(result='No user registered/active with that user/password'), 400
@@ -584,7 +587,10 @@ def admin_confirmation(email=None, username=None, platformName=None, ip=None):
                   sender=app.config.get('MAIL_USERNAME'),
                   recipients=[app.config.get('MAIL_USERNAME')],  # replace with your email for testing
                   html=template)
-    mail.send(msg)
+    try:
+        mail.send(msg)
+    except Exception:
+        logger.error("Mail does not work properly")
 
 
 def notify_user(email, action):
@@ -605,4 +611,7 @@ def notify_user(email, action):
                   sender=app.config.get('MAIL_USERNAME'),
                   recipients=[email],  # replace with your email for testing
                   body=body)
-    mail.send(msg)
+    try:
+        mail.send(msg)
+    except Exception:
+        logger.error("Mail does not work properly")
