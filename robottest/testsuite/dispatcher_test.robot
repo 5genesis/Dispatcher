@@ -22,7 +22,7 @@ ${test_experiment_bad}=   %{PACKAGES_DIR}/exp.json
 ${test_experiment_ok}=    %{PACKAGES_DIR}/exp_fixed.json
 
 # VIM
-${test_image_file}=   %{PACKAGES_DIR}/%{TEST_IMAGE}
+${test_image_file}=   %{PACKAGES_DIR}/test_image2.qcow2
 ${vim_image_name}=    ubuntutest
 ${vim_name}=   %{VIM_NAME}
 
