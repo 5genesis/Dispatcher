@@ -180,16 +180,12 @@ def register():
             return jsonify(result='Registration failed: Not valid email'), 400
 
         data = User.query.filter_by(username=username).first()
-        if data and data.deleted:
-            data.password = hashlib.md5(password.encode()).hexdigest()
-            data.email = email
-            data.deleted = False
-            new_action = Registry(username=username, action='Re-Register')
+        if data:
+            return jsonify(result='User already exists'), 400
 
-        else:
-            new_user = User(username=username, password=password, email=email)
-            new_action = Registry(username=username, action='Register')
-            db.session.add(new_user)
+        new_user = User(username=username, password=password, email=email)
+        new_action = Registry(username=username, action='Register')
+        db.session.add(new_user)
         db.session.add(new_action)
         db.session.commit()
         admin_confirmation(email, username)
