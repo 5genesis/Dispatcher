@@ -35,22 +35,31 @@ def authorization_requests(path):
     db = dbclient["experimentsdb"]
     experiments = db["experiments"]
 
-    if path_split[0] == 'execution':
-        logger.info("User is going being checked")
+    if path_split[0] == 'result_catalog':
+        logger.info("Result catalog validation")
+        if path_split[1] == 'statistical_analysis':
+            executionId = request.get_data()['experimentid']
+
+        if path_split[1] == 'get_data':
+            executionId = path_split[-1]
+
+    elif path_split[0] == 'execution':
+        logger.info("Execution operations validation")
         if path_split[-1] in ('cancel', 'delete', 'json', 'logs', 'results', 'descriptor'):
             executionId = path_split[-2]
         elif path_split[-1] != 'nextExecutionId':
             executionId = path_split[-1]
 
-        if executionId:
-            user = get_user()
-            if user == 'Admin':
-                return
-            logger.info("{} is going to be checked".format(user))
-            if len(list(experiments.find({'executionId': executionId, 'user': user}))) == 0:
-                error = 'Not enough permissions: user {} has not launch the executionID {}'.format(user, executionId)
-                logger.error(error)
-                raise Exception(error)
+    if executionId:
+        logger.info("User is going being checked")
+        user = get_user()
+        if user == 'Admin':
+            return
+        logger.info("{} is going to be checked".format(user))
+        if len(list(experiments.find({'executionId': executionId, 'user': user}))) == 0:
+            error = 'Not enough permissions: user {} has not launch the executionID {}'.format(user, executionId)
+            logger.error(error)
+            raise Exception(error)
 
 
 def get_user():
@@ -87,7 +96,18 @@ def proxy(path):
         authorization_requests(path)
 
         if request.method == 'GET':
-            resp = requests.get(f'{SITE_NAME}{path}')
+            if path.find('result_catalog') > 0:
+                path = path.split('result_catalog')[-1]
+                if path.find('statistical_analysis'):
+                    url = RESULT_CATALOG + ':5003/'
+                elif path.find('get_data'):
+                    url = RESULT_CATALOG + ':5000/'
+                else:
+                    raise Exception('Not available request')
+
+                resp = requests.get(f'{url}{path}', data=request.get_data())
+            else:
+                resp = requests.get(f'{SITE_NAME}{path}')
         elif request.method == 'POST':
             if path.find('distributed') >= 0:
                 resp = requests.post(f'{SITE_NAME}{path}', data=request.get_data())
@@ -367,6 +387,7 @@ if __name__ == '__main__':
     with open('schemas/experiment_schema.json', 'r') as f:
         ed_schema_data = f.read()
     SITE_NAME = os.environ['ELCM']
+    RESULT_CATALOG = os.environ['RESULT_CATALOG']
     ed_schema = json.loads(ed_schema_data)
     validate = fastjsonschema.compile(ed_schema)
     serve(app, port=5100)

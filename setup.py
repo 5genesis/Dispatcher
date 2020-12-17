@@ -110,6 +110,7 @@ configFilePath = r'dispatcher.conf'
 conf.read(configFilePath)
 enablers = ""
 elcm = ""
+file_write = 'w'
 for sect in conf.sections():
     url = url = conf[sect]['protocol'] + '://' + conf[sect]['host']
     if conf[sect].get('port'):
@@ -119,8 +120,11 @@ for sect in conf.sections():
 
     enablers += add_enabler.replace("{0}", sect).replace("{1}", url)
     if sect == 'elcm':
-        with open('distributor/config.env', 'w') as file:
+
+        with open('distributor/config.env', file_write) as file:
             file.write('ELCM={}'.format(url))
+        file_write = 'a'
+
         url = 'http://distributor:5100/execution'
         exec_sect = sect + '/execution'
         enablers += add_enabler.replace("{0}", exec_sect).replace("{1}", url)
@@ -131,6 +135,14 @@ for sect in conf.sections():
         validate_sect = sect + '/validate/ed'
         enablers += add_enabler.replace("{0}", validate_sect).replace("{1}", url)
 
+    if sect == 'result_catalog':
+        with open('distributor/config.env', file_write) as f:
+            f.write('RESULT_CATALOG={}'.format(url))
+        file_write = 'a'
+
+        url = 'http://distributor:5100/result_catalog'
+        exec_sect = sect + '/result_catalog'
+        enablers += add_enabler.replace("{0}", exec_sect).replace("{1}", url)
 
 with open('nginx.conf', 'w') as file:
     file.write(header+enablers+auth)
