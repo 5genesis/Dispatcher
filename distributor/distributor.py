@@ -96,12 +96,12 @@ def proxy(path):
         authorization_requests(path)
 
         if request.method == 'GET':
-            if path.find('result_catalog') > 0:
+            if path.find('result_catalog') >= 0:
                 path = path.split('result_catalog')[-1]
-                if path.find('statistical_analysis'):
-                    url = RESULT_CATALOG + ':5003/'
-                elif path.find('get_data'):
-                    url = RESULT_CATALOG + ':5000/'
+                if path.find('statistical_analysis') >= 0:
+                    url = RESULT_CATALOG + ':5003'
+                elif path.find('get_data') >= 0:
+                    url = RESULT_CATALOG + ':5000'
                 else:
                     raise Exception('Not available request')
 
