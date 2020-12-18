@@ -320,6 +320,11 @@ def split_experiment(experiment):
     distributed_platform = experiment.get('Remote')
     if not distributed_platform:
         return None
+
+    distributed_experiment = experiment.get('RemoteDescriptor')
+    if not distributed_experiment:
+        return None
+    
     ip, token = remote_data_info(distributed_platform)
     if not ip:
         return None
