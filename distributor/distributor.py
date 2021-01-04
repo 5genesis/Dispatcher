@@ -147,13 +147,14 @@ def onboard_ed(site, path):
         # Experiment Distribution
         remote_id = split_experiment(data)
 
-        r = requests.post(f'{site}{path}', json=request.get_json(), headers=headers)
+        r = requests.post(f'{site}{path}', json=data, headers=headers)
         if r.status_code > 300:
             raise Exception('ELCM reject the experiment: {}'.format(r.text))
 
-        executionId = ast.literal_eval(r.text)['ExecutionId']
+        executionId = r.json()['ExecutionId']
+
         if remote_id:
-            r = requests.post(f'{site}/distributed/{executionId}/peerDetails', json={'execution_id': remote_id},
+            _ = requests.post(f'{site}/distributed/{executionId}/peerDetails', json={'execution_id': remote_id},
                               headers=headers)
             remote_ack(data.get('Remote'), executionId=remote_id, remote_id=executionId)
         experiments = dbclient["experimentsdb"]["experiments"]
@@ -324,7 +325,7 @@ def split_experiment(experiment):
     distributed_experiment = experiment.get('RemoteDescriptor')
     if not distributed_experiment:
         return None
-    
+
     ip, token = remote_data_info(distributed_platform)
     if not ip:
         return None
