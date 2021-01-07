@@ -827,16 +827,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "Cancel experiment execution"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while canceling experiment execution"
           },
           "401": {
             "description": "Invalid permission",
@@ -881,16 +875,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "Experiment execution delete"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while deleting a Experiment execution"
           },
           "401": {
             "description": "Invalid permission",
@@ -935,16 +923,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "Execution json"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while obtaining the execution status"
           },
           "401": {
             "description": "Invalid permission",
@@ -989,16 +971,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "List of logs"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while obtaining the list of logs"
           },
           "401": {
             "description": "Invalid permission",
@@ -1043,16 +1019,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "Experiment results"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while obtaining the list of results"
           },
           "401": {
             "description": "Invalid permission",
@@ -1097,16 +1067,13 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
+            "description": "Experiment Descriptor",
             "schema": {
               "$ref": "#/definitions/ArrayOfExperiments"
             }
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while obtaining the ED"
           },
           "401": {
             "description": "Invalid permission",
@@ -1142,16 +1109,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "List of testcases"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while obtaining the list of testcases"
           },
           "401": {
             "description": "Invalid permission",
@@ -1187,16 +1148,10 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "List of UEs"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
-            "schema": {
-              "$ref": "#/definitions/ResponseDetails"
-            }
+            "description": "Problem while obtaining the list of UEs"
           },
           "401": {
             "description": "Invalid permission",
@@ -1232,16 +1187,49 @@
         ],
         "responses": {
           "200": {
-            "description": "List of experiments",
-            "schema": {
-              "$ref": "#/definitions/ArrayOfExperiments"
-            }
+            "description": "List of resources"
           },
           "400": {
-            "description": "Problem while obtaining the list of experiments",
+            "description": "Problem while obtaining the list of resources"
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
             "schema": {
-              "$ref": "#/definitions/ResponseDetails"
+              "$ref": "#/definitions/AuthError"
             }
+          }
+        }
+      }
+    },
+    "/elcm/facility/baseSliceDescriptors": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "ELCM"
+        ],
+        "summary": "Current slices",
+        "description": "",
+        "operationId": "slicesStatus",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of slices"
+          },
+          "400": {
+            "description": "Problem while obtaining the list of slices"
           },
           "401": {
             "description": "Invalid permission",
@@ -1360,6 +1348,125 @@
                 }
               }
             },
+            "headers": {}
+          },
+          "401": {
+            "description": "Invalid permission",
+            "headers": {},
+            "schema": {
+              "$ref": "#/definitions/AuthError"
+            }
+          },
+          "404": {
+            "description": "Experiment results not found"
+          }
+        }
+      }
+    },
+    "/result_catalog/get_data/{datasource}/{experimentId}": {
+      "get": {
+        "security": [
+          {
+            "basicAuth": []
+          },
+          {
+            "BearerToken": []
+          }
+        ],
+        "tags": [
+          "Result Catalog"
+        ],
+        "summary": "Retrieve the experiments raw data result",
+        "description": "",
+        "operationId": "ExpRawResult",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "datasource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "InfluxDB Database to querry"
+          },
+          {
+            "name": "experimentId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Indicate the execution id of the experiment"
+          },
+          {
+            "name": "measurement",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Indicate a simple measurement to obtain (default all available measurements)"
+          },
+          {
+            "name": "remove_outliers",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "zscore or mad (default none)"
+          },
+          {
+            "name": "match_series",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Synchronize data from multiple measurements (default false)"
+          },
+          {
+            "name": "max_lag",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Time lag for synchronisation (default 1s)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Any integer to indicate a limit on the returned rows (default none)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Any integer to indicate the offset for the row limit (default none)"
+          },
+          {
+            "name": "additional_clause",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Any InfluxDB clause (default none)"
+          },
+          {
+            "name": "chunked",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Whether the results are retrieved from the server in chunks (default false)"
+          },
+          {
+            "name": "chunk_size",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Any integer to define the chunk size (default 10000 if chunked is enabled)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Experiment raw data",
             "headers": {}
           },
           "401": {
