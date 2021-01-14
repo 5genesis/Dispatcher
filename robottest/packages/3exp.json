@@ -1,0 +1,26 @@
+{
+      "Application":"None",
+      "Automated":true,
+      "ExclusiveExecution":false,
+      "ExperimentType":"Distributed",
+      "Extra":{
+
+      },
+      "NSs":[
+
+      ],
+      "Parameters":{
+
+      },
+      "Remote":"Malaga",
+      "ReservationTime":null,
+      "Scenario":"None",
+      "Slice":"None",
+      "TestCases":[
+         "AtenasSide"
+      ],
+      "UEs":[
+         "AtenasUE"
+      ],
+      "Version":"210"
+   }

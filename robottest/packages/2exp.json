@@ -1,0 +1,21 @@
+{
+        "Id": 123,
+        "Name":"sfafd",
+        "User": 1234,
+        "Platform": "malaga",
+        "TestCases": ["TC1", "TC2"],
+        "UEs": ["UE1", "UE2"],
+        "Slice": "sliceid",
+        "NSs": "ejemplo",
+        "NS_Placement": "Edge",
+        "Limited": true,
+        "Type_experiment": false,
+        "Scenario": "scenario1",
+        "Application": "app1",
+        "Attended": true,
+        "Reservation_time": 123,
+        "Automated": false,
+        "ExperimentType": "test",
+        "Parameters": {},
+        "Version": 390
+}

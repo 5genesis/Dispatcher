@@ -23,6 +23,8 @@ ${test_nsd_pkg_vnf_dependency}=     %{PACKAGES_DIR}/fb_magma_ns.tar.gz
 ${test_nsd_id}=    hackfest1-ns
 
 ${test_experiment_bad}=   %{PACKAGES_DIR}/exp.json
+${2test_experiment_bad}=   %{PACKAGES_DIR}/2exp.json
+${3test_experiment_bad}=   %{PACKAGES_DIR}/3exp.json
 ${test_experiment_ok}=    %{PACKAGES_DIR}/exp_fixed.json
 
 # VIM
@@ -107,7 +109,7 @@ AUTH_REG_3 Register failed due existing username
 
     # If the user exists, it still should pass the test
     ${exists}=  Evaluate   "User already exists" in """${resp.text}"""
-    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   200
+    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
     ...               ELSE   Should Be Equal As Strings    ${resp.status_code}    400
 
 AUTH_REG_4 Register failed due existing email
@@ -128,7 +130,7 @@ AUTH_REG_4 Register failed due existing email
 
     # If the user exists, it still should pass the test
     ${exists}=  Evaluate   "User already exists" in """${resp.text}"""
-    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   200
+    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
     ...               ELSE   Should Be Equal As Strings    ${resp.status_code}    400
 
 AUTH_VAL_1 Validate User
@@ -315,7 +317,7 @@ WRAPPER_IMG_UPL_3 Upload wrong Image VIM (Token Auth)
     Log   ${resp.content}
 
     # If the image exists, it still should pass the test
-    Run Keyword Should Be Equal As Strings    ${resp.status_code}   400
+    Should Be Equal As Strings    ${resp.status_code}   400
 
 WRAPPER_IMG_REG_1 Register VIM Image (Admin Basic Auth)
     sleep  5s
@@ -347,7 +349,7 @@ WRAPPER_IMG_REG_2 Register VIM Image (User without permisions Basic Auth)
 
     # VALIDATIONS
     Log   ${resp.content}
-    Should Be Equal As Strings    ${resp.status_code}    201
+    Should Be Equal As Strings    ${resp.status_code}    400
 
 WRAPPER_IMG_LIST_1 Get Image List (Token Auth)
     sleep  5s
@@ -416,7 +418,7 @@ WRAPPER_VNF_INDEX_3 Index Faulty VNFD (Token Auth)
     #Should Be Equal As Strings  ${resp.json()['error']}   Some VNFs have invalid descriptors
     Should Be Equal As Strings    ${resp.status_code}    400
 
-WRAPPER_VNF_INDEX_4 Index VNFD (Token Auth)
+WRAPPER_VNF_INDEX_4 Index Faulty VNFD due an inexisting image dependency (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
@@ -431,7 +433,7 @@ WRAPPER_VNF_INDEX_4 Index VNFD (Token Auth)
 
     # VALIDATIONS
     Log    ${resp.content}
-    Should Be Equal As Strings    ${resp.status_code}    200
+    Should Be Equal As Strings    ${resp.status_code}    400
 
 
 WRAPPER_VNF_LIST_1 Get VNFD list (Token Auth)
@@ -535,39 +537,7 @@ WRAPPER_NS_LIST_1 Get NSD list (Token Auth)
     Should Be Equal As Strings  ${resp.status_code}  200
 
 
-Validate Bad Experiment Descriptor
-    sleep  5s
-    # Request preparation
-    ${headers}=   create dictionary   Authorization=${token}
-    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
-
-    # Data
-    ${file_data}=    Get File    ${test_experiment_bad}
-
-    ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
-
-    # VALIDATIONS
-   Log   ${resp.json()}
-    Should Be Equal As Strings    ${resp.status_code}    400
-
-
-Validate Experiment Descriptor
-    sleep  5s
-    # Request preparation
-    ${headers}=   create dictionary   Authorization=${token}
-    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
-
-    # Data
-    ${file_data}=    Get File    ${test_experiment_ok}
-
-    ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
-
-    # VALIDATIONS
-    Log   ${resp.json()}
-    Should Be Equal As Strings    ${resp.status_code}    200
-
-
-Onboard NSD (Token Auth)
+WRAPPER_NS_ONBOARD_1 Onboard NSD (Token Auth)
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Authorization=${token}
@@ -583,8 +553,39 @@ Onboard NSD (Token Auth)
     log   ${resp.json()}
     Should Be Equal As Strings    ${resp.status_code}    201
 
+WRAPPER_NS_ONBOARD_2 Onboard NSD already onboarded (Token Auth)
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Authorization=${token}
+    #${headers}=   create dictionary   Content-Type=multipart/form-data   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
 
-Delete NSD
+    # Data
+    ${data}=   Evaluate   [('ns', '${test_nsd_id}')]
+
+    ${resp}=    Post Request    Dispatcher   /mano/onboard   data=${data}
+
+    # VALIDATIONS
+    log   ${resp.json()}
+    Should Be Equal As Strings    ${resp.status_code}    400
+
+WRAPPER_NS_ONBOARD_3 Onboard not existing NSD (Token Auth)
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Authorization=${token}
+    #${headers}=   create dictionary   Content-Type=multipart/form-data   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
+
+    # Data
+    ${data}=   Evaluate   [('ns', 'notexisting-${test_nsd_id}')]
+
+    ${resp}=    Post Request    Dispatcher   /mano/onboard   data=${data}
+
+    # VALIDATIONS
+    log   ${resp.json()}
+    Should Be Equal As Strings    ${resp.status_code}    404
+
+WRAPPER _NS_DELETE_1 Delete NSD
     sleep  5s
     # Request preparation
     ${headers}=   create dictionary   Content-Type=multipart/form-data   Authorization=${token}
@@ -597,6 +598,86 @@ Delete NSD
 
     # VALIDATIONS
     Should Be Equal As Strings    ${resp.status_code}    204
+
+WRAPPER _NS_DELETE_2 Delete not existing NSD
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Content-Type=multipart/form-data   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
+
+    # Data
+    &{data}=    Create Dictionary    all=True
+
+    ${resp}=    Delete Request    Dispatcher   /mano/nsd/notexisting-${test_nsd_id}    data=${data}
+
+    # VALIDATIONS
+    Should Be Equal As Strings    ${resp.status_code}    400
+
+DISTR_ED_VALIDATION_1 Validate Experiment Descriptor
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
+
+    # Data
+    ${file_data}=    Get File    ${test_experiment_ok}
+
+    ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
+
+    # VALIDATIONS
+    Log   ${resp.json()}
+    ${exists}=  Evaluate   "/facility/baseSliceDescriptors" in """${resp.text}"""
+    Run Keyword If   '${exists}' == 'True'   Run Keyword   Should Be Equal As Strings    ${resp.status_code}   400
+    ...               ELSE   Should Be Equal As Strings    ${resp.status_code}    200
+
+
+DISTR_ED_VALIDATION_2 Validate Bad Experiment Descriptor due missing parameters
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
+
+    # Data
+    ${file_data}=    Get File    ${test_experiment_bad}
+
+    ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
+
+    # VALIDATIONS
+   Log   ${resp.json()}
+    Should Be Equal As Strings    ${resp.status_code}    400
+
+DISTR_ED_VALIDATION_3 Validate Bad Experiment Descriptor due incorrect parameter types
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
+
+    # Data
+    ${file_data}=    Get File    ${2test_experiment_bad}
+
+    ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
+
+    # VALIDATIONS
+   Log   ${resp.json()}
+    Should Be Equal As Strings    ${resp.status_code}    400
+
+DISTR_ED_VALIDATION_4 Validate Bad Experiment Descriptor due incorrect distributed experiment
+    sleep  5s
+    # Request preparation
+    ${headers}=   create dictionary   Authorization=${token}
+    Create Session  alias=Dispatcher  url=${dispatcher_URL}   headers=${headers}   verify=${false}
+
+    # Data
+    ${file_data}=    Get File   ${3test_experiment_bad}
+
+    ${resp}=    Post Request    Dispatcher   /elcm/validate/ed    data=${file_data}
+
+    # VALIDATIONS
+   Log   ${resp.json()}
+    Should Be Equal As Strings    ${resp.status_code}    400
+
+
+
 
 
 Delete User (Admin Basic Auth)
