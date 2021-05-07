@@ -1,6 +1,7 @@
 jwcrypto==0.6.0
 waitress==1.4.3
 Flask==1.0.2
+SQLAlchemy<1.4.0
 Flask-SQLAlchemy==2.1
 requests==2.20.1
 flask_mail==0.9.1
