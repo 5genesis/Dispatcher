@@ -1,7 +1,7 @@
 requests==2.20.1
 Flask==1.0.2
 waitress==1.4.4
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 jsonschema==2.6.0
 simplejson==3.17.0
 PyYAML==5.1
