@@ -118,6 +118,13 @@ for sect in conf.sections():
     if conf[sect].get('path'):
         url += conf[sect]['path']
 
+    if sect == 'result_catalog':
+        with open('distributor/config.env', file_write) as f:
+            f.write('RESULT_CATALOG={}\n'.format(url))
+        file_write = 'a'
+
+        url = 'http://distributor:5100/result_catalog'
+        
     enablers += add_enabler.replace("{0}", sect).replace("{1}", url)
     if sect == 'elcm':
 
@@ -135,14 +142,6 @@ for sect in conf.sections():
         validate_sect = sect + '/validate/ed'
         enablers += add_enabler.replace("{0}", validate_sect).replace("{1}", url)
 
-    if sect == 'result_catalog':
-        with open('distributor/config.env', file_write) as f:
-            f.write('RESULT_CATALOG={}\n'.format(url))
-        file_write = 'a'
-
-        url = 'http://distributor:5100/result_catalog'
-        
-        enablers += add_enabler.replace("{0}", sect).replace("{1}", url)
 
 with open('nginx.conf', 'w') as file:
     file.write(header+enablers+auth)
