@@ -740,7 +740,7 @@
         }
       }
     },
-    "/elcm/execution{id}": {
+    "/elcm/execution/{id}": {
       "get": {
         "security": [
           {
@@ -794,7 +794,7 @@
         }
       }
     },
-    "/elcm/execution{id}/cancel": {
+    "/elcm/execution/{id}/cancel": {
       "get": {
         "security": [
           {
@@ -842,7 +842,7 @@
         }
       }
     },
-    "/elcm/execution{id}/delete": {
+    "/elcm/execution/{id}/delete": {
       "get": {
         "security": [
           {
@@ -890,7 +890,7 @@
         }
       }
     },
-    "/elcm/execution{id}/json": {
+    "/elcm/execution/{id}/json": {
       "get": {
         "security": [
           {
@@ -938,7 +938,7 @@
         }
       }
     },
-    "/elcm/execution{id}/logs": {
+    "/elcm/execution/{id}/logs": {
       "get": {
         "security": [
           {
@@ -986,7 +986,7 @@
         }
       }
     },
-    "/elcm/execution{id}/results": {
+    "/elcm/execution/{id}/results": {
       "get": {
         "security": [
           {
@@ -1034,7 +1034,7 @@
         }
       }
     },
-    "/elcm/execution{id}/descriptor": {
+    "/elcm/execution/{id}/descriptor": {
       "get": {
         "security": [
           {
