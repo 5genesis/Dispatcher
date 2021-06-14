@@ -315,8 +315,8 @@ def onboard_ns_process(network_services):
             else:
                 logger.info("NS ({}) onboarded.".format(ns[0]))
                 ns[0] = ast.literal_eval(r.text)['id']
-            ns_by_id.append(ns)
-        return ns_by_id
+        ns_by_id.append(ns)
+    return ns_by_id
 
 
 def remote_data_info(distributed_platform):
