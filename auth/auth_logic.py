@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, url_for
 import hashlib
 from datetime import datetime
 import ast
@@ -171,6 +171,7 @@ def change_password():
 def register():
     """Register Form"""
     logger.info(str(request))
+    logger.info("Registering user")
     try:
         username = request.form['username']
         password = hashlib.md5(request.form['password'].encode()).hexdigest()
@@ -254,6 +255,7 @@ def delete_platform(platformName):
 @admin_auth
 def show_users():
     logger.info(str(request))
+    logger.info("Showing the list of registered users")
     user = request.args.get('username')
     verbose = request.args.get('verbose')
 
@@ -386,6 +388,7 @@ def validate_user(data):
 @admin_auth
 def validate_user_manually(data):
     logger.info(str(request))
+    logger.info("Validating user")
     try:
         admin_auth(validate_user)
         user = data
@@ -440,7 +443,7 @@ def register_platform(platform_name):
 
     except Exception as e:
         if str(type(e)).find('IntegrityError') > 0:
-            e = 'User already exists'
+            e = 'Platform already exists'
         return jsonify(result=('Platform registration failed: ' + str(e))), 400
 
 
@@ -448,6 +451,7 @@ def register_platform(platform_name):
 @auth_logic.route('/register_platform_in_platform', methods=['POST'])
 def register_platform_in_platform():
     logger.info(str(request))
+    logger.info("Starting platform registration")
 
     platform_name = get_platform_name()
     platform_id = get_platform_id()
@@ -478,6 +482,7 @@ def register_platform_in_platform():
 @auth_logic.route('/validate_platform/<data>', methods=['GET'])
 def validate_platform(data):
     logger.info(str(request))
+    logger.info("Starting Platform validation")
     try:
         mongodb = mongoDBClient["PlatformsDB"]
         platforms = mongodb["platforms"]
@@ -504,7 +509,7 @@ def validate_platform(data):
 
             platforms.insert_one({'platform': platformName, 'token': token, 'ip': data.ip})
 
-        return jsonify(result='Changes applied')
+        return jsonify(result='Platform validated')
 
     except Exception as e:
         return jsonify(result=('Validation process interrupted: ' + str(e))), 400
@@ -526,6 +531,7 @@ def show_platforms():
 @admin_auth
 def validate_platform_manually(data):
     logger.info(str(request))
+    logger.info("Manual validation of platform {}".format(data))
     try:
         admin_auth(validate_platform)
         platformName = data
@@ -541,10 +547,18 @@ def validate_platform_manually(data):
         token = str(Etoken.serialize())
 
         platforms.insert_one({'platform': platformName, 'token': token, 'ip': data.ip})
-        return jsonify(result='Changes applied')
+        return jsonify(result='Platform validated')
 
     except Exception as e:
         return jsonify(result=('Validation process interrupted: ' + str(e))), 400
+
+
+def proxify_url(url_string):
+    # Adds port and partial path to access from outside the proxy
+    ip = url_string.split('/')[2]
+    url_aux = url_string.replace(ip, ip + Settings.RequestPrefix)
+    url_aux = url_aux.replace("http://", Settings.RequestProtocol)
+    return url_aux 
 
 
 def admin_confirmation(email=None, username=None, platformName=None, ip=None):
@@ -569,15 +583,23 @@ def admin_confirmation(email=None, username=None, platformName=None, ip=None):
     Etoken.make_encrypted_token(key)
     token_provide = str(Etoken.serialize())
 
+
     if username:
         subject = 'User validation'
-        template = render_template('validate_user.html', user=username, email=email, token_provide=token_provide,
-                                   token_not_provide=token_not_provide)
+        url_yes = url_for('auth_page.validate_user', data=token_provide, _external=True)
+        url_yes = proxify_url(url_yes)
+        url_no = url_for('auth_page.validate_user', data=token_not_provide, _external=True)
+        url_no = proxify_url(url_no)
+        template = render_template('validate_user.html', user=username, email=email, url_yes=url_yes,
+                                   url_no=url_no)
     else:
         subject = 'Platform validation'
+        url_yes = url_for('auth_page.validate_platform', data=token_provide, _external=True)
+        url_yes = proxify_url(url_yes)
+        url_no = url_for('auth_page.validate_platform', data=token_not_provide, _external=True)
+        url_no= proxify_url(url_no)
         template = render_template('validate_platform.html', current_platform=get_platform_name(),
-                                   platform=platformName, ip=ip, token_provide=token_provide,
-                                   token_not_provide=token_not_provide)
+                                   platform=platformName, ip=ip, url_yes=url_yes, url_no=url_no)
 
     msg = Message(subject=subject,
                   sender=app.config.get('MAIL_USERNAME'),

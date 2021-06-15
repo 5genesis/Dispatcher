@@ -2,10 +2,10 @@
 <p>The user "{{ user }}" with email&nbsp;<a href="mailto:{{ email }}" target="_blank" rel="noopener">{{ email }}</a>&nbsp;is trying to validate his account in the platform. You can choose if you want to provide access or not.</p>
 <h3 style="color: #2e6c80;">Take a decision:</h3>
 <ol style="list-style: none; font-size: 14px; line-height: 32px; font-weight: bold;">
-<a href="{{ url_for('auth_page.validate_user', data=token_provide, _external=True) }}"> <li style="clear: both;"><img style="float: left;" src="https://html-online.com/img/01-interactive-connection.png" alt="interactive connection" width="45" />Provide access</li></a>
-<a href="{{ url_for('auth_page.validate_user', data=token_not_provide, _external=True) }}"> <li style="clear: both;"><img style="float: left;" src="https://html-online.com/img/02-html-clean.png" alt="html cleaner" width="45" />Not provide access and revoke his account</li></a>
+<a href="{{ url_yes }}"> <li style="clear: both;"><img style="float: left;" src="https://html-online.com/img/01-interactive-connection.png" alt="interactive connection" width="45" />Provide access</li></a>
+<a href="{{ url_no }}"> <li style="clear: both;"><img style="float: left;" src="https://html-online.com/img/02-html-clean.png" alt="html cleaner" width="45" />Not provide access and revoke his account</li></a>
 </ol>
 <p>&nbsp;</p>
 <h2 style="color: #2e6c80;">Sincerely,</h2>
-<h2 style="color: #2e6c80;">The Auth Team</h2>
+<h2 style="color: #2e6c80;">The 5GENESIS Auth Team</h2>
 <p>&nbsp;</p>
