@@ -3,7 +3,7 @@ Flask==1.0.2
 waitress==1.4.4
 pymongo==3.8.0
 Flask-RESTful==0.3.7
-PyYAML==5.1
+PyYAML==5.4
 Flask-Cors==3.0.9
 openstacksdk==0.38.0
 configobj==5.0.6
