@@ -184,6 +184,7 @@ def index_ns(fields, filename, final_path, new_version, user=None):
              final_path + '/' + fields.get('id') + "-" + fields.get('version') + '.tar.gz')
     yaml.dump(fields, open(final_path + '/' + 'metadata.yaml', 'w'))
     index = yaml.load(open('/repository/index.yaml'), Loader=yaml.FullLoader)
+    logger.info("Dumping index 1: {}".format(str(index)))
     if new_version:
         index['ns_packages'][fields.get('id')][fields.get('version')] = data_ind
         if version.parse(index['ns_packages'][fields.get('id')]['latest']) < version.parse(fields.get('version')):
@@ -195,7 +196,9 @@ def index_ns(fields, filename, final_path, new_version, user=None):
             private_packages = dbclient['private_packages']['ns']
             private_packages.insert_one({'id': fields.get('id'), 'user': user})
         dependencies = dbclient['dependencies']['ns']
-        dependencies.insert_one({'id': fields.get('id'), 'vnfs': fields.get('vnfd-id-ref')})
+        #dependencies.insert_one({'id': fields.get('id'), 'vnfs': fields.get('vnfd-id-ref')})
+        dependencies.insert_one({'id': fields.get('id'), 'vnfs': fields.get('vnfd-id')})
+    logger.info("Dumping index 2: {}".format(str(index)))
     yaml.dump(index, open('/repository/index.yaml', 'w'))
 
 
@@ -411,20 +414,29 @@ def onboard_ns():
         if ns not in index['ns_packages'].keys():
             return jsonify({'result': '{} Network Service not found'.format(ns)}), 404
         latest = index['ns_packages'][ns]['latest']
+        logger.info("Loading ns_metadata")
+        
         ns_metadata = yaml.load(open(os.path.join('/repository', 'ns', ns, latest, 'metadata.yaml')),
                                 Loader=yaml.FullLoader)
-        vnf_dependencies = ns_metadata['vnfd-id-ref']
-        for vnf_dependency in vnf_dependencies:
-            vnf = index['vnf_packages'][vnf_dependency]
-            vnf_path = '/repository/' + vnf[vnf['latest']]['path']
-            r, status_code = nbiUtil.upload_vnfd_package(vnf_path)
-            if status_code >= 300:
-                if not 'exists' in str(r):
-                    raise Exception("VNF '{}' can not be onboarded".format(vnf_dependency))
-            else:
-                dbclient['onboarded']['vnf'].insert_one({'vnf': vnf_dependency, 'ns': ns, 'vnfid': r['id']})
+        logger.info("ns_metadata: {}".format(str(ns_metadata)))
+        #vnf_dependencies = ns_metadata['vnfd-id-ref']
+        vnf_dependencies = ns_metadata['vnfd-id']
+        logger.info("vnf_dependencies: {}".format(str(vnf_dependencies)))
+
+        logger.info("== Starting OSM upload ==")
+        #for vnf_dependency in vnf_dependencies:
+        #    vnf = index['vnf_packages'][vnf_dependency]
+        #    vnf_path = '/repository/' + vnf[vnf['latest']]['path']
+        #    r, status_code = nbiUtil.upload_vnfd_package(vnf_path)
+        #    logger.info("> nbiUtil.upload_vnfd_package status code: {}".format(str(status_code)))
+        #    if status_code >= 300:
+        #        if not 'exists' in str(r):
+        #            raise Exception("VNF '{}' can not be onboarded".format(vnf_dependency))
+        #    else:
+        #        dbclient['onboarded']['vnf'].insert_one({'vnf': vnf_dependency, 'ns': ns, 'vnfid': r['id']})
         ns_package = '/repository/' + index['ns_packages'][ns][index['ns_packages'][ns]['latest']]['path']
         r, status_code = nbiUtil.upload_nsd_package(ns_package)
+        logger.info("> nbiUtil.upload_nsd_package status code: {}".format(str(status_code)))
         if status_code >= 300:
             raise Exception("NS '{}' can not be onboarded".format(vnf_dependency))
     except Exception as e:

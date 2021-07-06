@@ -258,6 +258,8 @@ class NbiUtil():
                     return vnfd['vnfd-catalog'], r.status_code
                 if 'vnfd:vnfd-catalog' in vnfd:
                     return vnfd['vnfd:vnfd-catalog'], r.status_code
+                if 'vnfd' in vnfd: # SOL0006 compatibility
+                    return vnfd['vnfd'], r.status_code
         except Exception as e:
             print("ERROR - get_vnfd: ", e)
             return {"detail": str(e), "status": 400, "code": type(e).__name__}, 400 
@@ -325,7 +327,7 @@ class NbiUtil():
         status code
         """
 
-        #print("INFO - Uploading VNFD: ", file.filename)
+        print("DEBUG - Uploading VNFD: ", file)
         if not os.path.exists(file):
             return {"detail": "File '{}' does not exist".format(file), "status": 404, "code": "NOT_FOUND"}, 404
         data = open(file, 'rb').read()
@@ -337,6 +339,7 @@ class NbiUtil():
         headers["Content-type"] = "application/gzip"
         try:
             r = requests.post(vnfd_url, params=None, verify=False, stream=True, data=data, headers=headers)
+            print("DEBUG - Uploading VNFD ret code: ", str(r))
             return r.json(), r.status_code
         except Exception as e:
             print("ERROR - post VNFD: ", e)
@@ -436,7 +439,7 @@ class NbiUtil():
         status code
         """
 
-        #print("INFO - Uploading NSD: ", file.filename)
+        print("DEBUG - Uploading NSD: ", file)
         if not os.path.exists(file):
             return "File '{}' does not exist".format(file), 404
         data = open(file, 'rb').read()
@@ -448,6 +451,7 @@ class NbiUtil():
         headers["Content-type"] = "application/gzip"
         try:
             r = requests.post(nsd_url, params=None, verify=False, stream=True, data=data, headers=headers)
+            print("DEBUG - Uploading NSD ret code: ", str(r))
             return r.json(), r.status_code
         except Exception as e:
             print("ERROR - post NSD: ", e)
