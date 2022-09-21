@@ -1,4 +1,4 @@
-jwcrypto==0.6.0
+jwcrypto==1.4
 waitress==1.4.3
 Flask==1.0.2
 SQLAlchemy<1.4.0
